@@ -142,6 +142,9 @@ details.fold > summary { cursor: pointer; font-size: 13px; color: var(--accent);
 .row2 { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--mute); }
 .note { font-size: 12px; color: var(--mute); margin: 0; }
 #tools { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+/* 作者署名：桌面在最右；手機排到標題同一行的右邊 */
+#author { display: flex; flex-direction: column; align-items: flex-end; font-size: 12px; line-height: 1.25; color: var(--ink); font-weight: 600; letter-spacing: .02em; white-space: nowrap; }
+#author small { font-size: 10.5px; font-weight: 400; color: var(--mute); }
 #findBox { position: relative; }
 #find { width: 13em; box-sizing: border-box; border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 3px 8px; font-size: 13px; }
 #findList { position: absolute; right: 0; top: calc(100% + 4px); z-index: 20; width: max-content; min-width: 100%; max-width: min(340px, calc(100vw - 32px)); max-height: 60vh; overflow: auto; margin: 0; padding: 4px; list-style: none; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, .18); }
@@ -173,7 +176,7 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
   aside { overflow: visible; border: 0 !important; border-top: 1px solid var(--line) !important; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   #scrub { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 }
-@media (max-width: 560px) { #tools { width: 100%; } #findBox { flex: 1; } #find { width: 100%; } }
+@media (max-width: 560px) { header h1 { order: -2; } #author { order: -1; margin-left: auto; } #tools { width: 100%; } #findBox { flex: 1; } #find { width: 100%; } }
 @media (max-width: 560px) { #scrub { grid-template-columns: minmax(0, 1fr); } #dayBox { grid-row: auto; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -188,6 +191,7 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
       <button class="btn" id="srcBtn" title="資料來源">來源</button>
       <button class="btn" id="helpBtn" aria-label="說明與快捷鍵" title="說明與快捷鍵（?）">?</button>
     </div>
+    <div id="author"><small>作者</small>INMU_KING_2026</div>
   </header>
   <main>
     <aside id="notes">
