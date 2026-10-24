@@ -66,6 +66,9 @@ aside { min-height: 0; overflow: auto; background: var(--panel); padding: 12px 1
 .tag3d.big { font-size: 13.5px; font-weight: 700; border-width: 2px; } /* m3 簡化模式的兩群大字，邊框借翼板／基板色 */
 .tag3d.big.alar { border-color: var(--c-alard); }
 .tag3d.big.basal { border-color: var(--c-basald); }
+#heatLg { position: absolute; left: 10px; bottom: 10px; display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11.5px; padding: 3px 8px; border-radius: 6px; background: color-mix(in srgb, var(--panel) 85%, transparent); color: var(--ink); pointer-events: none; }
+#heatLg[hidden] { display: none; }
+#heatLg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 #views { position: absolute; top: 10px; left: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
 .btn { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 3px 10px; font-size: 13px; cursor: pointer; }
 .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
@@ -203,11 +206,14 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
           <span id="viewBtns" style="display:contents"></span>
           <button class="btn" id="cut3d" aria-pressed="false" title="3D 也從切面位置切開（快捷鍵 C）">3D 切開</button>
           <button class="btn" id="labBtn" aria-pressed="false" title="在模型上標出看得到的構造名稱（快捷鍵 N）">圖上名稱</button>
+          <button class="btn" id="kgBtn" aria-pressed="true" title="國考標記：圖例、搜尋、名稱標出考過幾題，卡片列出題目（快捷鍵 K）">國考</button>
+          <button class="btn" id="heatBtn" aria-pressed="false" title="模型與切面依考過題數上色（快捷鍵 G）">國考上色</button>
           <button class="btn" id="tagBtn" aria-pressed="true" title="區域、地標的固定名稱（快捷鍵 L）">地標名稱</button>
           <button class="btn" id="resetBtn" title="鏡頭、切面、開關、圖層回到預設，天數不變（快捷鍵 R）">回到預設</button>
           <button class="btn" id="showAll" hidden title="把 H 隱藏的構造全部顯示"></button>
         </div>
         <div id="labels"></div>
+        <div id="heatLg" hidden><span><i style="background:#f7e7a6"></i>1 題</span><span><i style="background:#f3c977"></i>2 題</span><span><i style="background:#f0a54a"></i>3–4 題</span><span><i style="background:#c8331b"></i>5 題以上</span><span><i style="background:#9aa3a8"></i>沒考過</span></div>
       </div>
       <div id="scrub">
         <div id="dayBox">
@@ -243,7 +249,7 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
     <tr><td>換天數</td><td>拖下方天數滑桿，或點左欄事件、滑桿下的刻度（事件會連切面一起跳）</td></tr>
     <tr><td>換切面位置</td><td>拖右欄切面下方的滑桿</td></tr>
     <tr><td>找構造</td><td>右上搜尋框，三個模組一起找，中英文都可以</td></tr>
-    <tr><td><span class="kgN">國考 N</span></td><td>國考考過 N 題（圖例、搜尋結果、卡片標題；3D 上的圖上名稱與地標名稱寫成 <span class="kgN">考N</span>；題目在卡片的「國考題」摺疊）</td></tr>
+    <tr><td><span class="kgN">國考 N</span></td><td>國考考過 N 題（圖例、搜尋結果、卡片標題；3D 上的圖上名稱與地標名稱寫成 <span class="kgN">考N</span>；題目在卡片的「國考題」摺疊）。按「國考」（K）關掉；「國考上色」（G）把模型與切面依題數上色，左下有色階</td></tr>
     <tr><td>分享</td><td>網址會記住模組、天數、切面、開關與選取；按「分享」複製連結</td></tr>
   </table>
   <h3>快捷鍵</h3>
@@ -290,8 +296,9 @@ const std = (o = {}) => new THREE.MeshStandardMaterial({ roughness: .6, metalnes
 // 依 css 變數快取的材質；bank.all 是全部建過的
 function matBank(extra) { const B = {}, get = (v) => B[v] || (B[v] = mat(v, extra)); get.all = B; return get; }
 // 頂點色用的顏色（css 變數 → THREE.Color），換主題時更新；themeGen 每換一次 +1，模組快取的幾何靠它判斷要不要重算
-const COLOR = {}; let themeGen = 0;
-const colOf = (v) => COLOR[v] || (COLOR[v] = new THREE.Color(css(v)));
+// heatVar：國考上色時 css 變數 → 熱度色（管壁的頂點色用；變數名就是構造 id，例如 --c-dien → dien）；沒上色時 null
+const COLOR = {}; let themeGen = 0, heatVar = null;
+const colOf = (v) => COLOR[v] || (COLOR[v] = new THREE.Color(heatVar ? heatVar(v) : css(v)));
 // 一圈一圈接成管子的網格（n 圈 × 每圈 nr 點，頂點之後再填）；flip 反轉面的方向
 function ringGeometry(n, nr, colors, flip) {
   const g = new THREE.BufferGeometry(), idx = [];
@@ -329,6 +336,7 @@ function capMesh(g, baseMat, struct) {
 // 2D 切面：填色（pts 為像素座標）
 function fillPoly(ctx, pts, color, struct) {
   if (pts.length < 3) return;
+  if (heatVar && struct && mod.struct[struct]) color = heatHex(kgOf(mod, struct));
   ctx.beginPath(); pts.forEach((q, i) => (i ? ctx.lineTo(...q) : ctx.moveTo(...q))); ctx.closePath();
   ctx.fillStyle = color; ctx.fill();
   ctx.lineWidth = 1; ctx.strokeStyle = "rgba(0,0,0,.25)"; ctx.stroke();
@@ -395,9 +403,9 @@ const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(3, 8, -4
 const fill = new THREE.DirectionalLight(0xffffff, .5); fill.position.set(-4, 2, 6); scene.add(fill);
 
 /* ---------- 狀態 ---------- */
-const state = { mod: "m1", day: 22, cut3d: false, tags: true, labs: true, sel: null, playing: false };
-try { const s = JSON.parse(localStorage.getItem("neuroembryo.ui") || "{}"); if (typeof s.tags === "boolean") state.tags = s.tags; if (typeof s.labs === "boolean") state.labs = s.labs; if (typeof s.mod === "string") state.mod = s.mod; } catch (e) {}
-const saveUi = () => { try { localStorage.setItem("neuroembryo.ui", JSON.stringify({ tags: state.tags, labs: state.labs, mod: state.mod })); } catch (e) {} };
+const state = { mod: "m1", day: 22, cut3d: false, tags: true, labs: true, kg: true, heat: false, sel: null, playing: false };
+try { const s = JSON.parse(localStorage.getItem("neuroembryo.ui") || "{}"); if (typeof s.tags === "boolean") state.tags = s.tags; if (typeof s.labs === "boolean") state.labs = s.labs; if (typeof s.kg === "boolean") state.kg = s.kg; if (typeof s.mod === "string") state.mod = s.mod; } catch (e) {}
+const saveUi = () => { try { localStorage.setItem("neuroembryo.ui", JSON.stringify({ tags: state.tags, labs: state.labs, kg: state.kg, mod: state.mod })); } catch (e) {} };
 
 /* ===== 模組 1：神經管（第 17–30 天，Langman） ===== */
 const M1 = (() => {
@@ -1599,7 +1607,7 @@ const M = {
   secTitle: "橫切面", secEnds: ["尾端（薦髓）", "頭端（中腦）"], cutRange: [.01, .99, .005], cut: .2,
   note: "示意模型：把脊髓到中腦拉直成一條管子，長度不照比例，沒畫腦曲、小腦、大腦；天數為示意。腦幹核依 Haines（老師 p.33）清單，柱序依 Haines（老師 p.34）；SVE 三個核 p.33 未列。預設「簡化 4／8」：翼板 4 個感覺核同一色、基板 8 個運動核同一色，SVE 淡化；關掉（快捷鍵 S）看 7 個核柱各自的顏色與縮寫。來源：Langman 與 Haines《Fundamental Neuroscience》（老師用書），兩者不同處並列。",
   flags: { cols: true, simple: true },
-  toggles: [{ id: "cols", label: "透視核柱", title: "管壁變透明、看縱向的核柱（快捷鍵 K）", key: "k" },
+  toggles: [{ id: "cols", label: "透視核柱", title: "管壁變透明、看縱向的核柱（快捷鍵 T）", key: "t" },
     { id: "simple", label: "簡化 4／8", title: "翼板 4 感覺核、基板 8 運動核兩色；關掉看 7 個核柱（快捷鍵 S）", key: "s" }],
   struct: null, group: new THREE.Group(),
 };
@@ -1957,7 +1965,7 @@ const MODS = [M1, M2, M3, { id: "m4", name: "眼", soon: true }];
 let mod = MODS.find((m) => m.id === state.mod && !m.soon) || M1;
 
 function update() {
-  mod.update(); applyHidden(); labDirty = true; labJob = null;
+  heatColors(); mod.update(); applyHidden(); applyHeat(); labDirty = true; labJob = null;
   drawSection(); renderDay();
   if (state.sel) showCard(state.sel);
   needsRender = true; // 名稱標籤在迴圈畫完這一幀時一起更新
@@ -2034,7 +2042,7 @@ function labFinish() {
     const cx = c.sx / c.n, cy = c.sy / c.n; let best = c.pts[0], bd = 1e9;
     for (const p of c.pts) { const d = (p[0] - cx) ** 2 + (p[1] - cy) ** 2; if (d < bd) { bd = d; best = p; } }
     labNdc.set((best[0] + .5) / J.nx * 2 - 1, 1 - (best[1] + .5) / J.ny * 2); labRay.setFromCamera(labNdc, camera);
-    const name = labName(c.s), kn = kgOf(mod, c.s), lg = mod.legend.find((l) => l.id === c.s && !l.toggle), col = lg ? `var(${lg.css})` : "var(--mute)", sig = name + "|" + kn + "|" + col;
+    const name = labName(c.s), kn = kgOf(mod, c.s), lg = mod.legend.find((l) => l.id === c.s && !l.toggle), col = heatVar ? heatHex(kn) : lg ? `var(${lg.css})` : "var(--mute)", sig = name + "|" + kn + "|" + col;
     let el = LAB_EL.get(c.s);
     if (!el) { el = document.createElement("span"); el.addEventListener("click", () => select(c.s)); LAB_EL.set(c.s, el); }
     if (el._sig !== sig) { el._sig = sig; el.innerHTML = escH(name) + kgMini(kn); el.style.setProperty("--c", col); }
@@ -2110,7 +2118,7 @@ function showCard(s) { // 內容沒變就不動（摺疊維持開關）；變了
   const kgs = (C.kg || []).filter((id) => KGI[id]);
   const en = typeof C.en === "function" ? C.en(st) : C.en;
   const html = `<h2>${C.name(st)}${kgTag(kgs.length)}</h2>${en ? `<div class="en">${en}</div>` : ""}<div class="meta">${C.meta}</div>${C.body(st)}${C.trap ? `<div class="trap">${C.trap}</div>` : ""}${C.more || ""}` +
-    (kgs.length ? `<details class="fold"><summary>國考題（${kgs.length}）</summary>${kgs.map(qHtml).join("")}</details>` : "");
+    (kgs.length && state.kg ? `<details class="fold"><summary>國考題（${kgs.length}）</summary>${kgs.map(qHtml).join("")}</details>` : "");
   const sig = mod.id + "|" + s + "|" + html;
   if (cardEl.dataset.sig === sig) return;
   const open = cardEl.dataset.sig?.startsWith(mod.id + "|" + s + "|") ? new Set([...cardEl.querySelectorAll("details[open] > summary")].map((x) => x.textContent)) : new Set();
@@ -2123,8 +2131,43 @@ function showCard(s) { // 內容沒變就不動（摺疊維持開關）；變了
 const KGI = Object.fromEntries((window.KG || []).map((q) => [q.id, q]));
 // 考過幾題：3D 標籤、圖例、搜尋結果、卡片標題共用
 const kgOf = (m, s) => (m.struct?.[s]?.kg || []).filter((id) => KGI[id]).length;
-const kgTag = (n) => (n ? `<span class="kgN">國考 ${n}</span>` : "");
-const kgMini = (n) => (n ? `<span class="kgN">考${n}</span>` : ""); // 3D 上的名稱用短的（照全身模型）
+const kgTag = (n) => (n && state.kg ? `<span class="kgN">國考 ${n}</span>` : "");
+const kgMini = (n) => (n && state.kg ? `<span class="kgN">考${n}</span>` : ""); // 3D 上的名稱用短的（照全身模型）
+
+/* ---------- 國考開關（K）與國考上色（照全身模型；國考關掉時上色也關） ---------- */
+const heatHex = (n) => (!n ? "#9aa3a8" : n >= 5 ? "#c8331b" : n >= 3 ? "#f0a54a" : n >= 2 ? "#f3c977" : "#f7e7a6");
+let heatSig = "";
+function heatColors() { // 管壁頂點色：換模組或開關時把 COLOR 換成熱度色／原色，themeGen +1 讓模組重算幾何
+  const sig = state.kg && state.heat ? mod.id : "";
+  if (sig === heatSig) return;
+  heatSig = sig; heatVar = sig ? (v) => heatHex(kgOf(mod, v.slice(4))) : null;
+  for (const v in COLOR) COLOR[v].set(heatVar ? heatVar(v) : css(v)); themeGen++;
+}
+// 網格：上色時換成「原材質的複本＋熱度色」，每次 update 從原材質同步（透明度、切面），關掉換回原材質
+const HEATC = new WeakMap(), HEATS = new WeakSet();
+function applyHeat() {
+  mod.group.traverse((o) => {
+    if (!o.isMesh || !o.material || Array.isArray(o.material)) return;
+    if (!HEATS.has(o.material)) o.userData.mat0 = o.material;
+    const base = o.userData.mat0, s = o.userData.struct;
+    if (!heatVar || !mod.struct[s]) { o.material = base; return; }
+    const n = kgOf(mod, s); let c = HEATC.get(base); if (!c) HEATC.set(base, (c = {}));
+    let hm = c[n]; if (!hm) { hm = c[n] = base.clone(); HEATS.add(hm); }
+    const cp = base.clippingPlanes; hm.copy(base); hm.clippingPlanes = cp; hm.vertexColors = false; hm.color.set(heatHex(n));
+    if (base.emissive?.getHex()) hm.emissive.copy(hm.color).multiplyScalar(.25);
+    o.material = hm;
+  });
+}
+const setKg = (v) => { state.kg = v; if (!v) state.heat = false; saveUi(); kgUi(); };
+const setHeat = (v) => { if (!state.kg) return; state.heat = v; kgUi(); };
+function kgBtns() {
+  $("kgBtn").setAttribute("aria-pressed", String(state.kg)); $("heatBtn").setAttribute("aria-pressed", String(state.heat)); $("heatBtn").disabled = !state.kg;
+  $("heatLg").hidden = !(state.kg && state.heat);
+}
+function kgUi() {
+  kgBtns(); for (const el of $("labs").children) el._sig = "";
+  update(); renderLegend(); renderTags(); if (state.sel) showCard(state.sel); // update 先換好 heatVar，圖例色塊才跟著換
+}
 // 3D 標籤只在文字就是該構造名稱時標（m3 的延腦／橋腦／中腦是位置標籤，點了選基板，不標）
 const tagKg = (txt, s) => { const n = kgOf(mod, s), t = txt.replace(/（.*?）/g, "").trim(); return n && nameOf(s).split("／").some((p) => p && (t.includes(p) || p.includes(t))) ? n : 0; };
 function qHtml(id) {
@@ -2171,7 +2214,7 @@ const setCut3d = (v) => { state.cut3d = v; $("cut3d").setAttribute("aria-pressed
 const setTags = (v) => { state.tags = v; $("tagBtn").setAttribute("aria-pressed", String(v)); saveUi(); renderTags(); labDirty = true; labJob = null; needsRender = true; };
 function legendPressed(l) { return mod.legendPressed ? mod.legendPressed(l) : mod.layers[l.id]; }
 function renderLegend() { // 圖例內容變了（m3 簡化／詳細）才重建，焦點留在原本的 chip
-  const sig = mod.legend.map((l) => [l.id, l.name, l.css, l.dim, l.toggle].join()).join("|");
+  const sig = mod.legend.map((l) => [l.id, l.name, l.css, l.dim, l.toggle].join()).join("|") + "|" + state.kg + (heatVar ? "H" : "");
   if ($("legend").dataset.sig !== sig) {
     const fid = document.activeElement?.closest?.("#legend .chip")?.dataset.lid;
     buildLegend(); $("legend").dataset.sig = sig;
@@ -2188,7 +2231,7 @@ function buildLegend() {
   const lg = $("legend"); lg.innerHTML = "";
   for (const l of mod.legend) {
     const b = document.createElement("button"); b.className = l.toggle ? "chip tog" : "chip"; b.dataset.lid = l.id + (l.toggle ? ":t" : "");
-    b.innerHTML = `<i style="background: var(${l.css})${l.dim ? "; opacity: .3" : ""}"></i>${l.name}${l.toggle ? "" : kgTag(kgOf(mod, l.id))}`;
+    b.innerHTML = `<i style="background: ${heatVar && !l.toggle ? heatHex(kgOf(mod, l.id)) : `var(${l.css})`}${l.dim ? "; opacity: .3" : ""}"></i>${l.name}${l.toggle ? "" : kgTag(kgOf(mod, l.id))}`;
     b.addEventListener("click", () => {
       if (mod.legendClick) mod.legendClick(l); else mod.layers[l.id] = !mod.layers[l.id];
       renderLegend(); if (mod.legendClick && !l.toggle) return; update();
@@ -2274,6 +2317,9 @@ function buildUi() {
   $("tagBtn").addEventListener("click", () => setTags(!state.tags));
   $("labBtn").setAttribute("aria-pressed", String(state.labs));
   $("labBtn").addEventListener("click", () => setLabs(!state.labs));
+  $("kgBtn").addEventListener("click", () => setKg(!state.kg));
+  $("heatBtn").addEventListener("click", () => setHeat(!state.heat));
+  kgBtns();
   $("play").addEventListener("click", () => state.playing ? stopPlay() : startPlay());
   $("resetBtn").addEventListener("click", resetMod);
   $("showAll").addEventListener("click", () => { hidden.clear(); update(); });
@@ -2290,6 +2336,8 @@ function buildUi() {
     if (k === "c") setCut3d(!state.cut3d);
     if (k === "n") setLabs(!state.labs);
     if (k === "l") setTags(!state.tags);
+    if (k === "k") setKg(!state.kg);
+    if (k === "g") setHeat(!state.heat);
     const tg = (mod.toggles || []).find((x) => x.key === k); if (tg) toggleFlag(tg.id);
     if (e.key === " ") { e.preventDefault(); state.playing ? stopPlay() : startPlay(); }
     if (e.key === "ArrowRight") { stopPlay(); setDay(Math.floor(state.day + 1.0001)); }
@@ -2371,7 +2419,7 @@ function loop(now) {
     if (labJob && !state.playing && labRun(6)) labFinish();
   }
 }
-function onTheme() { for (const m of THEMED) m.color.set(css(m.userData.css)); for (const v in COLOR) COLOR[v].set(css(v)); themeGen++; for (const m of MODS) m.onTheme?.(); update(); cardEl.querySelectorAll("canvas.fig").forEach(drawFig); }
+function onTheme() { for (const m of THEMED) m.color.set(css(m.userData.css)); for (const v in COLOR) COLOR[v].set(heatVar ? heatVar(v) : css(v)); themeGen++; for (const m of MODS) m.onTheme?.(); update(); cardEl.querySelectorAll("canvas.fig").forEach(drawFig); }
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", onTheme);
 new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
@@ -2506,7 +2554,7 @@ function pickFind(e) {
   select(e.s);
 }
 function keyRows() {
-  const rows = [["空白", "播放／暫停"], ["← →", "前一天／後一天"], ["C", "3D 切開"], ["N", "圖上名稱（標出看得到的構造）"], ["L", "地標名稱（區域、地標的固定名稱）"]];
+  const rows = [["空白", "播放／暫停"], ["← →", "前一天／後一天"], ["C", "3D 切開"], ["N", "圖上名稱（標出看得到的構造）"], ["L", "地標名稱（區域、地標的固定名稱）"], ["K", "國考標記（考過幾題、卡片的國考題）"], ["G", "國考上色（依考過題數上色）"]];
   MODS.forEach((m, i) => (m.toggles || []).forEach((tg) => rows.push([tg.key.toUpperCase(), `${tg.label}（模組 ${i + 1} ${m.name}）`])));
   rows.push(["H", "隱藏選取的構造（按「全部顯示」還原）"], ["R", "回到預設（天數不變）"], ["Esc", "關搜尋清單；取消選取"], ["/", "搜尋構造"], ["?", "這個說明"]);
   return rows.map(([k, v]) => `<tr><td>${k.split(" ").map((x) => `<kbd>${x}</kbd>`).join(" ")}</td><td>${v}</td></tr>`).join("");
