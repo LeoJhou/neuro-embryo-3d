@@ -1,0 +1,2459 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>神經發育 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+TC:wght@600&display=swap">
+<style>
+/* Layout: 3D stage in the middle with the day scrubber under it; module notes on the left, 2D section on the right (stacked on phones). Module code lives in m1.js, m2.js… merged by tools/build.py. */
+:root {
+  --bg: #eef0ec; --panel: #f8f9f6; --stage: #e2e6e0; --ink: #1d2420; --mute: #56625b; --line: #d0d7d0;
+  --accent: #3d6fb0; --accent-ink: #ffffff; --chip: #e8ece6; --kg: #f3e3a6; --kg-ink: #5a4710; --warn: #a3541b;
+  --c-ecto: #8fc3e6; --c-neuro: #4f62c4; --c-crest: #3fa35c; --c-meso: #d9786b; --c-somite: #b8463b;
+  --c-noto: #c84f9a; --c-endo: #e8c547; --c-streak: #6b5a4c;
+  --c-pros: #c95b5b; --c-tel: #b8383f; --c-dien: #e58a7d; --c-mes: #4fa36a; --c-rhomb: #4f7fc4; --c-met: #2f5ea8; --c-myel: #7fb0e3; --c-spin: #d8c9a3; --c-vent: #f2c14e;
+  --c-alar: #8fb3e3; --c-basal: #eb9a86; --c-roof: #a7b3aa; --c-floor: #7d8a80; --c-mantle: #b9b2a0; --c-marg: #e9e4d6; --c-alard: #6fa8dc; --c-basald: #d9786b;
+  --c-gse: #c0392b; --c-gve: #e67e22; --c-sve: #c84f9a; --c-gva: #2e9e8f; --c-sva: #3fa35c; --c-gsa: #2f5ea8; --c-ssa: #7b5bc4;
+  --f-display: "Noto Serif TC", "Songti TC", serif;
+  --f-body: -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif; /* 內文用系統字，省掉三個粗細的網路字型 */
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121614; --panel: #1a201c; --stage: #0e1210; --ink: #e3ebe5; --mute: #8fa096; --line: #2b352f;
+  --accent: #7aa6e6; --accent-ink: #0b1a2e; --chip: #222a25; --kg: #5a4a14; --kg-ink: #f6dd8a; --warn: #e0965a;
+  --c-ecto: #7fb6dc; --c-neuro: #7f90ea; --c-crest: #5cc479; --c-meso: #e08a7e; --c-somite: #d15a4e;
+  --c-noto: #e06cb3; --c-endo: #e8c547; --c-streak: #b39d89;
+  --c-pros: #e07373; --c-tel: #d9545a; --c-dien: #f0a194; --c-mes: #62bf7f; --c-rhomb: #6f9be0; --c-met: #4f7fd0; --c-myel: #9cc4ee; --c-spin: #c9b88e; --c-vent: #f5cc5f;
+  --c-alar: #6f93c9; --c-basal: #d98471; --c-roof: #7f8b82; --c-floor: #5f6b62; --c-mantle: #8c8676; --c-marg: #4a4a40; --c-alard: #7fb6e6; --c-basald: #e08a7e;
+  --c-gse: #e5584a; --c-gve: #f39c45; --c-sve: #e06cb3; --c-gva: #45c1b0; --c-sva: #5cc479; --c-gsa: #5f8ee0; --c-ssa: #a387e8;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #121614; --panel: #1a201c; --stage: #0e1210; --ink: #e3ebe5; --mute: #8fa096; --line: #2b352f;
+  --accent: #7aa6e6; --accent-ink: #0b1a2e; --chip: #222a25; --kg: #5a4a14; --kg-ink: #f6dd8a; --warn: #e0965a;
+  --c-ecto: #7fb6dc; --c-neuro: #7f90ea; --c-crest: #5cc479; --c-meso: #e08a7e; --c-somite: #d15a4e;
+  --c-noto: #e06cb3; --c-endo: #e8c547; --c-streak: #b39d89;
+  --c-pros: #e07373; --c-tel: #d9545a; --c-dien: #f0a194; --c-mes: #62bf7f; --c-rhomb: #6f9be0; --c-met: #4f7fd0; --c-myel: #9cc4ee; --c-spin: #c9b88e; --c-vent: #f5cc5f;
+  --c-alar: #6f93c9; --c-basal: #d98471; --c-roof: #7f8b82; --c-floor: #5f6b62; --c-mantle: #8c8676; --c-marg: #4a4a40; --c-alard: #7fb6e6; --c-basald: #e08a7e;
+  --c-gse: #e5584a; --c-gve: #f39c45; --c-sve: #e06cb3; --c-gva: #45c1b0; --c-sva: #5cc479; --c-gsa: #5f8ee0; --c-ssa: #a387e8;
+  color-scheme: dark; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.55 var(--f-body); overflow: hidden; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#app { height: 100%; display: grid; grid-template-rows: auto 1fr; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--line); background: var(--panel); }
+header h1 { font: 600 18px/1.2 var(--f-display); margin: 0; letter-spacing: .02em; }
+#mods { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { border: 1px solid var(--line); background: var(--chip); border-radius: 999px; padding: 2px 12px; font-size: 13px; cursor: pointer; }
+.tab[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.tab:disabled { opacity: .55; cursor: default; }
+.tab small { font-size: 11px; opacity: .8; margin-left: 4px; }
+main { min-height: 0; display: grid; grid-template-columns: 300px minmax(0, 1fr) 360px; }
+aside { min-height: 0; overflow: auto; background: var(--panel); padding: 12px 14px; }
+#notes { border-right: 1px solid var(--line); }
+#bench { border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+#center { min-width: 0; min-height: 0; display: grid; grid-template-rows: 1fr auto; }
+#stage { position: relative; min-height: 0; background: var(--stage); overflow: hidden; }
+#stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+#labels { position: absolute; inset: 0; pointer-events: none; }
+.tag3d { position: absolute; transform: translate(-50%, -100%); font-size: 12px; font-weight: 500; white-space: nowrap; padding: 1px 7px; border-radius: 4px; background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--line); }
+.tag3d::after { content: ""; position: absolute; left: 50%; top: 100%; width: 1px; height: 10px; background: var(--mute); }
+.tag3d.hot { border-color: var(--warn); color: var(--warn); font-weight: 700; }
+.tag3d.flex { font-style: italic; font-weight: 400; color: var(--mute); border-style: dashed; }
+.tag3d.big { font-size: 13.5px; font-weight: 700; border-width: 2px; } /* m3 簡化模式的兩群大字，邊框借翼板／基板色 */
+.tag3d.big.alar { border-color: var(--c-alard); }
+.tag3d.big.basal { border-color: var(--c-basald); }
+#views { position: absolute; top: 10px; left: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.btn { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 3px 10px; font-size: 13px; cursor: pointer; }
+.btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn[data-toggle], .chip.tog { border-width: 2px; font-weight: 700; } /* 模組開關（腦室、透視核柱）：只加粗，不改顏色 */
+.btn[data-toggle] { padding: 2px 9px; }
+.chip.tog { padding: 1px 9px 1px 6px; }
+#scrub { padding: 10px 16px 12px; background: var(--panel); border-top: 1px solid var(--line); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; align-items: center; }
+#dayBox { grid-row: span 2; display: flex; align-items: center; gap: 10px; }
+#play { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); font-size: 14px; cursor: pointer; }
+#dayNum { font: 600 22px/1 var(--f-display); font-variant-numeric: tabular-nums; min-width: 4.6em; }
+#dayNum small { display: block; font: 400 12px/1.4 var(--f-body); color: var(--mute); margin-top: 3px; }
+#day { width: 100%; accent-color: var(--accent); }
+#ticks { position: relative; height: 20px; font-size: 11px; color: var(--mute); }
+#ticks button { position: absolute; transform: translateX(-50%); border: 0; background: none; padding: 0 2px; font-size: 11px; color: var(--mute); cursor: pointer; white-space: nowrap; }
+#ticks button.on { color: var(--accent); font-weight: 700; }
+.lbl { font-size: 11px; letter-spacing: .08em; color: var(--mute); margin: 14px 0 6px; }
+.lbl:first-child { margin-top: 0; }
+#modTitle { font: 600 17px/1.3 var(--f-display); margin: 0 0 4px; }
+#modSub { color: var(--mute); font-size: 12.5px; margin: 0; }
+ol.ev { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+ol.ev button { width: 100%; text-align: left; display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: 6px; border: 0; border-radius: 6px; background: none; padding: 5px 6px; cursor: pointer; }
+ol.ev button:hover { background: var(--chip); }
+ol.ev button.on { background: var(--chip); box-shadow: inset 3px 0 0 var(--accent); }
+ol.ev .d { font-family: var(--f-mono); font-size: 12px; color: var(--mute); padding-top: 1px; }
+ol.ev .t { font-weight: 700; font-size: 13.5px; }
+ol.ev .s { display: block; font-weight: 400; color: var(--mute); font-size: 12.5px; }
+#legend { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--chip); border-radius: 999px; padding: 2px 10px 2px 7px; font-size: 12.5px; cursor: pointer; }
+.chip i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+.chip[aria-pressed="false"] { opacity: .45; }
+.chip[aria-pressed="false"] i { background: transparent !important; outline: 1px solid var(--mute); }
+#card { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--bg); }
+#card h2 { font: 600 15px/1.3 var(--f-display); margin: 0 0 2px; }
+#card .en { color: var(--mute); font-size: 12.5px; margin-bottom: 2px; }
+#card .meta { font-size: 12px; color: var(--mute); margin-bottom: 6px; }
+#card p { margin: 0 0 6px; font-size: 13.5px; }
+#card ul { margin: 0; padding-left: 18px; font-size: 13px; }
+#card .trap { color: var(--warn); font-size: 12.5px; margin-top: 6px; }
+#card table.cmp { border-collapse: collapse; width: 100%; font-size: 12.5px; margin: 4px 0 6px; }
+#card .cmp th, #card .cmp td { border: 1px solid var(--line); padding: 3px 5px; text-align: left; vertical-align: top; }
+#card .cmp th { color: var(--mute); font-weight: 600; }
+#card .wide { overflow-x: auto; }
+#card.empty { color: var(--mute); font-size: 13px; }
+details.fold > summary { cursor: pointer; font-size: 13px; color: var(--accent); margin-top: 4px; }
+.kgN { font-size: 11px; background: var(--kg); color: var(--kg-ink); border-radius: 4px; padding: 0 5px; margin-left: 6px; font-weight: 700; white-space: nowrap; }
+#kgList { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+#kgList li > button { width: 100%; text-align: left; border: 0; background: none; padding: 3px 4px; border-radius: 5px; font-size: 12.5px; cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; }
+#kgList li > button:hover { background: var(--chip); }
+#kgList .other { opacity: .62; }
+#kgList .kgMod { font-size: 11px; color: var(--mute); margin-right: 6px; }
+#kgList .id { font-family: var(--f-mono); font-size: 11.5px; color: var(--mute); }
+.q { font-size: 12.5px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 4px 0 6px; }
+.q ol { margin: 4px 0 0; padding-left: 0; list-style: none; }
+.q li.ok { color: var(--accent); font-weight: 700; }
+#secHead { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; }
+#secWhere { margin-left: auto; }
+#secModes { display: inline-flex; }
+#secModes[hidden] { display: none; }
+#secModes .btn { padding: 1px 9px; font-size: 12.5px; border-radius: 0; }
+#secModes .btn:first-child { border-radius: 6px 0 0 6px; }
+#secModes .btn:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
+#cut:disabled { opacity: .35; }
+#secHead h2 { font: 600 15px/1.3 var(--f-display); margin: 0; }
+#secWhere { font-size: 12px; color: var(--mute); }
+#card canvas.fig { width: 100%; display: block; box-sizing: border-box; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); margin: 6px 0 4px; }
+#sec { width: 100%; aspect-ratio: 720 / 460; max-width: 100%; box-sizing: border-box; display: block; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+#cut { width: 100%; margin-inline: 0; accent-color: var(--accent); }
+.row2 { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--mute); }
+.note { font-size: 12px; color: var(--mute); margin: 0; }
+#tools { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+#findBox { position: relative; }
+#find { width: 13em; box-sizing: border-box; border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 3px 8px; font-size: 13px; }
+#findList { position: absolute; right: 0; top: calc(100% + 4px); z-index: 20; width: max-content; min-width: 100%; max-width: min(340px, calc(100vw - 32px)); max-height: 60vh; overflow: auto; margin: 0; padding: 4px; list-style: none; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, .18); }
+#findList[hidden] { display: none; }
+#findList button { width: 100%; text-align: left; border: 0; background: none; padding: 4px 8px; border-radius: 5px; cursor: pointer; display: block; font-size: 13px; }
+#findList button:hover, #findList button.on { background: var(--chip); }
+#findList small { display: block; color: var(--mute); font-size: 11.5px; }
+#findList .none { padding: 4px 8px; color: var(--mute); font-size: 12.5px; }
+#tip { position: fixed; z-index: 30; pointer-events: none; font-size: 12.5px; padding: 2px 8px; border-radius: 4px; background: var(--ink); color: var(--bg); white-space: nowrap; }
+#tip[hidden], #views [hidden], #tools [hidden] { display: none; }
+dialog { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); width: min(560px, calc(100vw - 32px)); box-sizing: border-box; max-height: 82vh; padding: 14px 18px 16px; }
+dialog::backdrop { background: rgba(0, 0, 0, .4); }
+dialog h2 { font: 600 16px/1.3 var(--f-display); margin: 0 0 8px; }
+dialog h3 { font-size: 13px; color: var(--mute); margin: 12px 0 4px; font-weight: 600; }
+dialog table { border-collapse: collapse; width: 100%; font-size: 13px; }
+dialog td { border-bottom: 1px solid var(--line); padding: 4px 6px; vertical-align: top; }
+dialog td:first-child { white-space: nowrap; width: 1%; }
+dialog ul { padding-left: 18px; margin: 0; font-size: 13px; }
+dialog li { margin-bottom: 3px; }
+dialog form { float: right; }
+kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--bg); }
+@media (max-width: 1100px) { main { grid-template-columns: 260px minmax(0, 1fr) 300px; } }
+@media (max-width: 860px) {
+  body { overflow: auto; }
+  #app { height: auto; grid-template-rows: auto auto; }
+  main { display: flex; flex-direction: column; }
+  #center { order: 1; } #bench { order: 2; } #notes { order: 3; }
+  #stage { height: 56vh; min-height: 300px; }
+  aside { overflow: visible; border: 0 !important; border-top: 1px solid var(--line) !important; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  #scrub { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+}
+@media (max-width: 560px) { #tools { width: 100%; } #findBox { flex: 1; } #find { width: 100%; } }
+@media (max-width: 560px) { #scrub { grid-template-columns: minmax(0, 1fr); } #dayBox { grid-row: auto; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div id="app">
+  <header>
+    <h1>神經發育 3D</h1>
+    <nav id="mods" aria-label="模組"></nav>
+    <div id="tools">
+      <div id="findBox"><input id="find" type="search" placeholder="搜尋構造（/）" aria-label="搜尋構造" autocomplete="off" spellcheck="false"><ul id="findList" hidden></ul></div>
+      <button class="btn" id="shareBtn" title="複製目前畫面的連結">分享</button>
+      <button class="btn" id="srcBtn" title="資料來源">來源</button>
+      <button class="btn" id="helpBtn" aria-label="說明與快捷鍵" title="說明與快捷鍵（?）">?</button>
+    </div>
+  </header>
+  <main>
+    <aside id="notes">
+      <div class="lbl">模組</div>
+      <h2 id="modTitle"></h2>
+      <p id="modSub"></p>
+      <div class="lbl" id="evLbl"></div>
+      <ol class="ev" id="events"></ol>
+      <div class="lbl" id="kgLbl"></div>
+      <ul id="kgList"></ul>
+    </aside>
+    <div id="center">
+      <div id="stage">
+        <div id="views">
+          <span id="viewBtns" style="display:contents"></span>
+          <button class="btn" id="cut3d" aria-pressed="false" title="3D 也從切面位置切開（快捷鍵 C）">3D 切開</button>
+          <button class="btn" id="tagBtn" aria-pressed="true" title="快捷鍵 N">名稱</button>
+          <button class="btn" id="resetBtn" title="鏡頭、切面、開關、圖層回到預設，天數不變（快捷鍵 R）">回到預設</button>
+          <button class="btn" id="showAll" hidden title="把 H 隱藏的構造全部顯示"></button>
+        </div>
+        <div id="labels"></div>
+      </div>
+      <div id="scrub">
+        <div id="dayBox">
+          <button id="play" aria-label="播放">▶</button>
+          <div id="dayNum"></div>
+        </div>
+        <input id="day" type="range" step="0.05" aria-label="胚胎日數">
+        <div id="ticks"></div>
+      </div>
+    </div>
+    <aside id="bench">
+      <div id="secHead"><h2 id="secTitle"></h2><span id="secModes" role="group" aria-label="切面方向"></span><span id="secWhere"></span></div>
+      <canvas id="sec" width="720" height="460"></canvas>
+      <div class="row2"><span id="secL"></span><span id="secHint">拖曳改切面位置</span><span id="secR"></span></div>
+      <input id="cut" type="range" aria-label="切面位置">
+      <div class="lbl" id="legendLbl"></div>
+      <div id="legend"></div>
+      <div class="lbl">構造</div>
+      <div id="card" class="empty">點 3D 或下方切面上的構造看說明。</div>
+      <p class="note" id="note"></p>
+    </aside>
+  </main>
+</div>
+
+<div id="tip" hidden></div>
+<dialog id="helpDlg" aria-labelledby="helpH">
+  <form method="dialog"><button class="btn" aria-label="關閉">✕</button></form>
+  <h2 id="helpH">說明與快捷鍵</h2>
+  <h3>操作</h3>
+  <table>
+    <tr><td>旋轉／平移／縮放</td><td>拖曳 3D；右鍵拖曳或兩指拖曳平移；滾輪或捏合縮放</td></tr>
+    <tr><td>看構造說明</td><td>點 3D 或右欄切面上的構造；滑鼠停在構造上會顯示名稱</td></tr>
+    <tr><td>換天數</td><td>拖下方天數滑桿，或點左欄事件、滑桿下的刻度（事件會連切面一起跳）</td></tr>
+    <tr><td>換切面位置</td><td>拖右欄切面下方的滑桿</td></tr>
+    <tr><td>找構造</td><td>右上搜尋框，三個模組一起找，中英文都可以</td></tr>
+    <tr><td>分享</td><td>網址會記住模組、天數、切面、開關與選取；按「分享」複製連結</td></tr>
+  </table>
+  <h3>快捷鍵</h3>
+  <table id="keyTbl"></table>
+</dialog>
+<dialog id="srcDlg" aria-labelledby="srcH">
+  <form method="dialog"><button class="btn" aria-label="關閉">✕</button></form>
+  <h2 id="srcH">資料來源</h2>
+  <ul>
+    <li><b>Langman's Medical Embryology</b>，15th ed.（卡片標「Langman 15th」與圖號）。</li>
+    <li><b>Haines, Fundamental Neuroscience for Basic and Clinical Applications</b>，4th ed.；少數 5th ed.（標「Haines 4th p.XX」）。</li>
+    <li><b>上課投影片</b>：卡片標「老師 p.XX」是投影片頁碼。</li>
+    <li><b>上課補充（共筆）</b>：投影片與兩本書都沒寫、只在上課共筆出現的內容，另外標出。</li>
+    <li><b>國考題</b>：考選部醫師第一階段國家考試歷屆試題，題號寫成「年-次-題」。</li>
+    <li><b>2D 示意圖</b>：依上面書中的圖簡化重畫，不是原圖；圖上標了依據的圖號。</li>
+    <li><b>3D</b>：示意模型，形狀、大小與天數都是示意；用 <a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a> 0.160（MIT）。</li>
+  </ul>
+  <p class="note" style="margin-top:8px">兩本書說法不同時並列，不另作取捨。</p>
+</dialog>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script>window.KG = [{"id": "112-1-醫學一-32", "stem": "下列關於頭側神經孔（rostral neuropore）與尾側神經孔（caudal neuropore）關閉時間的比較，何者正確？", "options": {"A": "頭側神經孔提早2~3天關閉", "B": "尾側神經孔提早2~3天關閉", "C": "頭側神經孔提早7~9天關閉", "D": "尾側神經孔提早7~9天關閉"}, "answer": "A", "mod": "m1", "day": 25, "sel": "plate"}, {"id": "112-2-醫學一-32", "stem": "下列何者在胚胎發育第三週結束時，尚未出現？", "options": {"A": "原條（primitive streak）", "B": "脊索（notochord）", "C": "中胚層（mesoderm）", "D": "咽弓（pharyngeal arch）"}, "answer": "D", "mod": "m1", "day": 21, "sel": "streak"}, {"id": "113-2-醫學一-32", "stem": "胚胎發育的第三週（第15～21天）期間，下列何者不會出現？", "options": {"A": "原腸胚（gastrula）", "B": "脊索（notochord）", "C": "神經溝（neural groove）", "D": "咽弓（pharyngeal arch）"}, "answer": "D", "mod": "m1", "day": 21, "sel": "plate"}, {"id": "114-2-醫學一-32", "stem": "下列何者不是由神經嵴細胞（neural crest cell）衍生而成？", "options": {"A": "黑色素細胞（melanocyte）", "B": "交感節後神經元（postganglionic sympathetic neuron）", "C": "甲狀腺之濾泡細胞（follicular cell of thyroid gland）", "D": "腎上腺髓質之嗜鉻細胞（chromaffin cell of adrenal medulla）"}, "answer": "C", "mod": "m1", "day": 24, "sel": "crest"}, {"id": "108-1-醫學一-36", "stem": "下列何者衍生自脊索（notochord）？", "options": {"A": "椎體（body of vertebra）", "B": "髓核（nucleus pulposus）", "C": "纖維環（anulus fibrosus）", "D": "椎弓（vertebral arch）"}, "answer": "B", "mod": "m1", "day": 22, "sel": "noto"}, {"id": "110-1-醫學一-35", "stem": "下列何者源自體節之生骨節（sclerotome）的間質細胞？", "options": {"A": "脊椎骨（vertebra）", "B": "髓核（nucleus pulposus）", "C": "顱骨（cranium）", "D": "四肢骨（appendicular skeleton）"}, "answer": "A", "mod": "m1", "day": 24, "sel": "somite"}, {"id": "112-1-醫學一-35", "stem": "骨骼系統的發育主要來自那兩種構造？①中胚層（mesoderm） ②內胚層（endoderm） ③神經外胚層（neuroectoderm） ④神經嵴（neural crest）", "options": {"A": "①②", "B": "①③", "C": "①④", "D": "②④"}, "answer": "C", "mod": "m1", "day": 24, "sel": "crest"}, {"id": "106-2-醫學一-36", "stem": "有關成體腦區與胚胎時期腦泡（brain vesicle）發育起源之關聯，何者錯誤？", "options": {"A": "橋腦（pons）－後腦（rhombencephalon）", "B": "小腦（cerebellum）－前腦（prosencephalon）", "C": "視丘（thalamus）－前腦（prosencephalon）", "D": "頂蓋（tectum）－中腦（mesencephalon）"}, "answer": "B", "mod": "m2", "day": 60, "sel": "cbl"}, {"id": "113-1-醫學一-36", "stem": "大腦導水管（cerebral aqueduct）是衍生自那一腦泡（brain vesicle）？", "options": {"A": "菱腦（rhombencephalon）", "B": "中腦（mesencephalon）", "C": "間腦（diencephalon）", "D": "端腦（telencephalon）"}, "answer": "B", "mod": "m2", "day": 44, "sel": "aq"}, {"id": "114-2-醫學一-36", "stem": "神經垂體部（neurohypophysis）是衍生自：", "options": {"A": "端腦（telencephalon）", "B": "間腦（diencephalon）", "C": "中腦（mesencephalon）", "D": "髓腦（myelencephalon）"}, "answer": "B", "mod": "m2", "day": 40, "sel": "dien"}, {"id": "115-1-醫學一-36", "stem": "下列構造與其發育來源的位置配對，何者錯誤？", "options": {"A": "橋腦及小腦（pons and cerebellum）：後腦（metencephalon）", "B": "四疊體（tectum）：中腦（mesencephalon）", "C": "乳狀體（mammillary body）：間腦（diencephalon）", "D": "視囊（optic vesicle）：髓腦（myelencephalon）"}, "answer": "D", "mod": "m2", "day": 32, "sel": "optic"}, {"id": "108-2-醫學一-36", "stem": "下列有關眼睛（eye）發育的敘述，何者錯誤？", "options": {"A": "眼裂（optic fissure）位於眼杯（optic cup）的腹側面，並沿著視柄（optic stalk）發育", "B": "視網膜中央動脈和靜脈（central artery and vein of retina）是源自遠側端玻璃體血管（hyaloid vessels）的衍生物", "C": "視網膜色素上皮（retinal pigment epithelium）是源自眼杯（optic cup）的外層", "D": "視神經（optic nerve）是源自視網膜之神經節細胞軸突（axons of ganglion cells）"}, "answer": "B", "mod": "m2", "day": 40, "sel": "optic"}, {"id": "110-1-醫學一-36", "stem": "下列有關視神經（optic nerve）發育的敘述，何者正確？", "options": {"A": "在胎兒出生前，視神經的髓鞘形成（myelination）已完全發育", "B": "視神經細胞是由大腦的皮質部衍生形成", "C": "視神經髓鞘僅包圍至視神經盤（optic nerve disc）", "D": "視神經源自神經嵴（neural crest）"}, "answer": "C", "mod": "m2", "day": 40, "sel": "optic"}, {"id": "112-1-醫學一-36", "stem": "下列有關角膜（cornea）發育來源的敘述，何者錯誤？", "options": {"A": "角膜形成主要來自視網膜（retina）的誘導", "B": "角膜間葉（mesenchyme）衍生自中胚層（mesoderm）", "C": "角膜內皮細胞（endothelium）衍生自神經嵴細胞（neural crest cells）", "D": "角膜外層上皮（external corneal epithelium）衍生自體表外胚層（surface ectoderm）"}, "answer": "A", "mod": "m2", "day": 40, "sel": "optic"}, {"id": "106-1-醫學一-32", "stem": "下列何處的肌肉組織不是衍生自中胚層（mesoderm）？", "options": {"A": "肋間（intercostal region）", "B": "虹膜（iris）", "C": "心臟（heart）", "D": "消化道（digestive tract）"}, "answer": "B", "mod": "m2", "day": 40, "sel": "optic"}, {"id": "115-2-醫學一-36", "stem": "瞳孔擴張及括約肌（dilator and sphincter pupillae），是源自何處？", "options": {"A": "神經外胚層（neuroectoderm）", "B": "生發層（stratum germinativum）", "C": "內胚層（endoderm）", "D": "中胚層（mesoderm）"}, "answer": "A", "mod": "m2", "day": 40, "sel": "optic"}, {"id": "107-1-醫學一-36", "stem": "在中樞神經系統的發育中，下列何者是衍生自基板神經母細胞（neuroblasts of basal plates）：", "options": {"A": "背角（dorsal horn）", "B": "下丘（inferior colliculus）", "C": "薄核（gracile nucleus）", "D": "紅核（red nucleus）"}, "answer": "D", "mod": "m3", "day": 50, "sel": "rn"}, {"id": "107-2-醫學一-36", "stem": "腦部發育過程中，下列何者不是衍生自翼板（alar plate）？", "options": {"A": "橄欖核（olivary nucleus）", "B": "楔核（cuneate nucleus）", "C": "紅核（red nucleus）", "D": "下丘（inferior colliculus）"}, "answer": "C", "mod": "m3", "day": 50, "sel": "rn"}];</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+/* ---------- 共用工具（各模組共用） ---------- */
+const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const THEMED = [];   // 跟著主題換色的材質
+function mat(cssVar, extra = {}) {
+  const m = new THREE.MeshStandardMaterial({ color: css(cssVar), roughness: .62, metalness: 0, side: THREE.DoubleSide, ...extra });
+  m.userData.css = cssVar; THEMED.push(m); return m;
+}
+function themed(m, cssVar) { m.color.set(css(cssVar)); m.userData.css = cssVar; THEMED.push(m); return m; }
+const std = (o = {}) => new THREE.MeshStandardMaterial({ roughness: .6, metalness: 0, side: THREE.DoubleSide, ...o });
+// 依 css 變數快取的材質；bank.all 是全部建過的
+function matBank(extra) { const B = {}, get = (v) => B[v] || (B[v] = mat(v, extra)); get.all = B; return get; }
+// 頂點色用的顏色（css 變數 → THREE.Color），換主題時更新；themeGen 每換一次 +1，模組快取的幾何靠它判斷要不要重算
+const COLOR = {}; let themeGen = 0;
+const colOf = (v) => COLOR[v] || (COLOR[v] = new THREE.Color(css(v)));
+// 一圈一圈接成管子的網格（n 圈 × 每圈 nr 點，頂點之後再填）；flip 反轉面的方向
+function ringGeometry(n, nr, colors, flip) {
+  const g = new THREE.BufferGeometry(), idx = [];
+  g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(n * nr * 3), 3));
+  if (colors) g.setAttribute("color", new THREE.BufferAttribute(new Float32Array(n * nr * 3), 3));
+  for (let i = 0; i < n - 1; i++) for (let k = 0; k < nr; k++) {
+    const a = i * nr + k, b = i * nr + (k + 1) % nr, c = (i + 1) * nr + k, d = (i + 1) * nr + (k + 1) % nr;
+    if (flip) idx.push(a, c, b, b, c, d); else idx.push(a, b, c, b, d, c);
+  }
+  g.setIndex(idx); return g;
+}
+// 切面標示框：半透明面＋邊線，跟著主題換色
+function planeFrame(op, edgeOp) {
+  return [new THREE.Mesh(new THREE.PlaneGeometry(1, 1), themed(new THREE.MeshBasicMaterial({ transparent: true, opacity: op, side: THREE.DoubleSide, depthWrite: false }), "--accent")),
+    new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(1, 1)), themed(new THREE.LineBasicMaterial({ transparent: true, opacity: edgeOp }), "--accent"))];
+}
+function ellipse(cx, cy, rx, ry, n) { const o = []; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; o.push([cx + rx * Math.cos(a), cy + ry * Math.sin(a)]); } return o; }
+const area = (P) => { let a = 0; for (let i = 0; i < P.length; i++) { const p = P[i], q = P[(i + 1) % P.length]; a += p[0] * q[1] - q[0] * p[1]; } return a / 2; };
+function clearGroup(g) { for (const m of g.children) { m.geometry.dispose(); m.material.dispose?.(); } g.clear(); }
+// 切面多邊形 → 3D 切口的面；to3(x, y) → [x, y, z]
+function capGeometry(P, to3) {
+  if (P.length < 3 || Math.abs(area(P)) < 1e-5) return null;
+  const pts = P.map(([x, y]) => new THREE.Vector2(x, y));
+  let tri; try { tri = THREE.ShapeUtils.triangulateShape(pts, []); } catch (e) { return null; }
+  if (!tri.length) return null;
+  const pos = new Float32Array(pts.length * 3); pts.forEach((p, i) => pos.set(to3(p.x, p.y), i * 3));
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(tri.flat()); g.computeVertexNormals();
+  return g;
+}
+function capMesh(g, baseMat, struct) {
+  const m = baseMat.clone(); m.clippingPlanes = []; m.transparent = false; m.opacity = 1; m.depthWrite = true; m.vertexColors = false; m.side = THREE.DoubleSide;
+  m.emissive = new THREE.Color(baseMat.color).multiplyScalar(.25);
+  const mesh = new THREE.Mesh(g, m); mesh.userData = { struct }; return mesh;
+}
+// 2D 切面：填色（pts 為像素座標）
+function fillPoly(ctx, pts, color, struct) {
+  if (pts.length < 3) return;
+  ctx.beginPath(); pts.forEach((q, i) => (i ? ctx.lineTo(...q) : ctx.moveTo(...q))); ctx.closePath();
+  ctx.fillStyle = color; ctx.fill();
+  ctx.lineWidth = 1; ctx.strokeStyle = "rgba(0,0,0,.25)"; ctx.stroke();
+  if (state.sel === struct) { ctx.lineWidth = 2.5; ctx.strokeStyle = css("--warn"); ctx.stroke(); }
+}
+// 2D 切面：左右兩欄引線標籤；labs = [[文字, [px, py], "L"|"R", 構造]]
+function drawLeaders(ctx, labs, W, H, dpr) {
+  const ink = css("--ink"), mute = css("--mute");
+  ctx.font = `500 ${Math.round(12.5 * dpr)}px ${css("--f-body")}`; ctx.lineJoin = "round"; ctx.textBaseline = "middle";
+  for (const side of ["L", "R"]) {
+    const g = labs.filter((l) => l[2] === side).map((l) => ({ l, q: l[1] })).sort((a, b) => a.q[1] - b.q[1]);
+    const gapY = 15 * dpr; let lastY = -1e9;
+    for (const it of g) { it.y = Math.max(it.q[1], lastY + gapY); lastY = it.y; }
+    const over = lastY - (H - 12); if (over > 0) for (const it of g) it.y -= over;
+    for (const it of g) {
+      const x = side === "L" ? 6 * dpr : W - 6 * dpr;
+      ctx.strokeStyle = mute; ctx.lineWidth = dpr; ctx.beginPath(); ctx.moveTo(...it.q);
+      const tx = side === "L" ? x + ctx.measureText(it.l[0]).width + 4 * dpr : x - ctx.measureText(it.l[0]).width - 4 * dpr;
+      ctx.lineTo(tx, it.y); ctx.stroke();
+      ctx.beginPath(); ctx.arc(it.q[0], it.q[1], 2 * dpr, 0, Math.PI * 2); ctx.fillStyle = mute; ctx.fill();
+      ctx.textAlign = side === "L" ? "left" : "right";
+      ctx.strokeStyle = css("--bg"); ctx.lineWidth = 3.5 * dpr; ctx.strokeText(it.l[0], x, it.y);
+      ctx.fillStyle = state.sel === it.l[3] ? css("--warn") : ink; ctx.fillText(it.l[0], x, it.y);
+    }
+  }
+}
+function dirText(ctx, W, H, dpr, top, bottom) {
+  ctx.fillStyle = css("--mute"); ctx.font = `400 ${Math.round(11 * dpr)}px ${css("--f-body")}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  if (top) ctx.fillText(top, W / 2, 9 * dpr);
+  if (bottom) ctx.fillText(bottom, W / 2, H - 8 * dpr);
+}
+
+/* ---------- three.js ---------- */
+const stage = document.getElementById("stage");
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const PR = Math.min(2, devicePixelRatio), TOUCH = matchMedia("(pointer: coarse)").matches;
+renderer.setPixelRatio(PR);
+// 手機、平板播放時每幀都重算幾何，像素比先降到 1.5，停下再回來
+function setPlayPR(playing) { const r = TOUCH && playing ? Math.min(PR, 1.5) : PR; if (renderer.getPixelRatio() !== r) { renderer.setPixelRatio(r); resize(); } }
+renderer.localClippingEnabled = true;
+stage.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(36, 1, .05, 200);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = .12;
+// 捏合縮放（同神解模型）：觸控捏合預設跟手指距離 1:1，要捏很多次才拉得近 → 觸控時把指數調高，滑鼠滾輪維持原本一步。
+const PINCH_GAIN = 2.6;
+stage.addEventListener("pointerdown", (e) => { controls.zoomSpeed = e.pointerType === "touch" ? PINCH_GAIN : 1; }, true);
+// 觸控板捏合是 ctrl+wheel；OrbitControls 每個事件固定縮 5%，不管手指動多少 → 改照實際 deltaY 縮放。
+stage.addEventListener("wheel", (e) => {
+  if (!e.ctrlKey) return;
+  e.preventDefault(); e.stopPropagation(); fly = null;
+  const off = camera.position.clone().sub(controls.target);
+  const d = THREE.MathUtils.clamp(off.length() * Math.exp(e.deltaY * .025), controls.minDistance, controls.maxDistance);
+  camera.position.copy(controls.target).add(off.setLength(d)); needsRender = true;
+}, { capture: true, passive: false });
+function setZoomLimits() { // 各模組的縮放範圍：最近＝各視角原始距離最小值的 0.3 倍，最遠＝切過去時距離（窄畫面會拉遠）的 3 倍，不超過 far
+  const ds = mod.views.map((V) => { const v = V.v(); return Math.hypot(...v.p.map((x, i) => x - v.t[i])); });
+  const d = camera.position.distanceTo(controls.target);
+  controls.minDistance = Math.min(d, ...ds) * .3; controls.maxDistance = Math.min(Math.max(d, ...ds) * 3, camera.far * .7);
+}
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8a80, 1.6));
+const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(3, 8, -4); scene.add(key);
+const fill = new THREE.DirectionalLight(0xffffff, .5); fill.position.set(-4, 2, 6); scene.add(fill);
+
+/* ---------- 狀態 ---------- */
+const state = { mod: "m1", day: 22, cut3d: false, tags: true, sel: null, playing: false };
+try { const s = JSON.parse(localStorage.getItem("neuroembryo.ui") || "{}"); if (typeof s.tags === "boolean") state.tags = s.tags; if (typeof s.mod === "string") state.mod = s.mod; } catch (e) {}
+const saveUi = () => { try { localStorage.setItem("neuroembryo.ui", JSON.stringify({ tags: state.tags, mod: state.mod })); } catch (e) {} };
+
+/* ===== 模組 1：神經管（第 17–30 天，Langman） ===== */
+const M1 = (() => {
+// cut：點事件時切面跳到的位置（0 尾、1 頭）：第 20 天第 1 對體節、第 22 天第 5 對體節、第 25 天頭端、第 28 天尾端
+const EVENTS = [
+  { d: 18, cut: 0.5, t: "神經板", s: "脊索與前索板誘導上方外胚層增厚，頭端較寬。" },
+  { d: 19, cut: 0.5, t: "神經溝", s: "神經板兩側緣隆起成神經褶，中間凹成神經溝。" },
+  { d: 20, cut: 0.74, t: "第一對體節", s: "軸旁中胚層由頭往尾分節，每天約 3 對。" },
+  { d: 22, cut: 0.67, t: "開始癒合", s: "頸部（約第 5 對體節）兩側神經褶先接合，向頭、尾兩端拉鍊式進行（老師 p.5）。" },
+  { d: 25, cut: 0.95, t: "頭側神經孔關閉", s: "約 18–20 對體節。沒關 → 無腦畸形。" },
+  { d: 28, cut: 0.14, t: "尾側神經孔關閉", s: "約 25 對體節，比頭側晚約 3 天。沒關 → 脊柱裂。初級神經管化完成（腦到腰髓）；薦、尾段由次級神經管化補上（第 20–42 天，Haines 4th p.66，老師 p.11）。" },
+];
+// 體節對數（約）：第 20 天起每天約 3 對
+const SOMITE_TABLE = [[19.6, 0], [20, 2], [21, 5], [22, 8], [23, 11], [24, 15], [25, 19], [26, 21], [27, 23], [28, 25], [29, 28], [30, 31]];
+
+const LAYERS = [
+  { id: "ecto", name: "表面外胚層", css: "--c-ecto" },
+  { id: "neuro", name: "神經外胚層", css: "--c-neuro" },
+  { id: "crest", name: "神經嵴", css: "--c-crest" },
+  { id: "meso", name: "中胚層", css: "--c-meso" },
+  { id: "noto", name: "脊索", css: "--c-noto" },
+  { id: "endo", name: "內胚層", css: "--c-endo" },
+];
+
+const STRUCT = {
+  plate: { layer: "neuro", name: (s) => s.closed > .5 ? "神經管" : s.c > .12 ? "神經褶／神經溝" : "神經板",
+    en: (s) => s.closed > .5 ? "neural tube" : s.c > .12 ? "neural fold／neural groove" : "neural plate",
+    meta: "神經外胚層",
+    body: (s) => s.closed > .5
+      ? `<p><b>初級神經管化</b>（primary neurulation）：兩側神經褶在背側中線接合成管，第 22 天起從頸部（約第 5 對體節）開始，往頭、尾兩端拉鍊式關閉（Haines 4th p.65，老師 p.5、7）。頭端將成腦泡，尾端成脊髓；管腔成腦室與中央管。</p><p><b>次級神經管化</b>（secondary neurulation）：尾部隆起（caudal eminence）空腔化，形成薦、尾段脊髓（Haines 4th p.66–67，老師 p.11）。</p>`
+      : s.c > .12
+      ? `<p>神經板兩側緣隆起成<b>神經褶</b>，中間凹陷成<b>神經溝</b>（約第 19 天）。神經褶頂端的細胞就是神經嵴（老師 p.7、10）。</p>`
+      : `<p>脊索與前索板（prechordal plate）誘導上方外胚層增厚成神經板（約第 18 天），頭端較寬，將來成腦。誘導機制兩書寫法不同：</p><ul><li>Haines 4th p.65（老師 p.10）：脊索的 cell adhesion molecules 擴散到神經板，把神經上皮細胞連成一片；神經板第 3 週末完成</li><li>Langman：脊索分泌 noggin、chordin、follistatin，抑制 BMP-4，外胚層才分化成神經板</li></ul>`,
+    kg: ["112-1-醫學一-32", "113-2-醫學一-32"],
+    more: `<details class="fold"><summary>概觀</summary><p>Haines 4th p.63（老師 p.4）：</p><ul><li>中樞神經由原始外胚層（primitive ectoderm）發育；第 6 週基本形態完成，之後以細胞增生、遷移、建立突觸為主</li><li>腦重：新生兒約 800 g → 6 歲約 1200 g → 成人約 1400 g（約 1000 億個神經元）</li><li>出生時約 3% 有重大中樞神經畸形；自然流產的胎兒約 75%、第一年內死亡的嬰兒約 40% 有重大中樞神經畸形</li></ul><p>上課補充（共筆）：中樞神經第 3 週開始發育、第 6 週有雛形。</p></details>`
+      + `<details class="fold"><summary>神經孔關閉天數</summary><p>Langman：頭側第 25 天、尾側第 28 天。Haines 4th p.65（老師 p.11）：前神經孔 E24、後神經孔 E26。兩者都是頭側比尾側早 2–3 天（112-1-32）。</p><p>上課補充（共筆）：知道前面比後面早關就好，天數不用記太細；神經孔第 4 週初形成、第 4 週末關閉。</p></details>`
+      + `<details class="fold"><summary>初級與次級神經管化</summary><table class="cmp"><tr><th></th><th>初級（primary）</th><th>次級（secondary）</th></tr><tr><th>過程</th><td>神經板摺疊、神經褶接合成管</td><td>尾部隆起（caudal eminence）的細胞團中空化，再接上神經管</td></tr><tr><th>形成</th><td>腦，脊髓到腰段</td><td>薦、尾段脊髓</td></tr><tr><th>時間</th><td>第 18 天到神經孔關閉（E24、E26）</td><td>第 20–42 天</td></tr></table><p>出處：Haines 4th p.65–67（5th p.75）、老師 p.11；老師 p.7D 第 22 天背面圖在後神經孔下方標「Region of secondary neurulation」。Langman 15th ed. 沒寫次級神經管化，只寫神經管化在第 28 天結束。</p><p class="trap">易錯：「次級腦泡」（五個腦泡）和「次級神經管化」是兩回事。</p></details>`
+      + `<details class="fold"><summary>神經管缺損</summary><p>神經管化或神經孔關閉出問題（dysraphic defect），神經組織與周圍的骨、腦膜、肌肉、皮膚都會異常（Haines 4th p.65–66，老師 p.12–15）。</p><ul>`
+      + `<li><b>無腦畸形</b>（anencephaly）：頭側神經孔沒關；約萬分之五，出生後必定死亡</li>`
+      + `<li><b>腦膨出</b>（encephalocele，顱裂）：顱骨缺損，最常見在枕骨。meningocele（腦膜＋CSF）→ meningoencephalocele（再加腦組織）→ meningohydroencephalocele（再加腦室，最嚴重）</li>`
+      + `<li><b>Arnold-Chiari 畸形</b>：枕骨大孔發育不全，小腦（蚓部、扁桃體）往下疝入枕骨大孔；可合併延腦或脊髓空洞症</li>`
+      + `<li><b>脊柱裂</b>（spina bifida）：尾側神經孔沒關。<b>隱性</b>（occulta）只缺椎弓、沒有囊；<b>囊性</b>（cystica）分 meningocele（腦膜＋CSF 膨出）與 meningomyelocele（再加脊髓；約萬分之五）</li>`
+      + `<li>羊水與母血 AFP 上升；孕前起每天補充葉酸 400 µg 可降低發生率（Haines 4th p.65：約 70%）</li></ul></details>`
+      + `<details class="fold"><summary>致畸因子</summary><p>Haines 4th p.69（老師 p.21、45）：</p><ul><li>感染：TORCH（toxoplasmosis 弓漿蟲、syphilis 梅毒、rubella 德國麻疹、cytomegalovirus、herpes simplex virus），以及 HIV</li><li>藥物、葉酸缺乏、母親糖尿病、基因缺陷（老師 p.45）</li></ul></details>` },
+  ecto: { layer: "ecto", name: () => "表面外胚層", en: "surface ectoderm", meta: "外胚層",
+    body: () => `<p>神經管閉合後與神經管分離，在背側重新接合、覆蓋神經管。</p>`,
+    more: `<details class="fold"><summary>衍生物</summary><ul><li>表皮、毛髮、指甲、皮膚腺體與乳腺</li><li>腦下垂體前葉、牙釉質</li><li>內耳、眼的水晶體</li></ul></details>`
+      + `<details class="fold"><summary>基板（placode）</summary><p>頭部表面外胚層局部增厚，參與形成感覺器官與腦神經（Haines 4th p.70–71，老師 p.26）：</p><ul><li>嗅基板 → 嗅神經（CN I）</li><li>耳基板 → 前庭耳蝸神經（CN VIII）、內耳</li><li>水晶體基板 → 水晶體</li><li>CN V、VII、IX、X 的感覺神經節有一部分細胞來自基板</li></ul><p>模組 3 的 basal plate 也譯作「基板」，是神經管腹側的運動區，兩者不同。</p></details>` },
+  crest: { layer: "crest", name: () => "神經嵴", en: "neural crest", meta: "外胚層（神經褶頂端）",
+    body: () => `<p>位在神經褶頂端；神經褶接合時脫離神經外胚層，經上皮—間質轉換遷移到全身。頭部的神經嵴在神經管閉合前就開始遷出。</p><p>圖中兩條路線：腹側（貼著神經管往下 → 背根神經節、交感鏈）與背外側（表面外胚層下方 → 黑色素細胞）。</p>`,
+    trap: "甲狀腺濾泡細胞來自內胚層，不是神經嵴；神經嵴衍生的是濾泡旁 C 細胞（114-2-32）。<br>腦膜：硬腦膜來自中胚層，軟腦膜、蜘蛛膜來自神經嵴（Langman）。Haines 4th p.95–96 寫神經嵴與中胚層一起形成原始腦膜，外層成硬腦膜、內層成蜘蛛膜與軟腦膜。",
+    kg: ["114-2-醫學一-32", "112-1-醫學一-35"],
+    more: `<details class="fold"><summary>衍生物（Haines Table 5-1）</summary><p>Haines 4th p.71 Table 5-1（5th p.80 Table 5.1；老師 p.27）：</p><p><b>神經元</b></p><ul><li>背根神經節（DRG）</li><li>交感神經節：脊柱旁（paravertebral）、脊柱前（prevertebral，又稱 preaortic）</li><li>腸神經節（Auerbach、Meissner 神經叢）</li><li>CN VII、IX、X 的副交感神經節（5th 版多列 CN III）</li><li>CN V、VII、VIII、IX、X 的感覺神經節（＊部分細胞來自基板）</li></ul><p><b>非神經元</b></p><ul><li>許旺細胞、周邊神經節的衛星細胞</li><li>黑色素細胞、牙本質母細胞</li><li>咽弓軟骨</li><li>睫狀肌與瞳孔肌（見下方易錯）</li><li>腎上腺髓質嗜鉻細胞</li><li>軟腦膜、蜘蛛膜</li></ul><p>Table 5-1 沒列、Langman 有的：顏面與顱骨的結締組織與骨、顏面頸部真皮、甲狀腺 C 細胞、心臟的錐幹隔。</p><p>上課補充（共筆）：脊柱旁神經節在脊柱兩側（交感鏈）；脊柱前神經節在主動脈前（腹腔、上下腸繫膜神經節）。</p><p class="trap">睫狀肌、瞳孔肌：Haines Table 5-1（老師 p.27）列為神經嵴；瞳孔括約肌與擴大肌在 Langman 與國考答案（106-1、115-2）是神經外胚層（視杯），睫狀肌在 Langman 是外覆的間葉。國考答神經外胚層；校內考題同時有 neural crest 與 neuroectoderm 選項時，依老師的表答 neural crest。Langman：一般平滑肌來自中胚層。</p></details>`
+      + `<details class="fold"><summary>周邊神經系統的來源</summary><p>Haines 4th p.70–71（老師 p.26）：周邊神經系統主要來自神經嵴，另有基板（placode）：</p><ul><li>嗅基板 → CN I；耳基板 → CN VIII</li><li>CN V、VII、IX、X 的感覺神經節：神經嵴＋基板</li><li>背根神經節、交感神經節、腸神經節（Auerbach、Meissner）、許旺細胞：神經嵴</li></ul><p>上課補充（共筆）：腦神經的神經節不是來自神經嵴，就是來自基板。</p></details>` },
+  noto: { layer: "noto", name: () => "脊索", en: "notochord", meta: "中胚層（中軸）",
+    body: () => `<p>誘導上方外胚層形成神經板，也誘導神經管腹側成為底板。之後退化，在椎間盤留下髓核。</p>`,
+    kg: ["108-1-醫學一-36", "112-2-醫學一-32"] },
+  somite: { layer: "meso", name: () => "體節", en: "somite", meta: "軸旁中胚層",
+    body: (s) => `<p>軸旁中胚層第 20 天起由頭往尾成對分節，每天約 3 對，第 5 週末約 42–44 對；體節數可用來推算胚齡（現在約 ${s.n} 對）。</p><ul><li>生骨節 → 脊椎、肋骨</li><li>生肌節 → 背部與體壁肌肉</li><li>生皮節 → 背部真皮</li></ul>`,
+    kg: ["110-1-醫學一-35"] },
+  parax: { layer: "meso", name: () => "軸旁中胚層（未分節）", en: "paraxial mesoderm", meta: "中胚層",
+    body: () => `<p>還沒分節的軸旁中胚層，往尾端陸續分成體節。</p>` },
+  inter: { layer: "meso", name: () => "中間中胚層", en: "intermediate mesoderm", meta: "中胚層", body: () => `<p>將來形成泌尿生殖系統。</p>` },
+  lat: { layer: "meso", name: () => "側板中胚層", en: "lateral plate mesoderm", meta: "中胚層",
+    body: () => `<p>分成體壁層與臟壁層，中間的空隙是胚內體腔。體壁層加上表面外胚層成體壁；臟壁層包住內胚層成腸壁。</p>` },
+  endo: { layer: "endo", name: () => "內胚層", en: "endoderm", meta: "內胚層",
+    body: () => `<p>形成消化道、呼吸道的上皮，以及肝、胰、甲狀腺濾泡等腺體實質。</p>` },
+  streak: { layer: "ecto", name: () => "原條與原結", en: "primitive streak／primitive node", meta: "上胚層（尾端）",
+    body: () => `<p>第 15 天出現，上胚層細胞由此內陷形成中胚層與內胚層（原腸化）。之後往尾端縮短，神經板隨著往尾端延長；第 4 週末退化，殘留可形成薦尾畸胎瘤。</p>`,
+    kg: ["112-2-醫學一-32"] },
+};
+
+/* ---------- 幾何參數 ---------- */
+const LEN = 9;                      // 頭尾長（示意單位）
+const zOf = (u) => (u - .5) * LEN;
+const TP = .12, TE = .05;           // 神經外胚層、表面外胚層厚度
+const U_SOM1 = .74, DS = .0175;     // 第 1 對體節位置、間距
+const U_FUSE = U_SOM1 - 4 * DS;     // 約第 5 對體節：開始癒合
+const U_PLATE_END = .97;
+
+function somiteCount(t) {
+  const T = SOMITE_TABLE; if (t <= T[0][0]) return 0;
+  for (let i = 1; i < T.length; i++) if (t <= T[i][0]) return lerp(T[i - 1][1], T[i][1], (t - T[i - 1][0]) / (T[i][0] - T[i - 1][0]));
+  return T[T.length - 1][1];
+}
+const streakTop = (t) => .28 - .19 * sm(17, 28.5, t);
+const plateStart = (t) => streakTop(t) + .035;
+const discHalf = (u) => (1.85 + .5 * u) * Math.sqrt(Math.max(0, 1 - Math.pow((u - .5) / .5, 6))) + .02;
+function plateHalf(u, t) {
+  const w = .62 + .75 * sm(.6, .86, u);
+  const tail = sm(plateStart(t) - .01, plateStart(t) + .07, u);
+  const head = Math.sqrt(Math.max(0, 1 - Math.pow(Math.max(0, u - .5) / (U_PLATE_END - .5), 10)));
+  return Math.max(.012, w * tail * head * sm(16.8, 17.8, t + 0) + .012 * (1 - sm(16.8, 17.8, t)));
+}
+const plateThick = (t) => lerp(TE, TP, sm(17, 18.2, t));
+// 癒合前緣
+const fuseFrontHead = (t) => lerp(U_FUSE, U_PLATE_END + .02, clamp((t - 22) / 3, 0, 1));
+const fuseFrontTail = (t) => lerp(U_FUSE, plateStart(28) - .02, clamp((t - 22) / 6, 0, 1));
+// u 處神經褶接合的日子
+function closeDay(u) {
+  if (u >= U_FUSE) return 22 + 3 * (u - U_FUSE) / (U_PLATE_END + .02 - U_FUSE);
+  return 22 + 6 * (U_FUSE - u) / (U_FUSE - (plateStart(28) - .02));
+}
+function foldState(u, t) {
+  const fold = .66 * sm(18.6, 21.8, t + .6 * sm(.7, .9, u));   // 頭端稍早
+  const BW = .035;
+  let closed = 0;
+  if (t > 22) { const d = Math.min(u - fuseFrontTail(t), fuseFrontHead(t) - u); closed = sm(-BW, BW, d); }
+  const c = fold + (1 - fold) * closed;
+  const sep = t > 22 ? sm(0, 1.4, t - closeDay(u)) : 0;
+  return { c, closed, sep };
+}
+function somiteProfile(u, t) { // 0..1，表面外胚層下的體節隆起
+  const n = Math.floor(somiteCount(t)); if (!n) return 0;
+  const k = (U_SOM1 - u) / DS; if (k < -.5 || k > n - .5) return 0;
+  const f = k - Math.round(k); return Math.cos(f * Math.PI) ** 2;
+}
+
+/* ---------- 切面 ---------- */
+const NP = 24, NE = 16;
+function bez(p0, p1, p2, n) { const out = []; for (let i = 0; i < n; i++) { const t = i / (n - 1); out.push([(1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0], (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1]]); } return out; }
+function thickStrip(line, th, side = -1) { // 中心線往一側加厚 → 閉合多邊形
+  const out = line.map((p) => p.slice()), back = [];
+  for (let i = 0; i < line.length; i++) {
+    const a = line[Math.max(0, i - 1)], b = line[Math.min(line.length - 1, i + 1)];
+    let dx = b[0] - a[0], dy = b[1] - a[1]; const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+    back.push([line[i][0] + side * -dy * th * -1, line[i][1] + side * dx * th * -1]);
+  }
+  return out.concat(back.reverse());
+}
+function rect(x0, x1, y0, y1) { return [[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, (y0 + y1) / 2]]; }
+
+function section(u, t) {
+  const W = plateHalf(u, t), tp = plateThick(t), D = discHalf(u);
+  const { c, closed, sep } = foldState(u, t);
+  const r = W / (Math.PI * Math.max(c, 1e-4));
+  const top = closed > .5 ? 2 * r : 0;
+  // 神經板背面中心線（之後的管腔面）
+  const line = [];
+  for (let i = 0; i < NP; i++) {
+    const s = -1 + 2 * i / (NP - 1);
+    if (c < 1e-3) line.push([s * W, 0]);
+    else { const f = s * Math.PI * c * .999; line.push([r * Math.sin(f), r * (1 - Math.cos(f))]); }
+  }
+  // 加厚：往曲率外側（背面朝內）
+  const plate = [];
+  for (let i = 0; i < NP; i++) plate.push(line[i]);
+  for (let i = NP - 1; i >= 0; i--) {
+    const a = line[Math.max(0, i - 1)], b = line[Math.min(NP - 1, i + 1)];
+    let dx = b[0] - a[0], dy = b[1] - a[1]; const L = Math.hypot(dx, dy) || 1;
+    plate.push([line[i][0] + dy / L * tp, line[i][1] - dx / L * tp]);
+  }
+  // 神經褶頂端（右側外緣）
+  const fR = Math.PI * c * .999;
+  const crestPt = c < 1e-3 ? [W, -tp / 2] : [r * Math.sin(fR) + Math.sin(fR) * tp * .5, r * (1 - Math.cos(fR)) - Math.cos(fR) * tp * .5];
+  const tubeOuterTop = 2 * r + tp;
+  // 表面外胚層（右側）：從褶頂到胚盤邊
+  const archTop = tubeOuterTop + .1;
+  const p0 = [lerp(crestPt[0] + .02, 0, sep), lerp(crestPt[1] + tp * .35, archTop, sep)];
+  const p1 = [lerp(Math.max(crestPt[0], 0) + .5, r + tp + .45, sep), lerp(crestPt[1] * .25, archTop * .75, sep)];
+  const bump = somiteProfile(u, t) * .07;
+  let eline = bez(p0, p1, [D, 0], NE).map(([x, y]) => [x, y + bump * Math.exp(-(((x - .7) / .35) ** 2))]);
+  const ectoR = thickStrip(eline, TE, 1);
+  // 中胚層
+  const nSom = somiteCount(t);
+  const segEnd = nSom >= 1 ? U_SOM1 - (Math.floor(nSom) - .5) * DS : 1;   // 比這更尾端的未分節
+  const paraxShow = u < segEnd ? 1 : 0;
+  const parax = ellipse(.66, -.38, .3, .2, 14);
+  const inter = ellipse(1.06, -.4, .1, .13, 10);
+  const gap = .1 * sm(19.5, 23, t);
+  const latX0 = 1.2, latX1 = Math.max(latX0 + .05, D - .06);
+  const latSom = rect(latX0, latX1, -.32 + gap / 2, -.18);
+  const latSpl = rect(latX0, latX1, -.62, -.42 - gap / 2);
+  const noto = ellipse(0, -tp - .13, .1, .1, 16);
+  const endo = rect(-D, D, -.72, -.67);
+  // 原條
+  const st = streakTop(t), onStreak = u < st ? 1 : 0;
+  const streak = rect(-.06, .06, -.005, .02);
+  // 神經嵴細胞（右側）
+  const crest = [];
+  const crestOn = sm(.25, .45, c) * (W > .1 ? 1 : 0);
+  if (crestOn > .01) {
+    const cranial = u > .72;
+    const mStart = cranial ? 20.6 : closeDay(u) + .3;
+    const m = sm(mStart, mStart + 3, t);
+    const S = closed > .5 ? [.07, tubeOuterTop + .04] : [crestPt[0] + .02, crestPt[1] + .02];
+    const vent = closed > .5 ? [S, [r + tp + .1, r + .02], [.32, -.55]] : [S, [S[0] + .15, -.18], [S[0] - .1, -.5]];
+    const dors = closed > .5 ? [S, [r + tp + .35, archTop * .55], [1.35, -.1]] : [S, [S[0] + .6, -.1], [S[0] + 1.0, -.14]];
+    const along = (P, k) => { k = clamp(k, 0, 1) * 2; const i = Math.min(1, Math.floor(k)), f = k - i; return [lerp(P[i][0], P[i + 1][0], f), lerp(P[i][1], P[i + 1][1], f)]; };
+    crest.push(along(vent, m), along(vent, m * .66), along(vent, m * .33), along(dors, m));
+    if (m < .02) { crest.length = 0; crest.push([S[0] - .03, S[1]], [S[0] + .04, S[1] + .02]); }
+  }
+  return { u, t, W, r, c, closed, sep, top, D, tp, plate, ectoR, parax, paraxShow, inter, latSom, latSpl, noto, endo, streak, onStreak, crest, crestOn, nSom: Math.round(nSom), crestPt, archTop };
+}
+const mirror = (poly) => poly.map(([x, y]) => [-x, y]).reverse();
+
+/* ---------- three.js ---------- */
+const M = {
+  id: "m1", name: "神經管", title: "神經管的形成與閉合", sub: "第 3–4 週：神經板 → 神經溝 → 神經管；神經孔關閉、神經嵴遷出。",
+  range: [17, 30], speed: 1.1, next: "m2", events: EVENTS, evLbl: "時間軸（Langman）",
+  legendLbl: "胚層（點一下開關）", legend: LAYERS, layers: Object.fromEntries(LAYERS.map((l) => [l.id, true])),
+  secTitle: "橫切面", secEnds: ["尾端", "頭端"], cutRange: [.06, .96, .005], cut: .5,
+  note: "示意模型：胚盤攤平畫、比例放大，未畫第 4 週的胚體摺疊與羊膜。來源：Langman 與 Haines《Fundamental Neuroscience》（老師用書），兩者不同處並列。",
+  struct: STRUCT, group: new THREE.Group(),
+};
+scene.add(M.group);
+const clipPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+const MAT = {};
+for (const k of ["ecto", "neuro", "crest", "meso", "somite", "noto", "endo", "streak"]) MAT[k] = mat("--c-" + k);
+
+const NU = 150;
+const US = Array.from({ length: NU }, (_, i) => .015 + (.985 - .015) * i / (NU - 1));
+const LOFTS = [];
+function loft(name, struct, layer, matKey, npts, get, range) {
+  const mesh = new THREE.Mesh(ringGeometry(NU, npts), MAT[matKey]);
+  mesh.userData = { struct, layer, name }; M.group.add(mesh);
+  const L = { name, mesh, npts, get, range, layer }; LOFTS.push(L); return L;
+}
+function taperPoly(poly, s) {
+  if (s >= 1) return poly; let cx = 0, cy = 0; for (const p of poly) { cx += p[0]; cy += p[1]; } cx /= poly.length; cy /= poly.length;
+  return poly.map(([x, y]) => [cx + (x - cx) * s, cy + (y - cy) * s]);
+}
+const endTaper = (u, a, b) => Math.sqrt(Math.max(0, Math.min(1, (u - a) / .03, (b - u) / .03)));
+
+loft("plate", "plate", "neuro", "neuro", NP * 2, (S) => S.plate, () => [0, 1]);
+loft("ectoR", "ecto", "ecto", "ecto", NE * 2, (S) => S.ectoR, () => [0, 1]);
+loft("ectoL", "ecto", "ecto", "ecto", NE * 2, (S) => mirror(S.ectoR), () => [0, 1]);
+loft("noto", "noto", "noto", "noto", 16, (S) => S.noto, () => [.1, .83]);
+loft("paraxR", "parax", "meso", "meso", 14, (S) => taperPoly(S.parax, S.paraxShow), (t) => [plateStart(t) - .02, .78]);
+loft("paraxL", "parax", "meso", "meso", 14, (S) => mirror(taperPoly(S.parax, S.paraxShow)), (t) => [plateStart(t) - .02, .78]);
+loft("interR", "inter", "meso", "meso", 10, (S) => S.inter, () => [.12, .74]);
+loft("interL", "inter", "meso", "meso", 10, (S) => mirror(S.inter), () => [.12, .74]);
+loft("latSomR", "lat", "meso", "meso", 5, (S) => S.latSom, () => [.04, .96]);
+loft("latSomL", "lat", "meso", "meso", 5, (S) => mirror(S.latSom), () => [.04, .96]);
+loft("latSplR", "lat", "meso", "meso", 5, (S) => S.latSpl, () => [.04, .96]);
+loft("latSplL", "lat", "meso", "meso", 5, (S) => mirror(S.latSpl), () => [.04, .96]);
+loft("endo", "endo", "endo", "endo", 5, (S) => S.endo, () => [0, 1]);
+loft("streak", "streak", "ecto", "streak", 5, (S) => taperPoly(S.streak, S.onStreak), (t) => [.03, streakTop(t)]);
+
+// 體節（instanced）
+const somites = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 20, 14), MAT.somite, 44);
+somites.userData = { struct: "somite", layer: "meso" }; M.group.add(somites);
+// 原結
+const node = new THREE.Mesh(new THREE.SphereGeometry(.09, 16, 12), MAT.streak);
+node.userData = { struct: "streak", layer: "ecto" }; M.group.add(node);
+// 神經嵴細胞
+const CREST_U = []; for (let u = .1; u <= .96; u += .018) CREST_U.push(u);
+const crestMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 10, 8), MAT.crest, CREST_U.length * 8);
+crestMesh.userData = { struct: "crest", layer: "crest" }; M.group.add(crestMesh);
+// 切面標示框與切口
+const [planeMarker, planeEdge] = planeFrame(.12, .7);
+M.group.add(planeMarker, planeEdge);
+const capGroup = new THREE.Group(); M.group.add(capGroup);
+
+const dummy = new THREE.Object3D();
+let geoT = null, capKey = null; // 幾何只跟天數有關；天數沒變（拖切面、開關圖層）就不重算
+function buildGeo(t) {
+  const secs = US.map((u) => section(u, t));
+  for (const L of LOFTS) {
+    const pos = L.mesh.geometry.attributes.position.array;
+    const [a, b] = L.range(t);
+    const polys = secs.map((S, i) => taperPoly(L.get(S), endTaper(US[i], a, b)));
+    // 方向一致（取面積最大的那圈決定）
+    let best = 0, sign = 1; for (const P of polys) { const A = area(P); if (Math.abs(A) > best) { best = Math.abs(A); sign = Math.sign(A); } }
+    for (let i = 0; i < NU; i++) {
+      let P = polys[i]; if (sign < 0) P = P.slice().reverse();
+      const z = zOf(US[i]);
+      for (let k = 0; k < L.npts; k++) { const p = P[k % P.length]; const o = (i * L.npts + k) * 3; pos[o] = p[0]; pos[o + 1] = p[1]; pos[o + 2] = z; }
+    }
+    L.mesh.geometry.attributes.position.needsUpdate = true;
+    L.mesh.geometry.computeVertexNormals(); L.mesh.geometry.computeBoundingSphere();
+  }
+  // 體節
+  let j = 0;
+  for (let k = 0; k < Math.floor(somiteCount(t)); k++) for (const side of [1, -1]) {
+    if (j >= 44) break;
+    dummy.position.set(side * .66, -.38, zOf(U_SOM1 - k * DS)); dummy.scale.set(.29, .2, DS * LEN * .46); dummy.updateMatrix(); somites.setMatrixAt(j++, dummy.matrix);
+  }
+  somites.count = j; somites.instanceMatrix.needsUpdate = true; somites.computeBoundingSphere();
+  // 原結
+  node.position.set(0, .02, zOf(streakTop(t)));
+  // 神經嵴
+  let ci = 0;
+  for (const u of CREST_U) {
+    const S = section(u, t); if (!S.crest.length) continue;
+    for (const [x, y] of S.crest) for (const side of [1, -1]) {
+      dummy.position.set(side * x, y, zOf(u)); const s = .05; dummy.scale.set(s, s, s); dummy.updateMatrix(); crestMesh.setMatrixAt(ci++, dummy.matrix);
+    }
+  }
+  crestMesh.count = ci; crestMesh.instanceMatrix.needsUpdate = true; crestMesh.computeBoundingSphere();
+}
+M.update = function () {
+  const t = state.day, layers = M.layers;
+  if (geoT !== t) { geoT = t; buildGeo(t); }
+  // 切面
+  const zc = zOf(M.cut), D = discHalf(M.cut);
+  planeMarker.position.set(0, .2, zc); planeMarker.scale.set(D * 2 + .5, 2.2, 1);
+  planeEdge.position.copy(planeMarker.position); planeEdge.scale.copy(planeMarker.scale);
+  planeMarker.visible = planeEdge.visible = !state.cut3d;
+  clipPlane.constant = -zc;
+  for (const m of Object.values(MAT)) m.clippingPlanes = state.cut3d ? [clipPlane] : [];
+  buildCaps();
+  for (const L of LOFTS) L.mesh.visible = layers[L.layer];
+  somites.visible = layers.meso; crestMesh.visible = layers.crest;
+  node.visible = layers.ecto && t < 29.5;
+};
+
+function secPolys(S) {
+  const L = [];
+  const on = M.layers;
+  if (on.endo) L.push(["endo", "endo", S.endo]);
+  if (on.meso) {
+    const isSom = S.paraxShow && S.nSom > 0 && somiteProfile(S.u, S.t) > .15;
+    if (S.paraxShow) L.push([isSom ? "somite" : "parax", isSom ? "somite" : "meso", S.parax], [isSom ? "somite" : "parax", isSom ? "somite" : "meso", mirror(S.parax)]);
+    else if (S.nSom > 0 && S.u < .78 && S.u > plateStart(S.t)) {
+      const P = ellipse(.66, -.38, .29 * Math.max(.25, somiteProfile(S.u, S.t) ** .5), .2, 14);
+      L.push(["somite", "somite", P], ["somite", "somite", mirror(P)]);
+    }
+    if (S.u > .12 && S.u < .74) L.push(["inter", "meso", S.inter], ["inter", "meso", mirror(S.inter)]);
+    L.push(["lat", "meso", S.latSom], ["lat", "meso", mirror(S.latSom)], ["lat", "meso", S.latSpl], ["lat", "meso", mirror(S.latSpl)]);
+  }
+  if (on.noto && S.u > .1 && S.u < .83) L.push(["noto", "noto", S.noto]);
+  if (on.neuro) L.push(["plate", "neuro", S.plate]);
+  if (on.ecto) { L.push(["ecto", "ecto", S.ectoR], ["ecto", "ecto", mirror(S.ectoR)]); if (S.onStreak) L.push(["streak", "streak", S.streak]); }
+  return L;
+}
+// 3D 切口的面
+function buildCaps() { // 天數、切面、圖層、主題都沒變就不重建
+  const key = state.cut3d ? [state.day, M.cut, JSON.stringify(M.layers), themeGen].join() : "";
+  if (key === capKey) return; capKey = key;
+  clearGroup(capGroup);
+  if (!state.cut3d) return;
+  const S = section(M.cut, state.day), z = zOf(M.cut) + .002;
+  for (const [struct, mk, P] of secPolys(S)) {
+    const g = capGeometry(P, (x, y) => [x, y, z]); if (!g) continue;
+    capGroup.add(capMesh(g, MAT[mk], struct));
+  }
+  // 神經嵴細胞（切面上）
+  if (M.layers.crest) for (const [x, y] of S.crest) for (const side of [1, -1]) {
+    const m = capMesh(new THREE.CircleGeometry(.05, 14), MAT.crest, "crest");
+    m.position.set(side * x, y, z + .003); capGroup.add(m);
+  }
+}
+
+/* ---------- 名稱標籤 ---------- */
+M.tagAnchors = function () {
+  const t = state.day, A = [], layers = M.layers;
+  const hd = fuseFrontHead(t), tl = fuseFrontTail(t);
+  if (layers.neuro) {
+    if (t < 18.8) A.push(["神經板", [0, .05, zOf(.55)], "plate"]);
+    else if (t < 22) { A.push(["神經溝", [0, .05, zOf(.5)], "plate"]); A.push(["神經褶", [plateHalf(.85, t) * .55, .45, zOf(.86)], "plate"]); }
+    else {
+      const mid = (Math.max(tl, plateStart(t)) + Math.min(hd, .97)) / 2, S = section(mid, t);
+      A.push(["神經管", [0, S.archTop + .05, zOf(mid)], "plate"]);
+      if (t < 25) { const u = (hd + U_PLATE_END) / 2; A.push(["頭側神經孔", [0, section(u, t).crestPt[1] + .2, zOf(u)], "plate", "hot"]); }
+      if (t < 28) { const u = (tl + plateStart(t)) / 2 + .01; A.push(["尾側神經孔", [0, section(u, t).crestPt[1] + .15, zOf(u)], "plate", "hot"]); }
+    }
+  }
+  const n = Math.floor(somiteCount(t));
+  if (layers.meso && n) { const u = U_SOM1 - Math.min(n - 1, 6) * DS; A.push([`體節（${Math.round(somiteCount(t))} 對）`, [layers.ecto ? 1.0 : .7, .12, zOf(u)], "somite"]); }
+  if (layers.ecto && t < 29.5) A.push(["原結", [0, .1, zOf(streakTop(t))], "streak"]);
+  if (layers.crest && t > 19.6 && t < 22.5) { const S = section(.8, t); A.push(["神經嵴", [-S.crestPt[0], S.crestPt[1] + .05, zOf(.8)], "crest"]); }
+  return A;
+};
+M.tagShown = (p) => !state.cut3d || p[2] > zOf(M.cut);
+
+/* ---------- 2D 橫切面 ---------- */
+function secXform(W, H) {
+  const X0 = -2.3, X1 = 2.3, Y0 = -.8, Y1 = 1.3, pad = W * .04, top = H * .05;
+  const sc = Math.min((W - 2 * pad) / (X1 - X0), (H - 2 * top) / (Y1 - Y0));
+  return { sc, ox: W / 2, oy: top + Y1 * sc };
+}
+M.drawSection = function (ctx, W, H, dpr) {
+  const S = section(M.cut, state.day), layers = M.layers;
+  const { sc, ox, oy } = secXform(W, H);
+  const P = ([x, y]) => [ox + x * sc, oy - y * sc];
+  const hits = [];
+  for (const [struct, mk, poly] of secPolys(S)) {
+    if (Math.abs(area(poly)) < 1e-5) continue;
+    fillPoly(ctx, poly.map(P), css(MAT[mk].userData.css), struct);
+    hits.push([struct, poly.map(P)]);
+  }
+  if (layers.crest) for (const c of S.crest) for (const side of [1, -1]) {
+    const q = P([side * c[0], c[1]]); ctx.beginPath(); ctx.arc(q[0], q[1], .05 * sc, 0, Math.PI * 2);
+    ctx.fillStyle = css("--c-crest"); ctx.fill(); ctx.strokeStyle = "rgba(0,0,0,.35)"; ctx.lineWidth = 1; ctx.stroke();
+    hits.push(["crest", ellipse(side * c[0], c[1], .07, .07, 8).map(P)]);
+  }
+  // 標籤
+  const labs = [];
+  const plateName = S.closed > .5 ? "神經管" : S.c > .12 ? (S.c > .5 ? "神經褶" : "神經溝") : "神經板";
+  if (layers.neuro && S.W > .05) { const q = S.plate[Math.round(NP * .22)]; labs.push([plateName, S.closed > .5 ? [-(S.r + S.tp / 2), S.r] : [q[0], q[1] - S.tp / 2], "L", "plate"]); }
+  if (layers.noto && S.u > .1 && S.u < .83) labs.push(["脊索", [-.1, -S.tp - .13], "L", "noto"]);
+  if (layers.endo) labs.push(["內胚層", [-S.D * .6, -.7], "L", "endo"]);
+  if (layers.meso) {
+    labs.push(["側板中胚層", [-(1.2 + S.D) / 2 - .15, -.52], "L", "lat"]);
+    const somNow = S.nSom > 0 && S.u < .78 && (somiteProfile(S.u, S.t) > .15 || !S.paraxShow);
+    labs.push([somNow ? "體節" : "軸旁中胚層", [.66, -.38], "R", somNow ? "somite" : "parax"]);
+    if (S.u > .12 && S.u < .74) labs.push(["中間中胚層", [1.06, -.4], "R", "inter"]);
+    if (sm(19.5, 23, S.t) > .3) labs.push(["胚內體腔", [-(1.2 + S.D) / 2, -.37], "L", "lat"]);
+  }
+  if (layers.ecto) labs.push(["表面外胚層", [S.D * .75, .0], "R", "ecto"]);
+  if (layers.crest && S.crest.length) labs.push(["神經嵴", S.crest[S.crest.length - 1], "R", "crest"]);
+  drawLeaders(ctx, labs.map(([txt, p, side, s]) => [txt, P(p), side, s]), W, H, dpr);
+  dirText(ctx, W, H, dpr, "背側（羊膜腔）", "腹側（卵黃囊）");
+  return { hits, where: whereText(M.cut) };
+};
+function whereText(u) {
+  const k = Math.round((U_SOM1 - u) / DS) + 1;
+  if (u > U_SOM1 + .02) return "頭端（將來的腦）";
+  if (u < streakTop(state.day)) return "原條區";
+  if (k <= 4) return "枕部體節高度";
+  return `約第 ${k} 對體節高度${k > Math.floor(somiteCount(state.day)) ? "（尚未分節）" : ""}`;
+}
+
+/* ---------- 卡片、天數、鏡頭、點選 ---------- */
+M.cardState = (s) => {
+  const st = section(s === "plate" ? clamp(M.cut, plateStart(state.day) + .02, .95) : M.cut, state.day);
+  st.n = Math.round(somiteCount(state.day)); return st;
+};
+M.dayInfo = (t) => { const n = Math.round(somiteCount(t)); return n ? `約 ${n} 對體節` : "尚無體節"; };
+M.views = [
+  { id: "dorsal", label: "背面", v: () => ({ p: [0, 13, -1.2], t: [0, 0, .3] }) },
+  { id: "oblique", label: "斜面", v: () => ({ p: [6.2, 6.4, -7.4], t: [0, -.1, .6] }) },
+  { id: "cut", label: "切面", cut: true, v: () => { const z = zOf(M.cut); return { p: [2.4, 2.1, z - 5], t: [0, -.15, z + 1.2] }; } },
+];
+M.defaultView = "oblique";
+M.pick = function (ray) {
+  const objs = [...LOFTS.map((L) => L.mesh), somites, crestMesh, node, ...capGroup.children].filter((o) => o.visible);
+  let hits = ray.intersectObjects(objs, false);
+  if (state.cut3d) hits = hits.filter((h) => h.object.parent === capGroup || h.point.z >= zOf(M.cut) - .01);
+  return hits.length ? hits[0].object.userData.struct : null;
+};
+Object.assign(M, { section, somiteCount, foldState });
+return M;
+})();
+
+/* ===== 模組 2：腦泡與腦室（第 28–60 天；Langman＋Haines；腦曲畫 Haines 的 4 個，不同處卡片並列） ===== */
+const M2 = (() => {
+// cut：點事件時切面跳到的位置（0 正中，往外側增加）：第 30 天前腦外側壁、第 44 天菱唇、第 60 天大腦半球，其餘正中
+const EVENTS = [
+  { d: 28, cut: 0, t: "三個初級腦泡", s: "前腦、中腦、菱腦；頸曲、頭曲出現（第 4 週，老師 p.17）。" },
+  { d: 30, cut: 0.4, t: "大腦半球外突", s: "前腦外側壁往兩側外突，之後成大腦半球（第 5 週初）。" },
+  { d: 32, cut: 0, t: "五個次級腦泡", s: "前腦 → 端腦＋間腦；菱腦 → 後腦＋末腦（第 5 週，老師 p.18）。" },
+  { d: 35, cut: 0, t: "橋曲、端腦曲", s: "共 4 個腦曲（Haines；Langman 只列 3 個）；橋曲方向與頸曲、頭曲相反。投影片文字與 Haines 4th p.67 寫第 5 週（考試答第 5 週）；Haines 圖（p.68 Fig. 5-7，老師 p.18）到 6 週圖才畫出這兩個腦曲。" },
+  { d: 44, cut: 0.3, t: "菱唇", s: "後腦翼板背外側增厚成菱唇（Langman Fig. 18.18；天數為示意）。" },
+  { d: 49, cut: 0, t: "脈絡叢", s: "腦室頂被軟腦膜血管頂入成脈絡叢：約 7 週第四腦室已有（Haines），7–8 週第三腦室、側腦室也有（Langman Fig. 18.24–18.25）。腦室模式才畫。" },
+  { d: 56, cut: 0, t: "小腦板", s: "橋曲加深，兩側菱唇被頭尾向壓扁、在中線接成小腦板（Langman Fig. 18.20，8 週）。" },
+  { d: 60, cut: 0.7, t: "半球蓋住間腦", s: "大腦半球往前、上、後長，蓋住間腦外側（約 8.5 週，老師 p.18）；中腦、小腦還露在外面。" },
+];
+// 沿神經管弧長 s：0 = 脊髓上段，1 = 端腦前端（終板）
+const REG = [
+  { id: "spin", s0: 0, s1: .15, css: "--c-spin", p: "--c-spin" },
+  { id: "myel", s0: .15, s1: .38, css: "--c-myel", p: "--c-rhomb" },
+  { id: "met", s0: .38, s1: .53, css: "--c-met", p: "--c-rhomb" },
+  { id: "mes", s0: .53, s1: .69, css: "--c-mes", p: "--c-mes" },
+  { id: "dien", s0: .69, s1: .86, css: "--c-dien", p: "--c-pros" },
+  { id: "tel", s0: .86, s1: 1.001, css: "--c-tel", p: "--c-pros" },
+];
+const REG3 = [
+  { id: "spin", s0: 0, s1: .15, css: "--c-spin" },
+  { id: "rhomb", s0: .15, s1: .53, css: "--c-rhomb" },
+  { id: "mes", s0: .53, s1: .69, css: "--c-mes" },
+  { id: "pros", s0: .69, s1: 1.001, css: "--c-pros" },
+];
+const VREG = [{ id: "cc", s0: 0, s1: .15 }, { id: "v4", s0: .15, s1: .53 }, { id: "aq", s0: .53, s1: .69 }, { id: "v3", s0: .69, s1: 1.001 }];
+const NAME = { spin: "脊髓", myel: "末腦", met: "後腦", mes: "中腦", dien: "間腦", tel: "端腦", pros: "前腦", rhomb: "菱腦",
+  cc: "中央管", v4: "第四腦室", aq: "大腦導水管", v3: "第三腦室", latv: "側腦室", ivf: "室間孔", optic: "視泡", hemi: "大腦半球", cbl: "菱唇", cp: "脈絡叢" };
+// 腦曲：dir −1 往腹側彎，+1 往背側彎（角度為示意）
+const FLEX = [
+  { id: "cerv", name: "頸曲", s: .15, w: .07, dir: -1, A: (t) => 60 + 25 * sm(28, 40, t) },
+  { id: "pont", name: "橋曲", s: .38, w: .08, dir: 1, A: (t) => 60 * sm(31, 40, t) + 30 * sm(46, 60, t) }, // 第 7–8 週再加深（D3，示意）
+  { id: "ceph", name: "頭曲", s: .61, w: .10, dir: -1, A: (t) => 95 + 50 * sm(28, 42, t) },
+  { id: "telf", name: "端腦曲", s: .865, w: .06, dir: -1, A: (t) => 40 * sm(32, 42, t) },
+];
+// 截面：[s, 半寬 a, 半高 b, 腦室半寬, 腦室半高, 腦室往背側偏移]
+const P28 = [[0, .30, .34, .09, .11, 0], [.14, .32, .36, .10, .12, 0], [.22, .42, .40, .24, .24, .03], [.32, .54, .46, .38, .32, .05], [.45, .56, .50, .40, .36, .05],
+  [.53, .40, .42, .25, .27, 0], [.61, .54, .58, .38, .42, 0], [.69, .44, .50, .28, .34, 0], [.78, .58, .64, .42, .48, 0], [.90, .60, .64, .44, .48, 0], [1, .52, .56, .36, .40, 0]];
+const P42 = [[0, .28, .32, .05, .07, 0], [.14, .30, .34, .06, .08, 0], [.21, .46, .38, .30, .22, .07], [.31, .86, .42, .72, .28, .10], [.42, .80, .50, .64, .32, .11],
+  [.49, .54, .48, .34, .28, .05], [.53, .38, .42, .15, .18, 0], [.61, .58, .64, .22, .30, .03], [.69, .40, .50, .11, .30, 0], [.74, .42, .72, .08, .52, 0],
+  [.82, .42, .72, .08, .52, 0], [.87, .40, .62, .12, .44, 0], [.94, .42, .52, .18, .32, 0], [1, .36, .42, .12, .22, 0]];
+const P60 = [[0, .28, .32, .04, .06, 0], [.14, .30, .34, .05, .07, 0], [.21, .46, .36, .30, .20, .08], [.31, .84, .42, .70, .26, .11], [.42, .82, .54, .62, .30, .13],
+  [.49, .56, .50, .30, .26, .06], [.53, .40, .44, .09, .11, 0], [.61, .54, .60, .09, .12, .02], [.69, .40, .50, .08, .20, 0], [.74, .42, .74, .07, .54, 0],
+  [.82, .42, .74, .07, .54, 0], [.87, .40, .62, .10, .44, 0], [.94, .40, .50, .14, .30, 0], [1, .34, .40, .10, .20, 0]];
+const NS = 200, NR = 32, NH = 64, NC = 24, NP = 40, LT = 10, DEG = Math.PI / 180, TH0 = 95 * DEG;
+const sOf = (i) => i / (NS - 1);
+const X = [1, 0, 0];
+function tab(T, s) {
+  if (s <= T[0][0]) return T[0].slice(1);
+  for (let i = 1; i < T.length; i++) if (s <= T[i][0]) {
+    let f = (s - T[i - 1][0]) / (T[i][0] - T[i - 1][0]); f = f * f * (3 - 2 * f);
+    return T[i].slice(1).map((v, k) => lerp(T[i - 1][k + 1], v, f));
+  }
+  return T[T.length - 1].slice(1);
+}
+const split = (t) => sm(30.5, 32, t);     // 3D 顏色：三腦泡 → 五腦泡
+const five = (t) => t >= 31.5;            // 名稱、切面、點選
+const regions = (t) => five(t) ? REG : REG3;
+const regionAt = (s, t) => regions(t).find((r) => s < r.s1) || REG[REG.length - 1];
+const ventAt = (s) => VREG.find((r) => s < r.s1).id;
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const norm = (v) => { const L = Math.hypot(...v) || 1; return v.map((x) => x / L); };
+const add = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
+
+/* ---------- 幾何 ---------- */
+const G = { C: [], N: [], a: [], b: [], va: [], vb: [], vo: [], hemi: [], g0: 0, bb: null };
+function at(arr, s) { // 沿 s 內插（向量或數值）
+  const x = clamp(s, 0, 1) * (NS - 1), i = Math.min(NS - 2, Math.floor(x)), f = x - i, A = arr[i], B = arr[i + 1];
+  return typeof A === "number" ? lerp(A, B, f) : A.map((v, k) => lerp(v, B[k], f));
+}
+function compute(t) {
+  const k1 = sm(28, 42, t), k2 = sm(44, 60, t);
+  const thAt = (s) => TH0 + FLEX.reduce((acc, f) => acc + f.dir * f.A(t) * DEG * sm(f.s - f.w, f.s + f.w, s), 0);
+  const ds = LT / (NS - 1); let y = 0, z = 0;
+  for (let i = 0; i < NS; i++) {
+    const s = sOf(i), th = thAt(s);
+    if (i) { const tm = thAt(s - .5 / (NS - 1)); y += Math.sin(tm) * ds; z += Math.cos(tm) * ds; }
+    G.C[i] = [0, y, z]; G.N[i] = [0, Math.cos(th), -Math.sin(th)];
+    const r28 = tab(P28, s), r42 = tab(P42, s), r60 = tab(P60, s);
+    const r = r28.map((v, k) => lerp(lerp(v, r42[k], k1), r60[k], k2));
+    const fo = s > .93 ? Math.sqrt(Math.max(0, 1 - ((s - .93) / .07) ** 2)) : s < .015 ? Math.sqrt(s / .015) : 1;
+    const fv = s > .92 ? Math.sqrt(Math.max(0, 1 - ((s - .92) / .06) ** 2)) : s < .02 ? Math.sqrt(s / .02) : 1;
+    G.a[i] = r[0] * fo; G.b[i] = r[1] * fo; G.va[i] = r[2] * fv; G.vb[i] = r[3] * fv; G.vo[i] = r[4] * fv;
+  }
+  // 置中
+  let y0 = 1e9, y1 = -1e9, z0 = 1e9, z1 = -1e9;
+  for (let i = 0; i < NS; i++) for (const k of [-1, 1]) {
+    const p = add(G.C[i], G.N[i], k * G.b[i]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); z0 = Math.min(z0, p[2]); z1 = Math.max(z1, p[2]);
+  }
+  const cy = (y0 + y1) / 2, cz = (z0 + z1) / 2;
+  for (const c of G.C) { c[1] -= cy; c[2] -= cz; }
+  G.bb = { y0: y0 - cy, y1: y1 - cy, z0: z0 - cz, z1: z1 - cz };
+  // 大腦半球：從端腦前端沿腦的彎曲往後長
+  const g0 = sm(29.5, 33, t), gl = sm(31, 60, t); G.g0 = g0; G.gl = gl;
+  // 第 7–8 週半球再加大，側面看蓋住間腦外側（老師 p.18 Haines 8.5 週圖）；不往後蓋中腦（Langman Fig. 18.27 要 10 週）
+  const R = lerp(.25, .56, gl) * lerp(1, 1.35, sm(46, 60, t)), rxm = R * .9 * g0, rym = R * 1.1 * g0, hv = lerp(.05, .22, gl), sEnd = lerp(.9, .70, gl);
+  const xh = Math.max(rxm + .05, at(G.a, .95) * .8);
+  G.xh = xh; G.hemi = [];
+  const pathAt = (q) => { const s = lerp(.985, sEnd, q); return add(at(G.C, s), at(G.N, s), hv); };
+  for (let j = 0; j < NH; j++) {
+    const q = j / (NH - 1), p = pathAt(q);
+    const T = norm(add(pathAt(Math.min(1, q + .01)), pathAt(Math.max(0, q - .01)), -1));
+    const f = Math.pow(Math.max(0, Math.sin(Math.PI * q)), .4);
+    G.hemi.push({ q, p, N: cross(T, X), rx: rxm * f, ry: rym * f, vx: rxm * lerp(.5, .3, gl) * f, vy: rym * lerp(.55, .4, gl) * f });
+  }
+  for (const h of G.hemi) { G.bb.y0 = Math.min(G.bb.y0, h.p[1] - h.ry); G.bb.y1 = Math.max(G.bb.y1, h.p[1] + h.ry); G.bb.z0 = Math.min(G.bb.z0, h.p[2] - h.ry); G.bb.z1 = Math.max(G.bb.z1, h.p[2] + h.ry); }
+  G.ivfA = at(G.C, .88); G.ivfB = G.hemi[Math.round(.3 * (NH - 1))].p;
+  // 視泡：間腦腹外側
+  const se = .78, Ce = at(G.C, se), Ne = at(G.N, se), ae = at(G.a, se), be = at(G.b, se);
+  G.eye = { c: add(Ce, Ne, -be * .7), x: ae + .12, r: .2, stalk: add(Ce, Ne, -be * .55), sx: ae * .5 };
+  // 菱唇 → 小腦板：後腦翼板背外側的增厚，從尾外側斜向頭內側（只存 +x 側）；第 50–58 天兩側在中線接合（Langman Fig. 18.18、18.20；天數為示意）
+  const gc = sm(40, 50, t), jn = sm(50, 58, t); G.cg = gc; G.cbl = [];
+  NAME.cbl = t >= 56 ? "小腦板" : "菱唇";
+  for (let j = 0; j < NC; j++) {
+    const u = j / (NC - 1), s = lerp(.505, .43, u), a = at(G.a, s), b = at(G.b, s), Nn = at(G.N, s);
+    const fx = lerp(lerp(.35, 0, jn), .8, u), n = b * Math.sqrt(1 - fx * fx);
+    const f = Math.sqrt(Math.max(0, Math.sin(Math.PI * lerp(lerp(0, .5, jn), 1, u))));
+    const S = norm(add([fx / a, 0, 0], Nn, n / (b * b))), rv = lerp(.05, .26, gc) * f; // S：腦壁表面法向
+    G.cbl.push({ p: add(add(add(at(G.C, s), X, fx * a), Nn, n), S, rv * .45), T: cross(X, Nn), S, x: fx * a, rv, rw: lerp(.07, .2, gc) * f });
+  }
+  // 脈絡叢：腦室頂被血管頂入（Haines 5th p.93–96；Langman Fig. 18.24–18.25）；第四腦室先、第三腦室與側腦室後（天數為示意）
+  G.cp4 = sm(44, 50, t); G.cp3 = sm(48, 56, t);
+  const lump = (u) => (1 + .35 * Math.sin(u * Math.PI * 13)) * Math.sqrt(Math.sin(Math.PI * u));
+  const roof = (s0, s1, g, k) => Array.from({ length: NP }, (_, j) => {
+    const u = j / (NP - 1), s = lerp(s0, s1, u), N = at(G.N, s);
+    return { p: add(at(G.C, s), N, at(G.vo, s) + at(G.vb, s) * k), N, x: 0, rx: at(G.va, s) * .35 * g * Math.sqrt(Math.sin(Math.PI * u)), ry: .1 * g * lump(u) };
+  });
+  G.cp = [roof(.24, .36, G.cp4, .8), roof(.72, .84, G.cp3, 1)];
+  G.cpl = Array.from({ length: NP }, (_, j) => { // 側腦室內側壁（脈絡裂），只存 +x 側
+    const u = j / (NP - 1), h = G.hemi[Math.round(lerp(.25, .75, u) * (NH - 1))];
+    return { p: [G.xh - h.vx, h.p[1], h.p[2]], N: h.N, x: G.xh - h.vx, rx: .1 * G.cp3 * Math.sqrt(Math.sin(Math.PI * u)), ry: h.vy * .35 * G.cp3 * lump(u) };
+  });
+}
+
+/* ---------- three.js ---------- */
+const M = {
+  id: "m2", name: "腦泡與腦室", title: "腦泡、腦曲與腦室",
+  sub: "第 4–8 週：三個初級腦泡 → 五個次級腦泡；4 個腦曲（Haines）；管腔成為腦室系統。",
+  range: [28, 60], speed: 2.8, next: "m3", events: EVENTS, evLbl: "時間軸（Langman＋Haines）",
+  legendLbl: "腦區（點一下看說明）",
+  legend: [...REG.map((r) => ({ id: r.id, name: NAME[r.id], css: r.css })), { id: "vent", name: "腦室", css: "--c-vent", toggle: true }],
+  secTitle: "矢狀切面", secEnds: ["正中", "外側"], cutRange: [0, 1.1, .01], cut: 0,
+  secModes: [{ id: "sag", label: "矢狀", title: "矢狀切面" }, { id: "cor", label: "冠狀", title: "間腦冠狀切面", fixed: true, hint: "固定示意圖，不隨天數與切面改變" }], secMode: "sag",
+  note: "示意模型：只畫神經管本身，大小固定不隨天數長大，腦曲角度為示意；未畫腦脊髓液流向；脈絡叢只在腦室模式畫（示意）。第 6 週以後各腔室跟著腦泡變形，但都屬腦室系統（上課補充，共筆）。第 3 個月以後半球繼續往後蓋過中腦、小腦長大。來源：Langman 與 Haines《Fundamental Neuroscience》（老師用書），兩者不同處並列。",
+  flags: { vent: false }, toggles: [{ id: "vent", label: "腦室", title: "腦壁變透明、只看腦室（快捷鍵 V）", key: "v" }],
+  struct: null, group: new THREE.Group(),
+};
+scene.add(M.group);
+const colMat = matBank();
+const wallMat = std({ vertexColors: true }), hemiMat = std(), eyeMat = std(), ventMat = mat("--c-vent", { roughness: .45 });
+const cblMat = mat("--c-met"), cpMat = mat("--c-roof", { roughness: .5 }); // 脈絡叢借頂板色（脈絡組織由頂板拉成）
+const MATS2 = [wallMat, hemiMat, eyeMat, ventMat, cblMat, cpMat];
+const clipPlane = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
+
+function makeTube(n, nr, material, ud, colors) {
+  const mesh = new THREE.Mesh(ringGeometry(n, nr, colors), material); mesh.userData = { n, nr, ...ud }; M.group.add(mesh); return mesh;
+}
+function fillTube(mesh, ring) { // ring(i) → [中心, 寬軸, 高軸, 半寬, 半高, 顏色]
+  const { n, nr } = mesh.userData, pos = mesh.geometry.attributes.position.array, col = mesh.geometry.attributes.color?.array;
+  for (let i = 0; i < n; i++) {
+    const [p, Xa, Na, rx, ry, c] = ring(i);
+    for (let k = 0; k < nr; k++) {
+      const f = 2 * Math.PI * k / nr, cs = Math.cos(f) * rx, sn = Math.sin(f) * ry, o = (i * nr + k) * 3;
+      pos[o] = p[0] + Xa[0] * cs + Na[0] * sn; pos[o + 1] = p[1] + Xa[1] * cs + Na[1] * sn; pos[o + 2] = p[2] + Xa[2] * cs + Na[2] * sn;
+      if (col && c) { col[o] = c.r; col[o + 1] = c.g; col[o + 2] = c.b; }
+    }
+  }
+  const g = mesh.geometry; g.attributes.position.needsUpdate = true; if (col) g.attributes.color.needsUpdate = true;
+  g.computeVertexNormals(); g.computeBoundingSphere();
+}
+const wall = makeTube(NS, NR, wallMat, { struct: "wall" }, true);
+const vent = makeTube(NS, 20, ventMat, { struct: "vent", vent: true });
+const SIDES = [-1, 1];
+const hemi = SIDES.map(() => makeTube(NH, NR, hemiMat, { struct: "tel" }));
+const latv = SIDES.map(() => makeTube(NH, 16, ventMat, { struct: "latv", vent: true }));
+const ivf = SIDES.map(() => makeTube(2, 12, ventMat, { struct: "ivf", vent: true }));
+const stalk = SIDES.map(() => makeTube(2, 12, eyeMat, { struct: "optic" }));
+const eye = SIDES.map(() => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), eyeMat); m.userData = { struct: "optic" }; M.group.add(m); return m; });
+const cbl = SIDES.map(() => makeTube(NC, 16, cblMat, { struct: "cbl" }));
+const cpMid = [0, 1].map(() => makeTube(NP, 12, cpMat, { struct: "cp", vent: true }));
+const cpLat = SIDES.map(() => makeTube(NP, 12, cpMat, { struct: "cp", vent: true }));
+const [planeMarker, planeEdge] = planeFrame(.06, .35);
+const camDir = new THREE.Vector3();
+for (const o of [planeMarker, planeEdge]) {
+  o.rotation.y = Math.PI / 2; M.group.add(o);
+  // 切面框正對鏡頭（側面視角）時淡出，免得背景蓋一塊暗矩形
+  const op = o.material.opacity;
+  o.onBeforeRender = (r, s, cam) => { cam.getWorldDirection(camDir); o.material.opacity = op * sm(.05, .35, 1 - Math.abs(camDir.x)); };
+}
+const capGroup = new THREE.Group(); M.group.add(capGroup);
+
+let ventMode = null, autoVent = false, geoKey = null, capKey = null;
+const tmpC = new THREE.Color();
+function buildGeo(t) { // 幾何只跟天數（和主題色）有關
+  const sp = split(t);
+  compute(t);
+  const rc = REG.map((r) => tmpC.copy(colOf(r.p)).lerp(colOf(r.css), sp).clone());
+  fillTube(wall, (i) => { const s = sOf(i), k = REG.findIndex((r) => s < r.s1); return [G.C[i], X, G.N[i], G.a[i], G.b[i], rc[k < 0 ? 5 : k]]; });
+  fillTube(vent, (i) => [add(G.C[i], G.N[i], G.vo[i]), X, G.N[i], G.va[i], G.vb[i]]);
+  SIDES.forEach((side, k) => {
+    const H = G.hemi, xs = (p) => [side * G.xh, p[1], p[2]];
+    fillTube(hemi[k], (j) => [xs(H[j].p), X, H[j].N, H[j].rx, H[j].ry]);
+    fillTube(latv[k], (j) => { const q = lerp(.08, .92, j / (NH - 1)), h = H[Math.round(q * (NH - 1))]; return [xs(h.p), X, h.N, h.vx, h.vy]; });
+    const A = G.ivfA, B = xs(G.ivfB), T = norm(add(B, A, -1)), Xi = norm(cross(G.N[Math.round(.88 * (NS - 1))], T)), Ni = cross(T, Xi);
+    fillTube(ivf[k], (i) => [i ? B : A, Xi, Ni, .05, .05]);
+    const E = G.eye, ec = [side * E.x, E.c[1], E.c[2]], es = [side * E.sx, E.stalk[1], E.stalk[2]];
+    eye[k].position.set(...ec); eye[k].scale.setScalar(E.r);
+    const Ts = norm(add(ec, es, -1)), Xs = norm(cross([0, 1, 0], Ts)), Ns = cross(Ts, Xs);
+    fillTube(stalk[k], (i) => [i ? ec : es, Xs, Ns, .07, .07]);
+    const mx = (v) => [side * v[0], v[1], v[2]];
+    fillTube(cbl[k], (j) => { const c = G.cbl[j]; return [mx(c.p), c.T, mx(c.S), c.rw, c.rv]; });
+    fillTube(cpLat[k], (j) => { const c = G.cpl[j]; return [mx(c.p), X, c.N, c.rx, c.ry]; });
+  });
+  cpMid.forEach((m, k) => fillTube(m, (j) => { const c = G.cp[k][j]; return [c.p, X, c.N, c.rx, c.ry]; }));
+  hemiMat.color.copy(colOf("--c-pros")).lerp(colOf("--c-tel"), sp);
+  eyeMat.color.copy(colOf("--c-pros")).lerp(colOf("--c-dien"), sp);
+}
+M.update = function () {
+  const t = state.day, gk = t + "|" + themeGen;
+  if (geoKey !== gk) { geoKey = gk; buildGeo(t); }
+  // 腦室模式：腦壁變透明
+  const vm = M.flags.vent;
+  if (!vm) autoVent = false; // 關掉後再打開就算手動
+  if (vm !== ventMode) {
+    ventMode = vm;
+    for (const m of [wallMat, hemiMat, eyeMat, cblMat]) { m.transparent = vm; m.opacity = vm ? .13 : 1; m.depthWrite = !vm; m.side = vm ? THREE.FrontSide : THREE.DoubleSide; m.needsUpdate = true; }
+  }
+  const showHemi = G.g0 > .01, showLat = G.g0 > .4;
+  hemi.forEach((m) => { m.visible = showHemi; });
+  latv.forEach((m) => { m.visible = showLat && vm; }); ivf.forEach((m) => { m.visible = showLat && vm; });
+  vent.visible = vm;
+  cbl.forEach((m) => { m.visible = G.cg > .01; });
+  cpMid[0].visible = vm && G.cp4 > .01; cpMid[1].visible = vm && G.cp3 > .01; cpLat.forEach((m) => { m.visible = vm && showLat && G.cp3 > .01; });
+  // 切面
+  clipPlane.constant = M.cut;
+  for (const m of MATS2) m.clippingPlanes = state.cut3d ? [clipPlane] : [];
+  const bb = G.bb;
+  for (const o of [planeMarker, planeEdge]) { o.position.set(-M.cut, (bb.y0 + bb.y1) / 2, (bb.z0 + bb.z1) / 2); o.scale.set(bb.z1 - bb.z0 + .6, bb.y1 - bb.y0 + .6, 1); o.visible = !state.cut3d; }
+  buildCaps();
+};
+
+/* ---------- 矢狀切面（x = 常數） ---------- */
+function runs(i0, i1, f) { // f(i) → [中心 z, 中心 y, 法向 z, 法向 y, 半高] 或 null；每段連續的切到 → 一個多邊形（z, y）
+  const out = []; let run = [];
+  const flush = () => {
+    if (run.length >= 2) out.push(run.map((r) => [r[0] + r[2] * r[4], r[1] + r[3] * r[4]]).concat(run.slice().reverse().map((r) => [r[0] - r[2] * r[4], r[1] - r[3] * r[4]])));
+    run = [];
+  };
+  for (let i = i0; i <= i1; i++) { const r = f(i); if (r) run.push(r); else flush(); }
+  flush(); return out;
+}
+const half = (c, a, b) => (a > c ? b * Math.sqrt(1 - (c / a) ** 2) : null);
+const ringRange = (r) => [Math.max(0, Math.floor(r.s0 * (NS - 1))), Math.min(NS - 1, Math.ceil(r.s1 * (NS - 1)))];
+function secPolys(c) {
+  const t = state.day, out = [];   // [構造, 顏色變數, 多邊形, 種類]
+  for (const r of regions(t)) {
+    const [i0, i1] = ringRange(r);
+    for (const P of runs(i0, i1, (i) => { const h = half(c, G.a[i], G.b[i]); return h == null ? null : [G.C[i][2], G.C[i][1], G.N[i][2], G.N[i][1], h]; })) out.push([r.id, r.css, P, "wall"]);
+  }
+  const H = G.hemi, five_ = five(t);
+  if (G.g0 > .01) {
+    const hf = (rk, hk) => (j) => { const h = H[j], d = c - G.xh; return Math.abs(d) < h[rk] ? [h.p[2], h.p[1], h.N[2], h.N[1], h[hk] * Math.sqrt(1 - (d / h[rk]) ** 2)] : null; };
+    for (const P of runs(0, NH - 1, hf("rx", "ry"))) out.push(["tel", five_ ? "--c-tel" : "--c-pros", P, "wall"]);
+    if (G.g0 > .4) {
+      for (const P of runs(Math.round(.08 * (NH - 1)), Math.round(.92 * (NH - 1)), hf("vx", "vy"))) out.push(["latv", "--c-vent", P, "vent"]);
+      const f = c / G.xh;
+      if (f >= 0 && f <= 1) { const A = G.ivfA, B = G.ivfB; out.push(["ivf", "--c-vent", ellipse(lerp(A[2], B[2], f), lerp(A[1], B[1], f), .05, .05, 12), "vent"]); }
+    }
+  }
+  const E = G.eye, d = Math.abs(c - E.x);
+  if (d < E.r) out.push(["optic", five_ ? "--c-dien" : "--c-pros", ellipse(E.c[2], E.c[1], Math.sqrt(E.r ** 2 - d * d), Math.sqrt(E.r ** 2 - d * d), 20), "wall"]);
+  // 菱唇／小腦板：管子大致沿 x 走，切面取 x = c 那一圈
+  const B = G.cbl;
+  if (G.cg > .01) for (let j = 0; j < NC - 1; j++) {
+    const A0 = B[j], A1 = B[j + 1];
+    if ((A0.x - c) * (A1.x - c) > 0 || A0.x === A1.x) continue;
+    const f = (c - A0.x) / (A1.x - A0.x), L = (k) => lerp(A0[k], A1[k], f), V = (k) => A0[k].map((v, i) => lerp(v, A1[k][i], f));
+    const p = V("p"), T = V("T"), S = V("S"), rw = L("rw"), rv = L("rv");
+    if (rw > .01) out.push(["cbl", "--c-met", Array.from({ length: 16 }, (_, i) => { const a = i / 16 * 2 * Math.PI, cw = Math.cos(a) * rw, sv = Math.sin(a) * rv; return [p[2] + T[2] * cw + S[2] * sv, p[1] + T[1] * cw + S[1] * sv]; }), "wall"]);
+    break;
+  }
+  for (const r of VREG) {
+    const [i0, i1] = ringRange(r);
+    for (const P of runs(i0, i1, (i) => { const h = half(c, G.va[i], G.vb[i]); return h == null ? null : [G.C[i][2] + G.N[i][2] * G.vo[i], G.C[i][1] + G.N[i][1] * G.vo[i], G.N[i][2], G.N[i][1], h]; })) out.push([r.id, "--c-vent", P, "vent"]);
+  }
+  // 脈絡叢（畫在腦室上面）
+  const cpRun = (R, g) => { if (g > .01) for (const P of runs(0, NP - 1, (j) => { const q = R[j], h = half(c - q.x, q.rx, q.ry); return h == null ? null : [q.p[2], q.p[1], q.N[2], q.N[1], h]; })) out.push(["cp", "--c-roof", P, "vent"]); };
+  cpRun(G.cp[0], G.cp4); cpRun(G.cp[1], G.cp3); if (G.g0 > .4) cpRun(G.cpl, G.cp3);
+  return out;
+}
+function buildCaps() { // 天數、切面、腦室模式、主題都沒變就不重建
+  const key = state.cut3d ? [state.day, M.cut, M.flags.vent, themeGen].join() : "";
+  if (key === capKey) return; capKey = key;
+  clearGroup(capGroup);
+  if (!state.cut3d) return;
+  for (const [struct, cv, P, kind] of secPolys(M.cut)) {
+    if (kind === "wall" && M.flags.vent) continue;
+    const x = -M.cut - (kind === "vent" ? .006 : .003);
+    const g = capGeometry(P, (z, y) => [x, y, z]); if (!g) continue;
+    const m = capMesh(g, colMat(cv), struct);
+    if (kind === "vent") { m.material.polygonOffset = true; m.material.polygonOffsetFactor = -2; m.renderOrder = 1; }
+    capGroup.add(m);
+  }
+}
+M.drawSection = function (ctx, W, H, dpr) {
+  if (M.secMode === "cor") { // 冠狀：畫間腦卡片的示意圖，點哪裡都選間腦
+    M.figs.coronal(ctx, W, H, dpr);
+    return { hits: [["dien", [[0, 0], [W, 0], [W, H], [0, H]]]], where: "Haines 4th Fig. 5-16 B 簡化" };
+  }
+  const bb = G.bb, polys = secPolys(M.cut);
+  const sc = Math.min(W * .64 / (bb.z1 - bb.z0), H * .8 / (bb.y1 - bb.y0));
+  const ox = W / 2 - (bb.z0 + bb.z1) / 2 * sc, oy = H * .46 + (bb.y0 + bb.y1) / 2 * sc;
+  const P = ([z, y]) => [ox + z * sc, oy - y * sc];
+  const hits = [], labs = [], seen = new Set(), vm = M.flags.vent;
+  for (const [struct, cv, poly, kind] of polys) {
+    const q = poly.map(P);
+    fillPoly(ctx, q, css(cv), struct);
+    hits.push([struct, q]);
+    if ((kind === "vent") === vm && !seen.has(struct)) {
+      seen.add(struct);
+      const k = Math.floor(q.length / 4), m = [(q[k][0] + q[q.length - 1 - k][0]) / 2, (q[k][1] + q[q.length - 1 - k][1]) / 2];
+      labs.push([struct === "tel" && G.g0 > .5 && kind === "wall" && poly !== polys.find((p) => p[0] === "tel")?.[2] ? NAME.hemi : struct === "optic" && state.day >= 34 ? "視杯" : NAME[struct], m, m[0] < W / 2 ? "L" : "R", struct]);
+    }
+  }
+  drawLeaders(ctx, labs, W, H, dpr);
+  dirText(ctx, W, H, dpr, "", "← 尾端　　頭端 →");
+  const hitHemi = polys.some((p) => p[0] === "tel" && p[2].length && G.g0 > .01 && M.cut > G.xh - G.hemi[NH >> 1].rx);
+  return { hits, where: M.cut < .03 ? "正中矢狀切面" : `旁矢狀切面${hitHemi ? "（切到大腦半球）" : ""}` };
+};
+
+/* ---------- 間腦冠狀切面（卡片裡的靜態示意圖；約 8 週，依 Haines 4th Fig. 5-16 B（老師 p.37）簡化重畫） ---------- */
+M.figs = {
+  coronal(ctx, W, H, dpr) {
+    const sc = Math.min(W * .46 / 2, H * .86 / 2.3), ox = W * .47, oy = H / 2 - .1 * sc;
+    const Pp = ([x, y]) => [ox + x * sc, oy - y * sc], mir = (q) => q.map(([x, y]) => [-x, y]);
+    const fill = (q, cv) => fillPoly(ctx, q.map(Pp), css(cv), "");
+    const G = (y, c, w) => Math.exp(-(((y - c) / w) ** 2));
+    // 端腦半球與側腦室（新月形：腦室外框再蓋一塊半球組織）
+    for (const k of [-1, 1]) {
+      fill(ellipse(k * .52, .58, .44, .34, 40), "--c-tel");
+      fill(ellipse(k * .5, .6, .3, .2, 32), "--c-vent");
+      fill(ellipse(k * .43, .5, .21, .12, 28), "--c-tel");
+    }
+    // 間腦（右半輪廓，左右對稱）
+    const half = [[0, .24], [.2, .26], [.42, .22], [.56, .1], [.62, -.08], [.6, -.3], [.52, -.52], [.4, -.72], [.24, -.88], [.1, -.98], [.06, -1.14]];
+    fill(half.concat(mir(half).reverse()), "--c-dien");
+    // 第三腦室：中線窄縫；側壁在上視丘溝（y −.04）、下視丘溝（y −.5）各凹一道；底部變細成漏斗隱窩
+    const SE = -.04, SH = -.5, wall = [];
+    for (let i = 0; i <= 60; i++) {
+      const y = lerp(.2, -1.08, i / 60);
+      wall.push([(.035 + .065 * G(y, SE, .035) + .065 * G(y, SH, .035)) * lerp(.5, 1, sm(-1.08, -.9, y)), y]);
+    }
+    fill(wall.concat(mir(wall).reverse()), "--c-vent");
+    // 視丘間黏合（虛線框，橫跨第三腦室）
+    const mi = [[-.1, -.18], [.1, -.18], [.1, -.34], [-.1, -.34]];
+    fill(mi, "--c-dien");
+    ctx.save(); ctx.setLineDash([4 * dpr, 3 * dpr]); ctx.lineWidth = 1.2 * dpr; ctx.strokeStyle = css("--ink");
+    ctx.beginPath(); mi.map(Pp).forEach((q, i) => (i ? ctx.lineTo(...q) : ctx.moveTo(...q))); ctx.closePath(); ctx.stroke(); ctx.restore();
+    // 頂板＋兩團脈絡叢（垂進第三腦室）
+    fill([[-.07, .2], [.07, .2], [.07, .25], [-.07, .25]], "--c-roof");
+    for (const k of [-1, 1]) fill(ellipse(k * .025, .13, .025, .06, 14), "--c-roof");
+    const L = (t, xy) => [t, Pp(xy), "L"], R = (t, xy) => [t, Pp(xy), "R"];
+    drawLeaders(ctx, [
+      L("端腦", [-.72, .84]), L("側腦室", [-.5, .73]), L("脈絡叢", [-.025, .12]), L("第三腦室", [-.03, -.75]),
+      R("上視丘", [.3, .1]), R("上視丘溝", [.1, SE]), R("背側視丘", [.38, -.24]), R("視丘間黏合＊", [.05, -.27]),
+      R("下視丘溝", [.1, SH]), R("下視丘", [.3, -.68]), R("漏斗", [.06, -1.06]),
+    ], W, H, dpr);
+    dirText(ctx, W, H, dpr, "背側", "腹側");
+  },
+};
+
+/* ---------- 名稱標籤 ---------- */
+const pt = (s, off) => add(at(G.C, s), at(G.N, s), off);
+// 正面視角時神經管沿視線排成一直線，標籤改放左右兩側（k = −1 左、+1 右），轉到其他視角再滑回背腹側
+let wf = 0;
+const sidePt = (s, off, k) => add(pt(s, off * (1 - wf)), X, k * wf * (at(G.a, s) + .45));
+M.tagAnchors = function () {
+  const t = state.day, A = [];
+  camera.getWorldDirection(camDir); wf = sm(.75, .95, Math.abs(camDir.z));
+  if (!M.flags.vent) {
+    for (const r of regions(t)) {
+      const s = (r.s0 + Math.min(1, r.s1)) / 2;
+      if (r.id === "tel" && G.g0 > .5) continue;
+      A.push([NAME[r.id], sidePt(s, at(G.b, s) + .05, -1), r.id]);
+    }
+    if (G.g0 > .5) { const h = G.hemi[NH >> 1]; A.push([NAME.hemi, [-G.xh, h.p[1] + h.N[1] * h.ry, h.p[2] + h.N[2] * h.ry], "tel"]); }
+    for (const f of FLEX) if (f.A(t) > 12) A.push([f.name, sidePt(f.s, (f.dir < 0 ? 1 : -1) * (at(G.b, f.s) + .3), 1), f.id, "flex"]);
+    const E = G.eye; A.push([t >= 34 ? "視杯" : NAME.optic, [-E.x, E.c[1] - E.r, E.c[2]], "optic"]);
+    if (G.cg > .4) { const c = G.cbl[Math.round(NC / 3)]; A.push([NAME.cbl, [-(c.p[0] + c.S[0] * c.rv), c.p[1] + c.S[1] * c.rv, c.p[2] + c.S[2] * c.rv], "cbl"]); }
+  } else {
+    for (const [id, s, k] of [["cc", .07, -1], ["v4", .40, 1], ["aq", .61, -1], ["v3", .79, 1]]) A.push([NAME[id], sidePt(s, at(G.vo, s), k), id]);
+    if (G.g0 > .4) { const h = G.hemi[NH >> 1]; A.push([NAME.latv, [-G.xh, h.p[1], h.p[2]], "latv"]); A.push([NAME.ivf, [-G.xh * .5, (G.ivfA[1] + G.ivfB[1]) / 2, (G.ivfA[2] + G.ivfB[2]) / 2], "ivf"]); }
+    if (G.cp4 > .5) { const c = G.cp[0][NP >> 1]; A.push([NAME.cp, add(c.p, c.N, c.ry), "cp"]); }
+  }
+  return A;
+};
+M.tagShown = (p) => !state.cut3d || p[0] >= -M.cut - .02;
+
+/* ---------- 卡片 ---------- */
+const HOLO = `<details class="fold"><summary>前腦無裂畸形（holoprosencephaly）</summary><p>Haines 4th p.68–69（老師 p.21–22）：原始前腦分成端腦與間腦的過程叫 prosencephalization；前腦的發育過程叫 central induction，前腦發育異常常合併臉部缺陷。</p><ul><li>前腦沒有分成左右兩半</li><li>alobar：單一腦泡、單一腦室；semilobar：部分分成兩葉。透明中隔等分隔腦室的中線構造缺失</li><li>常伴眼距過窄（hypotelorism）、獨眼（cyclops）、長鼻樣突起（proboscis）</li></ul><p>Langman：SHH 訊號不足 → 前腦無裂畸形、眼距過窄、獨眼。</p><p>上課補充（共筆）：alobar 最嚴重，皮質表面光滑、完全不分葉，腦室把皮質撐成薄薄一層；semilobar 左右半球部分分開，側腦室與第三腦室相通。</p></details>`;
+const P20 = "老師 p.20 Table 2-1";
+const VES = `<details class="fold"><summary>腦泡 → 構造 → 腦室總表（老師 p.20）</summary><p>依老師 p.20 Table 2-1；「國考加考」是表上沒列、另外要記的構造，括號是出處。上課補充（共筆 p.26）：這張表老師每一項都有帶過。</p>`
+  + `<div class="wide"><table class="cmp"><tr><th>次級（第 5 週）→ 腔室</th><th>成體構造（Table 2-1）</th><th>國考加考</th></tr>`
+  + `<tr><th colspan="3">初級（第 4 週）：前腦 prosencephalon</th></tr>`
+  + `<tr><td>端腦 telencephalon<br>→ 側腦室</td><td>大腦半球 cerebral hemispheres</td><td>皮質、基底核（蒼白球除外）、嗅腦†（上課補充（共筆））</td></tr>`
+  + `<tr><td>間腦 diencephalon<br>→ 第三腦室，經室間孔通側腦室</td><td>視丘 thalamus、下視丘 hypothalamus、視網膜 retina 等</td><td>上視丘（松果體）、底視丘（上課補充（共筆 p.27））；神經垂體（114-2）；乳頭體、視泡（115-1）；蒼白球＊</td></tr>`
+  + `<tr><th colspan="3">初級：中腦 mesencephalon（第 5 週不再細分）</th></tr>`
+  + `<tr><td>中腦 mesencephalon<br>→ 大腦導水管（113-1）</td><td>中腦 midbrain</td><td>頂蓋＝四疊體（106-2、115-1）；紅核（107-1、107-2 考翼板／基板）；黑質（上課補充（共筆））</td></tr>`
+  + `<tr><th colspan="3">初級：菱腦 rhombencephalon</th></tr>`
+  + `<tr><td>後腦 metencephalon<br>→ 第四腦室（一部分）</td><td>橋腦 pons、小腦 cerebellum</td><td>—</td></tr>`
+  + `<tr><td>末腦 myelencephalon<br>→ 第四腦室（一部分）＋中央管（一部分）</td><td>延腦 medulla</td><td>—</td></tr></table></div>`
+  + `<p>＊蒼白球：老師 p.20 Table 2-1 註腳歸間腦；Langman 歸端腦（見端腦卡片）。</p>`
+  + `<p>† 嗅腦：Haines 4th p.68 也列端腦衍生嗅球與嗅徑、部分基底核、杏仁核、海馬。</p>`
+  + `<p>紅核、黑質的來源：Langman（15th ed. Fig. 18.23）與 Haines 4th p.169 都寫中腦翼板細胞往腹側遷移而來；國考 107-1、107-2 答基板（見模組 3 紅核）。</p></details>`;
+const CORTEX = `<details class="fold"><summary>皮質發育</summary><p>Haines 4th p.77（5th p.85；老師 p.38–39）：</p><ul><li><b>inside-out</b>：先產生的神經元停在深層，後來的沿放射狀膠細胞穿過舊的、停在更外面</li><li>中間區與邊緣區之間多出<b>皮質板</b>（cortical plate）與<b>皮質下板</b>（subplate）；subplate 是暫時的，讓視丘等來的軸突先形成暫時突觸</li><li>第一孕期末出現縱裂、外側裂（Sylvian）、橫裂，之後形成腦回與腦溝</li></ul>`
+  + `<table class="cmp"><tr><th>胚胎層（老師 p.39）</th><th>成體</th></tr><tr><td>腦室區（ventricular zone）</td><td>室管膜層（ependymal layer）</td></tr><tr><td>中間區（intermediate zone）</td><td>白質（white matter）</td></tr><tr><td>皮質板（cortical plate）</td><td>皮質 II–VI 層</td></tr><tr><td>邊緣區（marginal zone）</td><td>皮質 I 層</td></tr><tr><td>皮質下板（subplate）</td><td>最後消失</td></tr></table>`
+  + `<p class="trap">易錯：白質來自<b>中間區</b>，不是 subplate。inside-out 指皮質板內 VI 層最早、II 層最晚；I 層來自邊緣區，邊緣區在皮質板出現前就有了。</p>`
+  + `<p>上課補充（共筆）：腦室區的神經母細胞多半移出，留下單層室管膜；很多室管膜細胞會特化成脈絡叢、製造 CSF。</p>`
+  + `<p><b>皮質畸形</b>（Haines 4th p.77–78，老師 p.40–41）：</p><ul><li>無腦回（lissencephaly）：表面平滑</li><li>巨腦回（pachygyria）：腦回太大</li><li>小腦回（microgyria）：腦回太小</li><li>裂腦（schizencephaly）：大腦半球單側或雙側裂開，從腦室通到蜘蛛膜下腔，大小不一；可能是細胞遷移嚴重失敗</li></ul><p>前三種可以全腦或局部，也可以同時出現。</p></details>`;
+const CSF = `<details class="fold"><summary>腦脊髓液循環與水腦</summary><p>老師 p.25：脈絡叢 → 腦室系統 → 蜘蛛膜下腔 → 上矢狀竇 → 全身靜脈（Haines 4th p.92–93）。上課補充（共筆）：脈絡叢每天製造 400–500 c.c.。</p><ul><li><b>先天性水腦</b>：最常見原因是導水管狹窄或閉鎖；上游的側腦室、第三腦室擴大，第四腦室不大（Haines 4th p.70 Fig. 5-11E，老師 p.24–25）</li><li><b>Dandy-Walker 畸形</b>：第四腦室囊狀擴大＋小腦蚓部發育不全，常合併水腦（Haines 4th p.70、75，老師 p.25）</li></ul></details>`;
+M.struct = {
+  pros: { name: () => "前腦", en: "prosencephalon（forebrain）", meta: "初級腦泡（第 4 週，老師 p.17）",
+    body: () => `<p>三個初級腦泡中最頭端的一個。第 5 週分成<b>端腦</b>與<b>間腦</b>（以端腦曲為界）；兩側外突的部分之後成大腦半球。</p><ul><li>腔室 → 側腦室＋第三腦室（${P20}）</li></ul>`, more: VES + HOLO },
+  mes: { name: () => "中腦", en: "mesencephalon（midbrain）", meta: "初級腦泡，第 5 週不再細分",
+    body: () => `<p>三腦泡、五腦泡兩個階段都叫中腦；頭曲就在中腦。和後腦之間的狹窄處是菱腦峽。</p><ul><li>衍生：中腦（頂蓋＝上丘、下丘；被蓋；大腦腳）</li><li>被蓋內的紅核（red nucleus）、黑質（substantia nigra）：Langman（15th ed. Fig. 18.23）與 Haines 4th p.169 都寫由中腦翼板細胞往腹側遷移而來；國考 107-1、107-2 答基板（見模組 3 紅核）。黑質沒有國考題，列入是上課補充（共筆）</li><li>腔室 → 大腦導水管（中腦壁增厚，管腔變窄）</li></ul><p>${P20}：中腦 → 中腦；腔室為大腦導水管。</p>`,
+    more: VES, kg: ["113-1-醫學一-36"] },
+  rhomb: { name: () => "菱腦", en: "rhombencephalon（hindbrain）", meta: "初級腦泡（第 4 週，老師 p.17）",
+    body: () => `<p>三個初級腦泡中最尾端的一個，接脊髓。第 5 週以橋曲為界分成<b>後腦</b>與<b>末腦</b>。</p><ul><li>腔室 → 第四腦室（${P20}）</li></ul>`, more: VES },
+  tel: { name: (s) => s.hemi ? "端腦／大腦半球" : "端腦", en: (s) => s.hemi ? "telencephalon／cerebral hemisphere" : "telencephalon", meta: "次級腦泡（第 5 週，由前腦分出）",
+    body: () => `<p>第 5 週初前腦外側壁往兩側外突成<b>大腦半球</b>，往前、上、後長，約 8.5 週時已蓋住間腦外側（老師 p.18 的 8.5 週圖）。模型第 46–60 天把半球放大到 1.35 倍；Langman（15th ed. Fig. 18.27）畫半球蓋住間腦、中腦、後腦頭端外側是 10 週，超出第 60 天，模型不蓋中腦。中間沒有外突的部分留在中線，前端是終板。Haines 4th p.68：第 5 週末端腦長出兩個外突（telencephalic vesicles），就是大腦半球的原基。</p><ul><li>衍生：大腦半球（皮質、紋狀體）</li><li>嗅腦（rhinencephalon）：Haines 4th p.68（5th p.77）列端腦衍生嗅球與嗅徑（olfactory bulb and tract）、部分基底核、杏仁核、海馬；Langman（15th ed. Fig. 18.29）寫鼻板與端腦作用形成嗅球，鼻板細胞成為鼻上皮的初級嗅覺神經元，軸突接到嗅球的次級神經元。表上列嗅腦是上課補充（共筆）</li><li>腔室 → 側腦室，經室間孔通第三腦室</li></ul><p>${P20}：端腦 → 大腦半球；腔室為側腦室。</p>`,
+    trap: "蒼白球（globus pallidus）歸屬兩本書不同。Langman（15th ed. Fig. 18.27B）：端腦底部的紋狀體被內囊分成尾狀核與豆狀核（殼核＋蒼白球），屬端腦。老師 p.20 Table 2-1 註腳：蒼白球看起來像大腦半球的一部分，其實是間腦衍生物。Haines 4th p.75 Fig. 5-16C（老師 p.37）也畫形成蒼白球的細胞從第三腦室的腦室區往外遷出（間腦來源）。",
+    more: VES + HOLO + CORTEX },
+  dien: { name: () => "間腦", en: "diencephalon", meta: "次級腦泡（第 5 週，由前腦分出）",
+    body: () => `<p>兩書分法不同：</p><ul><li>Langman：由上而下分成上視丘、視丘、下視丘、底視丘</li><li>Haines 4th p.75–76（老師 p.37）：約 6 週分成上視丘（epithalamus）、背側視丘（dorsal thalamus）、下視丘（hypothalamus）三部分，在第三腦室壁上以上視丘溝（epithalamic sulcus）、下視丘溝（hypothalamic sulcus）分界</li></ul><ul><li>上視丘 → 松果體</li><li>下視丘 → 乳頭體；底部的漏斗 → 神經垂體</li><li>外側壁外突成視泡 → 視網膜、視神經</li><li>腔室 → 第三腦室</li></ul><p>${P20}：間腦 → 視丘、下視丘、視網膜等；腔室為第三腦室。</p>`,
+    trap: "神經垂體來自間腦（漏斗）；腺垂體來自口腔外胚層（Rathke 囊）。",
+    more: VES + `<details class="fold"><summary>視丘發育</summary><p>Haines 4th p.75–76 Fig. 5-16（老師 p.37）：</p><ul><li>兩側視丘長大，約 80% 的人在第三腦室中間相連，叫視丘間黏合（interthalamic adhesion，massa intermedia）</li><li>放射狀膠細胞從第三腦室伸到軟腦膜面，神經元沿著它往外遷移</li><li><b>outside-first</b>：最早的神經元走到最外側，之後的停在較內側（圖上 1 → 4）；和大腦皮質的 inside-out 相反</li></ul></details>`
+      + `<details class="fold"><summary>冠狀切面（老師 p.37 圖 B）</summary><canvas class="fig" data-fig="coronal" data-r=".72"></canvas><p style="font-size:12px;color:var(--mute)">依 Haines 4th Fig. 5-16 B（老師 p.37）簡化重畫，原書圖說約 8 週；上課補充（共筆）說是 5–6 週的冠狀切。三部分在第 6 週已分出（Haines 4th p.75）。第三腦室側壁的上視丘溝、下視丘溝把間腦分成上視丘、背側視丘、下視丘。＊視丘間黏合約 80% 的人有（Haines 4th p.75）。</p></details>`,
+    kg: ["114-2-醫學一-36", "115-1-醫學一-36"] },
+  met: { name: () => "後腦", en: "metencephalon", meta: "次級腦泡（第 5 週，由菱腦分出）",
+    body: () => `<p>在橋曲的頭側。</p><ul><li>腹側 → 橋腦</li><li>背側的菱唇 → 小腦（見「菱唇／小腦板」卡片）</li><li>腔室 → 第四腦室上半（${P20}：第四腦室的一部分）</li></ul>`,
+    trap: "小腦來自後腦（菱腦），不是前腦。", more: VES },
+  myel: { name: () => "末腦", en: "myelencephalon", meta: "次級腦泡（第 5 週，由菱腦分出）",
+    body: () => `<p>在橋曲與頸曲之間，接脊髓。橋曲讓兩側壁往外攤開，頂板變得很薄（只剩一層室管膜，外面貼軟腦膜）。</p><ul><li>衍生：延腦</li><li>腔室 → 第四腦室下半、中央管上段（${P20}）</li></ul>`, more: VES },
+  spin: { name: () => "脊髓", en: "spinal cord", meta: "神經管尾段（這裡只畫最上面一小段）", body: () => `<ul><li>腔室 → 中央管</li></ul>`,
+    more: `<details class="fold"><summary>馬尾</summary><p>Haines 4th p.73–74 Fig. 5-14（5th p.82–83；老師 p.31）：脊柱長得比脊髓快。</p><ul><li>約 12 週：脊髓和脊柱一樣長</li><li>16–18 週：脊髓尾端開始落後，脊神經根要往下走一段才出椎間孔</li><li>約 1 歲：脊髓尾端在上腰椎；以下椎管裡只剩往下走的神經根，就是馬尾（cauda equina）</li></ul><p>1 歲時的位置：投影片圖畫在 L1–L2 附近；上課補充（共筆）寫約 L1。</p></details>` },
+  latv: { name: () => "側腦室", en: "lateral ventricle", meta: "端腦（大腦半球）的腔室", body: () => `<p>隨大腦半球往前、上、後延伸，經室間孔通第三腦室（老師 p.23）。</p>` },
+  ivf: { name: () => "室間孔", en: "interventricular foramen（of Monro）", meta: "側腦室 ↔ 第三腦室", body: () => `<p>左右側腦室各經一個室間孔，通到中線的第三腦室（老師 p.23；Haines 4th p.70）。</p>` },
+  v3: { name: () => "第三腦室", en: "third ventricle", meta: "間腦（加上端腦中線部分）的腔室", body: () => `<p>窄而高的中線腔室，前壁是終板。往前經室間孔通側腦室，往後接大腦導水管（老師 p.23）。</p>` },
+  aq: { name: () => "大腦導水管", en: "cerebral aqueduct", meta: "中腦的腔室", body: () => `<p>中腦壁增厚，管腔變成細管，連接第三與第四腦室（老師 p.23）。</p><p>上課補充（共筆）：腦室系統最窄、最容易阻塞，也是唯一沒有脈絡叢的部分。</p>`, kg: ["113-1-醫學一-36"],
+    more: CSF },
+  v4: { name: () => "第四腦室", en: "fourth ventricle", meta: "菱腦（後腦＋末腦）的腔室",
+    body: () => `<p>橋曲讓末腦兩側壁往外攤開、頂板變薄，成為菱形的寬腔室。之後頂部開出正中孔（Magendie）與兩個外側孔（Luschka），通蜘蛛膜下腔（老師 p.23）。</p><p>時間：Haines（4th ed. p.83）寫第 2–3 個月開孔，p.70 寫孔長得慢、第一孕期末才暢通。Langman（15th ed. Fig. 18.20B）把孔畫在 4 個月胚胎。超出本模組的第 60 天，模型沒畫孔。</p>`,
+    more: CSF },
+  cc: { name: () => "中央管", en: "central canal", meta: "脊髓的腔室", body: () => `<p>上端通第四腦室。</p><p>上課補充（共筆）：裡面有 CSF，但沒有脈絡叢、不製造 CSF。</p>` },
+  cbl: { name: (s) => s.t >= 56 ? "小腦板" : "菱唇", en: (s) => s.t >= 56 ? "cerebellar plate" : "rhombic lip", meta: "後腦翼板背外側（第 6–8 週，天數為示意）",
+    body: () => `<p>後腦翼板的背外側緣往內折、增厚成<b>菱唇</b>，左右各一。橋曲加深後，菱唇頭尾向被壓扁，兩側在中線接起來成為<b>小腦板</b>（Langman 15th ed. Fig. 18.18、18.20，約 8 週）。老師 p.18 的 8.5 週圖已標出 Cerebellum。</p><ul><li>Haines 4th p.74（老師 p.35）：菱唇頭段 → 小腦；尾段 → 下橄欖核、耳蝸核、橋腦核</li><li>Langman：約 12 週小腦板分出中線的蚓部（vermis）與兩側半球；橫裂分出小結（nodule）與絨球（flocculus），是最早出現的部分。模型只畫到第 60 天的小腦板，蚓部、半球、小結、絨球沒畫</li></ul><p>模型畫法：第 40–50 天菱唇長出，第 50–58 天在中線接合；天數為示意。小腦的分層見模組 3 頂板卡片的小腦摺疊。</p>`,
+    trap: "小腦來自後腦（菱腦）的翼板（菱唇），不是前腦（106-2）。", more: VES, kg: ["106-2-醫學一-36"] },
+  cp: { name: () => "脈絡叢", en: "choroid plexus", meta: "腦室頂（第 7–8 週，天數為示意）",
+    body: () => `<p>腦室頂板只剩一層室管膜，外面貼著富含血管的軟腦膜，兩層合稱<b>脈絡組織</b>（tela choroidea）。血管把脈絡組織頂進腦室，形成<b>脈絡叢</b>，負責分泌腦脊髓液（Haines 5th p.93–96，老師 p.25；4th 頁碼沒查到）。</p><ul><li>第四腦室：最早出現，Haines 5th Fig. 11.1 畫約 7 週的第四腦室脈絡叢</li><li>第三腦室頂、側腦室內側壁（脈絡裂）：Langman 15th ed. Fig. 18.24、18.25（7、8 週）</li><li>Langman：脈絡叢由特化的室管膜製造腦脊髓液，每天 400–500 mL</li></ul><p>上課補充（共筆）：大腦導水管與中央管沒有脈絡叢。</p><p>模型只在腦室模式畫：第四腦室第 44 天起、第三腦室與側腦室第 48 天起，天數與形狀都是示意。</p>`,
+    more: CSF },
+  cerv: { name: () => "頸曲", en: "cervical flexure", meta: "第 4 週（老師 p.17）", body: () => `<p>在菱腦與脊髓交界，往腹側彎。</p>` },
+  ceph: { name: () => "頭曲", en: "cephalic flexure", meta: "第 4 週（老師 p.17）", body: () => `<p>在中腦，往腹側彎，讓前腦折向腹側。</p><p>上課補充（共筆）：頭曲在中腦本身，不在腦泡交界。第 4 週平的胚盤因頭尾摺疊（folding）變成 C 型，裡面的神經管跟著折，形成腦曲。</p>` },
+  pont: { name: () => "橋曲", en: "pontine flexure", meta: "第 5 週（老師 p.18）",
+    body: () => `<p>在菱腦中段，把菱腦分成後腦（頭側）與末腦（尾側）。方向與頸曲、頭曲相反（往背側彎），讓末腦側壁往外攤開、頂板變薄，成為第四腦室。</p><p>Langman（15th ed. Fig. 18.20）：橋曲繼續加深，菱唇頭尾向被壓扁，成為小腦板。模型第 46–60 天把橋曲再加深 30°（角度為示意）。</p>` },
+  telf: { name: () => "端腦曲", en: "telencephalic flexure", meta: "第 5 週（Haines，老師 p.18–19）",
+    body: () => `<p>在間腦與端腦之間，往腹側彎，把前腦分成端腦與間腦。Haines 4th p.67：這個名稱是 diencephalic-telencephalic sulcus 的簡稱。</p>`,
+    trap: "Langman：只列頸曲、頭曲、橋曲 3 個。Haines（老師 p.18–19）：多一個端腦曲，共 4 個。模型畫 Haines 的 4 個。" },
+  optic: { name: () => "視泡／視杯", en: "optic vesicle／optic cup", meta: "間腦外側壁外突",
+    body: () => `<p>前腦（間腦）外側壁往外突成視泡，之後凹成雙層的視杯 → 視網膜；視柄 → 視神經。眼的 3D 模型（模組 4）還沒做，國考重點先列在下方。</p><p>Langman（15th ed.）：第 22 天前腦兩側出現視溝，第 4 週末成視泡，書前「Embryonic Development in Days」表列第 34 天為視杯與晶狀體板；第 5 週晶狀體泡脫離表皮。模型第 34 天起標「視杯」。</p>`,
+    trap: "視泡（視囊）來自間腦，不是髓腦（115-1）。視網膜中央動靜脈來自玻璃體血管的<b>近側段</b>，遠側段退化（108-2）。瞳孔括約肌與擴大肌來自神經外胚層，不是中胚層（106-1、115-2；Langman 同）。Haines 4th p.71 Table 5-1（老師 p.27）把睫狀肌與瞳孔肌列為神經嵴；國考答神經外胚層，校內考題同時有 neural crest 與 neuroectoderm 選項時，依老師的表答 neural crest。",
+    more: `<details class="fold"><summary>眼的發育重點（Langman 15th ed.）</summary><ul>
+<li>視杯外層 → 視網膜色素上皮；內層 → 視網膜神經層（108-2）。</li>
+<li>眼裂：在視杯腹側，沿視柄延伸；第 7 週閉合，沒閉合 → 虹膜缺損（coloboma，PAX2）。</li>
+<li>玻璃體動脈：經眼裂進入視杯；遠側段退化，近側段成為視網膜中央動脈（108-2）。</li>
+<li>視神經：視網膜節細胞的軸突沿視柄長回腦；視柄屬間腦，不是大腦皮質或神經嵴（110-1 B、D 錯）。</li>
+<li>晶狀體：表面外胚層增厚成晶狀體板 → 凹陷 → 第 5 週晶狀體泡脫離表皮。</li>
+<li>虹膜：視杯前緣的雙層（pars iridica retinae）形成；瞳孔括約肌與擴大肌來自視杯的外胚層，也就是神經外胚層（106-1、115-2）。睫狀肌則來自外覆的間葉。</li>
+<li>脈絡膜相當於軟腦膜、鞏膜相當於硬腦膜，都來自外覆的間葉。</li>
+<li>角膜：上皮來自表面外胚層；Langman 寫其餘來自間葉，沒提神經嵴。國考答案（112-1）把「間葉來自中胚層、內皮來自神經嵴、上皮來自表面外胚層」都當對，錯的選項是「角膜形成主要來自視網膜的誘導」。</li>
+<li>視神經髓鞘：國考答案（110-1）是「髓鞘只包到視神經盤」（出生前尚未完全髓鞘化）。Langman 原文沒查到這點。</li>
+<li>相關基因與畸形：PAX6（眼的主控基因，突變 → 無虹膜）、SHH（不足 → 前腦無裂畸形、眼距過窄、獨眼）、小眼、無眼、瞳孔膜殘留、德國麻疹（第 4–7 週感染）→ 白內障。</li>
+</ul></details>`,
+    kg: ["115-1-醫學一-36", "108-2-醫學一-36", "110-1-醫學一-36", "112-1-醫學一-36", "106-1-醫學一-32", "115-2-醫學一-36"] },
+};
+M.cardState = () => ({ t: state.day, hemi: G.g0 > .5 });
+M.dayInfo = (t) => `${five(t) ? "五個次級腦泡" : "三個初級腦泡"} · ${FLEX.filter((f) => f.A(t) > 12).length} 個腦曲`;
+M.legendClick = (l) => { if (!l.toggle) { select(l.id); return; } M.flags.vent = !M.flags.vent; };
+M.legendPressed = (l) => (l.toggle ? M.flags[l.id] : undefined);
+// 選到腦室類構造（卡片、圖例、國考題、切面）時自動打開腦室模式；自動打開的，選到其他構造時再關，手動打開的不動
+const isVent = (s) => /^(cc|v4|aq|v3|latv|ivf|cp)$/.test(s);
+M.reveal = function (s) {
+  if (s == null) return false;
+  if (isVent(s)) {
+    let ch = false;
+    if (!M.flags.vent) { M.flags.vent = autoVent = true; ch = true; }
+    if ((s === "latv" || s === "ivf") && state.day < 32) { state.day = 32; ch = true; } // 五個次級腦泡（老師 p.18）
+    return ch;
+  }
+  if (autoVent && M.flags.vent) { M.flags.vent = autoVent = false; return true; }
+  return false;
+};
+
+/* ---------- 鏡頭、點選 ---------- */
+M.views = [
+  { id: "lat", label: "側面", v: () => ({ p: [-15, .4, 0], t: [0, 0, 0] }) },
+  { id: "obl", label: "斜面", v: () => ({ p: [-10.5, 6, 7], t: [0, 0, 0] }) },
+  { id: "front", label: "正面", v: () => ({ p: [0, 1, 15], t: [0, 0, 0] }) },
+  { id: "cut", label: "切面", cut: true, v: () => ({ p: [-14, 2.5, 3.5], t: [0, 0, 0] }) },
+];
+M.defaultView = "lat";
+M.autoFit = true; // 鏡頭距離依模型投影大小自動調（外殼 autoFit）
+M.pick = function (ray) {
+  const objs = [wall, vent, ...hemi, ...latv, ...ivf, ...eye, ...stalk, ...cbl, ...cpMid, ...cpLat, ...capGroup.children].filter((o) => o.visible);
+  let hits = ray.intersectObjects(objs, false);
+  if (state.cut3d) hits = hits.filter((h) => h.object.parent === capGroup || h.point.x >= -M.cut - .01);
+  if (M.flags.vent) { const v = hits.find((h) => h.object.userData.vent || (h.object.parent === capGroup && isVent(h.object.userData.struct))); if (v) hits = [v]; }
+  if (!hits.length) return null;
+  const h = hits[0], o = h.object, ring = (h.faceIndex / (2 * o.userData.nr)) | 0;
+  if (o === wall) return regionAt(sOf(ring), state.day).id;
+  if (o === vent) return ventAt(sOf(ring));
+  return o.userData.struct;
+};
+Object.assign(M, { G, compute, FLEX, regions });
+return M;
+})();
+
+/* ===== 模組 3：翼板與基板（第 26–56 天；Langman＋Haines；三層順序與柱序畫 Haines，不同處卡片並列） ===== */
+const M3 = (() => {
+// cut：點事件時切面跳到的位置（0 薦髓、1 中腦）：脊髓事件切胸髓（側角 T1–L2），第 34、47 天延腦（下橄欖核），第 43 天延腦上端（.57：GVA 孤立核到 .56、SSA 前庭核從 .56 起，七柱最多同時切到六柱）
+const EVENTS = [
+  { d: 26, cut: 0.2, t: "腦室區", s: "管壁只有腦室區（ventricular zone）：假複層的梭形細胞，在管腔面分裂。" },
+  { d: 28, cut: 0.2, t: "邊緣區出現", s: "腦室區細胞的突起往外伸，形成邊緣區（marginal zone）。" },
+  { d: 29, cut: 0.2, t: "中間區出現", s: "細胞移到腦室區與邊緣區之間，形成中間區（intermediate zone；Langman 稱外套層 mantle layer）。Haines（老師 p.6、p.8）：三層中最後出現；Langman 先講外套層、再講邊緣層。" },
+  { d: 31, cut: 0.2, t: "翼板與基板", s: "界溝把中間區分成背側的翼板（感覺）與腹側的基板 basal plate（運動）；中線是頂板、底板。" },
+  { d: 32, cut: 0.2, t: "背根神經節、前根、後根", s: "神經嵴細胞在脊髓兩側聚成背根神經節；基板運動神經元的軸突從腹外側長出成前根，背根節細胞的中樞突從背外側長進脊髓成後根，周邊突與前根會合成脊神經（Langman 15th ed. Fig. 18.10）。兩本書沒寫確切天數，模型在第 32 天畫出。" },
+  { d: 34, cut: 0.5, t: "第四腦室打開", s: "最後都是翼板在外側、基板在內側。Langman：橋曲讓菱腦兩側壁往外攤開。上課補充（共筆）：翼板長得較快，包到基板外圍，把基板擠到前面。模型畫 Langman 的攤開。" },
+  { d: 38, cut: 0.2, t: "前角、後角、側角", s: "基板 → 前角，翼板 → 後角；T1–L2 中間帶形成側角（交感）。" },
+  { d: 43, cut: 0.57, t: "腦幹核柱", s: "由內往外：GSE、GVE、SVE｜界溝｜GVA、SVA、GSA、SSA。Langman 基板：內側 GSE、中間 SVE、外側 GVE。Haines（老師 p.34）：GSE、GVE 在第四腦室底，SVE 往腹外側。模型畫 Haines。" },
+  { d: 47, cut: 0.5, t: "翼板細胞往腹側移", s: "菱唇尾段（翼板）的神經母細胞往腹側遷移，成為下橄欖核、橋腦核（Haines，老師 p.35）。" },
+];
+const NAME = { vz: "腦室區", mantle: "中間區", marg: "邊緣區", alar: "翼板", basal: "基板 basal plate", roof: "頂板", floor: "底板", sl: "界溝", lumen: "管腔",
+  gse: "GSE", gve: "GVE", sve: "SVE", gva: "GVA", sva: "SVA", gsa: "GSA", ssa: "SSA", ah: "前角", ph: "後角", lh: "側角",
+  io: "下橄欖核", pn: "橋腦核", dc: "薄核／楔核", ic: "下丘", rn: "紅核", drg: "背根神經節", dr: "後根", vr: "前根", sn: "脊神經" };
+// 沿長軸 s：0 = 薦髓（尾端），1 = 中腦（頭端）；示意長度，不照比例
+const SEG = [
+  { id: "sac", name: "薦髓", s0: 0, s1: .07 }, { id: "lum", name: "腰髓", s0: .07, s1: .13 }, { id: "tho", name: "胸髓", s0: .13, s1: .30 },
+  { id: "cer", name: "頸髓", s0: .30, s1: .40 }, { id: "med", name: "延腦", s0: .40, s1: .62 }, { id: "pon", name: "橋腦", s0: .62, s1: .80 },
+  { id: "mid", name: "中腦", s0: .80, s1: 1.001 },
+];
+const segAt = (s) => SEG.find((g) => s < g.s1) || SEG[SEG.length - 1];
+const SPINAL = .40;
+const SIDES = [-1, 1];
+const LH = [[.015, .07, "S2–S4"], [.11, .29, "T1–L2"]]; // 側角（自主神經）所在節段
+const inLH = (s) => LH.some(([a, b]) => s > a && s < b);
+// 柱：顏色與由內往外的順序（Haines，老師 p.34）
+const COLS = [
+  { id: "gse", css: "--c-gse", u: .14, v: .50 }, { id: "gve", css: "--c-gve", u: .27, v: .42 }, { id: "sve", css: "--c-sve", u: .37, v: .74 },
+  { id: "gva", css: "--c-gva", u: .56, v: .44 }, { id: "sva", css: "--c-sva", u: .65, v: .48 }, { id: "gsa", css: "--c-gsa", u: .77, v: .52 },
+  { id: "ssa", css: "--c-ssa", u: .89, v: .50 },
+];
+const CC = Object.fromEntries(COLS.map((c) => [c.id, c]));
+const DCSS = { ah: "--c-gse", lh: "--c-gve", ph: "--c-gsa", io: "--c-alard", pn: "--c-alard", dc: "--c-alard", ic: "--c-alard", rn: "--c-basald" };
+// 簡化模式（預設，清單 D9）：感覺核一律翼板色、運動核一律基板色，SVE 三核淡化（老師 p.33 的 8 個運動核沒列）；詳細模式才用 7 柱各自的顏色
+const SENS = new Set(["gva", "sva", "gsa", "ssa", "ph"]), MOT = new Set(["gse", "gve", "sve", "ah", "lh"]);
+const simple = () => M.flags.simple;
+const nucCss = (n) => (!simple() ? n.css : SENS.has(n.id) ? "--c-alard" : MOT.has(n.id) ? "--c-basald" : n.css);
+const nucDim = (n) => simple() && n.id === "sve";
+const isBrainCol = (n) => !!CC[n.id] && n.s0 >= SPINAL - .03;   // 腦幹核柱的核（不含脊髓的後角基部 GVA）
+const pnsCss = (struct) => ({ drg: "--c-crest", dr: simple() ? "--c-alard" : "--c-gsa", vr: simple() ? "--c-basald" : "--c-gse", sn: "--mute" })[struct];
+// 核：[構造, 名稱, s0, s1, 出現的天數, {u, v, ru, rv}]；腦幹核依 Haines（老師 p.33；SVE 三核未列）
+const NUC = [
+  ["ah", "前角", 0, SPINAL + .02, 35, { u: .24, v: .62, ru: .13, rv: .2 }],
+  ["lh", "側角", 0, SPINAL, 36, { u: .43, v: .66, ru: .045, rv: .12 }],
+  ["gva", "內臟感覺（後角基部）", 0, SPINAL, 36, { u: .57, v: .5, ru: .05, rv: .1 }],
+  ["ph", "後角", 0, SPINAL + .02, 35, { u: .79, v: .62, ru: .12, rv: .19 }],
+  ["gse", "舌下神經核", .44, .58, 37], ["gse", "外旋神經核", .65, .69, 38], ["gse", "滑車神經核", .83, .87, 39], ["gse", "動眼神經核", .89, .97, 39],
+  ["gve", "迷走神經背核", .46, .58, 38], ["gve", "下唾液核", .585, .615, 39], ["gve", "上唾液核", .63, .66, 39], ["gve", "Edinger-Westphal 核", .9, .96, 40],
+  ["sve", "疑核", .45, .58, 38], ["sve", "顏面神經核", .64, .68, 39], ["sve", "三叉神經運動核", .71, .76, 39],
+  ["gva", "孤立核（內臟感覺）", .45, .56, 38], ["sva", "孤立核（味覺）", .5, .62, 38],
+  ["gsa", "三叉神經脊髓核", .38, .67, 37], ["gsa", "三叉神經主感覺核", .69, .75, 39],
+  ["ssa", "前庭核、耳蝸核", .56, .67, 38],
+  ["dc", "薄核", .37, .47, 41, { u: .95, v: .58, ru: .035, rv: .16 }], ["dc", "楔核", .37, .47, 41, { u: .87, v: .62, ru: .04, rv: .16 }],
+  ["io", "下橄欖核", .44, .58, 45, { u: .27, v: .86, ru: .08, rv: .1 }],
+  ["pn", "橋腦核", .64, .78, 45, { u: .3, v: .87, ru: .09, rv: .09 }],
+  ["ic", "下丘", .81, .88, 42, { u: .87, v: .62, ru: .09, rv: .2 }],
+  ["rn", "紅核", .88, .97, 42, { u: .22, v: .62, ru: .07, rv: .17 }],
+].map(([id, name, s0, s1, d0, o]) => {
+  const c = CC[id] || {};
+  return { id, name, s0, s1, d0, u: o?.u ?? c.u, v: o?.v ?? c.v, ru: o?.ru ?? .055, rv: o?.rv ?? .13, css: c.css || DCSS[id] };
+});
+const NZ = 150, NU = 22, NV = 6, NE = 14, NZR = 26, NA = 18, LEN = 9;
+const zOf = (s) => (s - .5) * LEN;
+const sOfRing = (i) => i / (NZ - 1);
+const uSL = .48, UF = .1, UR = .1;
+const G2 = (x, c, w) => Math.exp(-(((x - c) / w) ** 2));
+
+/* ---------- 截面參數（s, t → 管壁） ---------- */
+// [s, 板長 Lu, 厚度 T, 打開角度上限（度）]
+const WALL = [[0, 1.0, .46, 0], [.38, 1.1, .5, 0], [.45, 1.4, .8, 0], [.5, 1.6, .95, 66], [.62, 1.65, .98, 70], [.76, 1.6, .92, 58], [.8, 1.4, .72, 0], [1, 1.3, .6, 0]];
+function tab(T, s) {
+  if (s <= T[0][0]) return T[0].slice(1);
+  for (let i = 1; i < T.length; i++) if (s <= T[i][0]) {
+    let f = (s - T[i - 1][0]) / (T[i][0] - T[i - 1][0]); f = f * f * (3 - 2 * f);
+    return T[i].slice(1).map((v, k) => lerp(T[i - 1][k + 1], v, f));
+  }
+  return T[T.length - 1].slice(1);
+}
+function wallAt(s, t) {
+  const [Lu, T, phMax] = tab(WALL, s);
+  const grow = lerp(.82, 1, sm(26, 50, t));
+  const phi = phMax * sm(31, 40, t) * Math.PI / 180;
+  const vzE = lerp(1, .62, sm(27.5, 29, t));                                 // 邊緣區先出現（Haines）
+  const vz = vzE - .2 * sm(29, 30.5, t) - .26 * sm(32, 48, t);               // 腦室區外緣
+  const vm0 = lerp(vzE, .64, sm(29, 30.5, t));                               // 中間區外緣（第 29 天起才有厚度）
+  const horn = s < SPINAL + .03 ? sm(34, 42, t) * (1 - sm(SPINAL - .02, SPINAL + .03, s)) : 0;
+  const lh = inLH(s) ? sm(36, 43, t) * (s < .09 ? .55 : 1) : 0;
+  const open = sm(31, 40, t) * (phMax > 1 ? 1 : 0);
+  const wl = (s < .44 || s > .78 ? lerp(.13, .045, sm(30, 52, t)) : .13) * (s > .8 ? .7 : 1); // 管腔半寬
+  return { s, t, Lu: Lu * grow, T: T * grow, phi, vz, vm0, horn, lh, open, wl, yb: -Lu * grow * Math.cos(phi) / 2 - .1 * Math.sin(phi) };
+}
+const Tu = (W, u) => W.T * (u > 1 - UR ? lerp(1, lerp(1, .36, W.open), sm(1 - UR * 1.3, 1 - UR * .4, u)) : 1); // 打開處頂板變薄
+const wU = (W, u) => {           // 管腔：菱形，最寬處在界溝；後期脊髓背側閉合、只剩中央管
+  const close = W.s < .44 || W.s > .8 ? sm(36, 50, W.t) : 0;
+  const top = lerp(1 - UR, .6, close);
+  if (u <= UF * .7 || u >= top) return 0;
+  return W.wl * (u < uSL ? sm(UF * .7, uSL, u) : 1 - sm(uSL, top, u));
+};
+const vmU = (W, u) => Math.min(.94, W.vm0 + W.horn * (.24 * G2(u, .25, .12) + .2 * G2(u, .78, .11)) + W.lh * .2 * G2(u, .43, .05));
+const vzU = (W, u) => (u < UF || u > 1 - UR ? 1 : W.vz);
+// 板座標 (u, v) → 截面座標 (x, y)；side −1 左、+1 右
+function P(W, side, u, v) {
+  const c = Math.cos(W.phi), sn = Math.sin(W.phi), L = u * W.Lu, w = wU(W, u), T = v * Tu(W, u);
+  // 厚度方向：中線處轉成垂直（底板往腹側、閉合的頂板往背側），左右才接得起來
+  let nx = side * c, ny = -sn;
+  const a = 1 - sm(0, .3, u), b = sm(.7, 1, u) * (1 - W.open);
+  nx *= 1 - a - b; ny = ny * (1 - a - b) - a + b;
+  const h = Math.hypot(nx, ny) || 1;
+  return [side * (sn * L + c * w) + T * nx / h, W.yb + c * L - sn * w + T * ny / h];
+}
+// 板上一塊 [u0,u1] × [v0(u), v1(u)] → 固定點數的多邊形
+function patch(W, side, u0, u1, v0, v1, nu = NU, nv = NV) {
+  const o = [];
+  for (let i = 0; i < nu; i++) { const u = lerp(u0, u1, i / (nu - 1)); o.push(P(W, side, u, v0(u))); }
+  for (let j = 1; j < nv - 1; j++) o.push(P(W, side, u1, lerp(v0(u1), v1(u1), j / (nv - 1))));
+  for (let i = nu - 1; i >= 0; i--) { const u = lerp(u0, u1, i / (nu - 1)); o.push(P(W, side, u, v1(u))); }
+  for (let j = nv - 2; j >= 1; j--) o.push(P(W, side, u0, lerp(v0(u0), v1(u0), j / (nv - 1))));
+  return o;
+}
+// 管壁外框各點的 u（3D 點選、上色用）
+const OUTU = (() => { const o = []; for (let i = 0; i < NU; i++) o.push(i / (NU - 1)); for (let j = 1; j < NV - 1; j++) o.push(1); for (let i = NU - 1; i >= 0; i--) o.push(i / (NU - 1)); for (let j = NV - 2; j >= 1; j--) o.push(0); return o; })();
+const outline = (W, side) => patch(W, side, 0, 1, () => 0, () => 1);
+// 第四腦室頂（頂板拉薄成一層膜）
+function roofArc(W) {
+  const A = P(W, -1, 1, 0), B = P(W, 1, 1, 0), h = .24 * W.Lu * Math.sin(W.phi), th = .035;
+  const top = Math.max(A[1], B[1]) + h, inner = [], outer = [];
+  for (let i = 0; i < NA; i++) {
+    const q = i / (NA - 1), x = lerp(A[0], B[0], q), y = lerp(A[1], B[1], q) + (top - Math.max(A[1], B[1])) * Math.sin(Math.PI * q) ** .8;
+    inner.push([x, y]); outer.push([x, y + th * Math.sin(Math.PI * q) ** .3]);
+  }
+  return inner.concat(outer.reverse());
+}
+function lumenPoly(W) {
+  const L = [], R = [];
+  for (let i = 0; i < NU; i++) { const u = i / (NU - 1); L.push(P(W, -1, u, 0)); R.push(P(W, 1, u, 0)); }
+  const poly = L.slice().reverse().concat(R);
+  if (W.phi > .02) { const r = roofArc(W).slice(0, NA); poly.push(...r.slice(1, -1).reverse()); }
+  return poly;
+}
+// 核的出現程度（沿長軸兩端收尖 × 隨天數長大）
+function nucF(n, s, t) {
+  if (s <= n.s0 || s >= n.s1) return 0;
+  const q = (s - n.s0) / (n.s1 - n.s0);
+  return Math.pow(Math.sin(Math.PI * q), .35) * sm(n.d0, n.d0 + 5, t);
+}
+function nucCenter(n, W) {
+  if (n.id === "io" || n.id === "pn") { const m = sm(44, 52, W.t); return [lerp(.8, n.u, m), lerp(.55, n.v, m)]; } // 從翼板往腹側移
+  if (n.id === "lh") return [n.u, n.v + .06 * W.lh];
+  return [n.u, n.v];
+}
+function nucPoly(n, W, side, f) {
+  const [uc, vc] = nucCenter(n, W), o = [];
+  for (let k = 0; k < NE; k++) { const a = 2 * Math.PI * k / NE; o.push(P(W, side, uc + n.ru * f * Math.cos(a), vc + n.rv * f * Math.sin(a))); }
+  return o;
+}
+const stage_ = (t) => (t < 27.5 ? 0 : t < 29 ? 1 : t < 30.5 ? 2 : t < 32 ? 3 : 4); // 0 腦室區、1 ＋邊緣區、2 三層、3 翼板基板、4 核柱
+// 截面多邊形：[構造, 顏色變數, 多邊形, 側別]（畫的順序＝前後）
+function secPolys(s, t) {
+  const W = wallAt(s, t), out = [], st = t >= 30.5;
+  for (const side of [-1, 1]) {
+    out.push([t < 27.5 ? "vz" : "marg", t < 27.5 ? "--c-neuro" : "--c-marg", outline(W, side), side]);
+    if (t >= 27.5) {
+      const v0 = (u) => vzU(W, u), v1 = (u) => vmU(W, u);
+      if (st) {
+        out.push(["basal", "--c-basal", patch(W, side, UF, uSL, v0, v1), side]);
+        out.push(["alar", "--c-alar", patch(W, side, uSL, 1 - UR, v0, v1), side]);
+      } else out.push(["mantle", "--c-mantle", patch(W, side, UF, 1 - UR, v0, v1), side]);
+      out.push(["vz", "--c-neuro", patch(W, side, 0, 1, () => 0, (u) => (u < UF || u > 1 - UR ? .999 : W.vz)), side]);
+      if (st) {
+        out.push(["floor", "--c-floor", patch(W, side, 0, UF, () => 0, () => 1, 8, NV), side]);
+        out.push(["roof", "--c-roof", patch(W, side, 1 - UR, 1, () => 0, () => 1, 8, NV), side]);
+      }
+    }
+    for (const n of NUC) { const f = nucF(n, s, t); if (f > .05) out.push([n.id, nucCss(n), nucPoly(n, W, side, f), side, n.name, nucDim(n), n]); }
+  }
+  out.push(["lumen", "--c-vent", lumenPoly(W), 0]);
+  if (W.phi > .05) out.push(["roof", "--c-roof", roofArc(W), 0]);
+  return { W, polys: out.filter((p) => Math.abs(area(p[2])) > 1e-5) };
+}
+
+/* ---------- 周邊神經：背根神經節、後根、前根、脊神經（只在脊髓段；兩書沒寫確切天數，第 32 天畫出） ---------- */
+const PNS_S = [.035, .08, .125, .17, .215, .26, .305, .35];  // 示意的節段位置
+const pnsF = (t) => sm(31, 32, t);
+function pnsPts(W, side) {   // a 後根進脊髓處、b 前根出脊髓處、g 背根節、j 兩根會合、e 脊神經末端（截面座標）
+  let mx = 0; for (const p of outline(W, side)) mx = Math.max(mx, Math.abs(p[0]));
+  const a = P(W, side, .84, 1), b = P(W, side, .2, 1);
+  const g = [side * (mx + .17), a[1] - .1], j = [side * (mx + .32), lerp(a[1], b[1], .62)];
+  return { a, b, g, j, e: [side * (mx + .52), j[1] - .2] };
+}
+const PNS_R = { drg: [.1, .085], root: .024 };
+function ribbon(pts, w) { // 折線 → 寬 w 的帶狀多邊形
+  const L = [], R = [];
+  pts.forEach((p, i) => {
+    const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)], tx = b[0] - a[0], ty = b[1] - a[1], l = Math.hypot(tx, ty) || 1;
+    L.push([p[0] - w / 2 * ty / l, p[1] + w / 2 * tx / l]); R.push([p[0] + w / 2 * ty / l, p[1] - w / 2 * tx / l]);
+  });
+  return L.concat(R.reverse());
+}
+// 2D 橫切面用：[構造, 顏色, 多邊形, 側別, 標籤點]
+function pnsPolys(W) {
+  const f = pnsF(W.t), out = []; if (W.s >= SPINAL || f < .02) return out;
+  const part = (p, q) => [p, [lerp(p[0], q[0], f), lerp(p[1], q[1], f)]];
+  for (const side of SIDES) {
+    const { a, b, g, j, e } = pnsPts(W, side), w = PNS_R.root * 2;
+    out.push(["vr", pnsCss("vr"), ribbon(part(b, j), w), side, [lerp(b[0], j[0], .5), lerp(b[1], j[1], .5)]]);
+    out.push(["dr", pnsCss("dr"), ribbon([a, ...part(g, j)], w), side, [lerp(a[0], g[0], .45), lerp(a[1], g[1], .45)]]);
+    out.push(["sn", pnsCss("sn"), ribbon(part(j, e), w * 1.3), side, [lerp(j[0], e[0], .6), lerp(j[1], e[1], .6)]]);
+    out.push(["drg", pnsCss("drg"), ellipse(g[0], g[1], PNS_R.drg[0] * f, PNS_R.drg[1] * f, 18), side, g]);
+  }
+  return out;
+}
+
+/* ---------- three.js ---------- */
+const M = {
+  id: "m3", name: "翼板與基板", title: "翼板、基板與核柱",
+  sub: "第 4–8 週：腦室區 → 三層；界溝分出翼板（感覺）與基板（運動）；脊髓成前、後、側角，腦幹排成 7 個核柱。",
+  range: [26, 56], speed: 2.4, events: EVENTS, evLbl: "時間軸（天數為示意；Langman＋Haines）",
+  legendLbl: "分層、分板、核柱（點一下看說明）",
+  get legend() { // 簡化模式：7 柱的 chip 換成「感覺 4／運動 8」兩群＋淡化的 SVE（外殼在內容變了時重建圖例）
+    const s = this.flags.simple;
+    return [
+      { id: "vz", name: "腦室區", css: "--c-neuro" }, { id: "mantle", name: "中間區", css: "--c-mantle" }, { id: "marg", name: "邊緣區", css: "--c-marg" },
+      { id: "alar", name: "翼板", css: "--c-alar" }, { id: "basal", name: "基板 basal plate", css: "--c-basal" }, { id: "roof", name: "頂板", css: "--c-roof" }, { id: "floor", name: "底板", css: "--c-floor" },
+      ...(s ? [{ id: "alar", name: "翼板：4 感覺核（外側）", css: "--c-alard" }, { id: "basal", name: "基板：8 運動核（內側）", css: "--c-basald" }, { id: "sve", name: "SVE 3 核（不在 8 個內）", css: "--c-basald", dim: true }]
+        : COLS.map((c) => ({ id: c.id, name: NAME[c.id], css: c.css }))),
+      { id: "sec2", name: "次級神經管化", css: "--c-streak" },
+      { id: "drg", name: "背根神經節", css: "--c-crest" }, { id: "dr", name: "後根", css: pnsCss("dr") }, { id: "vr", name: "前根", css: pnsCss("vr") }, { id: "sn", name: "脊神經", css: "--mute" },
+      { id: "cols", name: "透視核柱", css: "--c-gse", toggle: true }, { id: "simple", name: "簡化 4／8", css: "--c-alard", toggle: true },
+    ];
+  },
+  secTitle: "橫切面", secEnds: ["尾端（薦髓）", "頭端（中腦）"], cutRange: [.01, .99, .005], cut: .2,
+  note: "示意模型：把脊髓到中腦拉直成一條管子，長度不照比例，沒畫腦曲、小腦、大腦；天數為示意。腦幹核依 Haines（老師 p.33）清單，柱序依 Haines（老師 p.34）；SVE 三個核 p.33 未列。預設「簡化 4／8」：翼板 4 個感覺核同一色、基板 8 個運動核同一色，SVE 淡化；關掉（快捷鍵 S）看 7 個核柱各自的顏色與縮寫。來源：Langman 與 Haines《Fundamental Neuroscience》（老師用書），兩者不同處並列。",
+  flags: { cols: true, simple: true },
+  toggles: [{ id: "cols", label: "透視核柱", title: "管壁變透明、看縱向的核柱（快捷鍵 K）", key: "k" },
+    { id: "simple", label: "簡化 4／8", title: "翼板 4 感覺核、基板 8 運動核兩色；關掉看 7 個核柱（快捷鍵 S）", key: "s" }],
+  struct: null, group: new THREE.Group(),
+};
+scene.add(M.group);
+const colMat = matBank({ roughness: .6 });
+const FADE = .3; // 簡化模式淡化 SVE 的不透明度（3D 與 2D 共用）
+const fadeMat = matBank({ roughness: .6, transparent: true, opacity: FADE, depthWrite: false });
+const nucMat = (n) => (nucDim(n) ? fadeMat : colMat)(nucCss(n));
+const wallMat = std({ vertexColors: true }), roofMat = mat("--c-roof", { transparent: true, opacity: .45, depthWrite: false });
+const clipPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+
+function makeLoft(n, nr, material, ud, colors) {
+  const mesh = new THREE.Mesh(ringGeometry(n, nr, colors, true), material); mesh.userData = { n, nr, ...ud }; M.group.add(mesh); return mesh;
+}
+function fillLoft(mesh, ring) { // ring(i) → [z, 多邊形 [[x, y]…], 顏色(k)?]
+  const { n, nr } = mesh.userData, pos = mesh.geometry.attributes.position.array, col = mesh.geometry.attributes.color?.array;
+  for (let i = 0; i < n; i++) {
+    const [z, poly, cf] = ring(i);
+    for (let k = 0; k < nr; k++) {
+      const o = (i * nr + k) * 3; pos[o] = poly[k][0]; pos[o + 1] = poly[k][1]; pos[o + 2] = z;
+      if (col && cf) { const c = cf(k); col[o] = c.r; col[o + 1] = c.g; col[o + 2] = c.b; }
+    }
+  }
+  const g = mesh.geometry; g.attributes.position.needsUpdate = true; if (col) g.attributes.color.needsUpdate = true;
+  g.computeVertexNormals(); g.computeBoundingSphere();
+}
+const NOUT = 2 * NU + 2 * (NV - 2);
+const walls = SIDES.map((side) => makeLoft(NZ, NOUT, wallMat, { struct: "wall", side }, true));
+const roofM = makeLoft(NZ, 2 * NA, roofMat, { struct: "roof" });
+const rods = [];
+for (const n of NUC) for (const side of SIDES) {
+  const m = makeLoft(NZR, NE, colMat(n.css), { struct: n.id, nuc: n, side, rod: true });
+  m.renderOrder = 2; rods.push(m);
+}
+// 次級神經管化區（薦、尾段）：薦髓外面套一層半透明色帶，只標區域
+const SEC2 = [0, .07], NB = 10;
+const bandMat = mat("--c-streak", { transparent: true, opacity: .35, depthWrite: false });
+const bands = SIDES.map((side) => { const m = makeLoft(NB, NOUT, bandMat, { struct: "sec2", side }); m.renderOrder = 3; return m; });
+function offsetPoly(poly, d) { // 沿外法線往外推 d
+  const sg = Math.sign(area(poly)) || 1, n = poly.length;
+  return poly.map((p, i) => {
+    const a = poly[(i + n - 1) % n], b = poly[(i + 1) % n], tx = b[0] - a[0], ty = b[1] - a[1], l = Math.hypot(tx, ty) || 1;
+    return [p[0] + sg * d * ty / l, p[1] - sg * d * tx / l];
+  });
+}
+// 周邊神經：每節段左右各一組（背根節橢球＋後根兩段、前根、脊神經圓柱）
+const UNIT_S = new THREE.SphereGeometry(1, 18, 12), UNIT_C = new THREE.CylinderGeometry(1, 1, 1, 10, 1, true);
+const pns = [];
+for (const s of PNS_S) for (const side of SIDES) for (const [struct, seg] of [["drg", "g"], ["dr", "ag"], ["dr", "gj"], ["vr", "bj"], ["sn", "je"]]) {
+  const m = new THREE.Mesh(seg === "g" ? UNIT_S : UNIT_C, colMat(({ drg: "--c-crest", dr: "--c-gsa", vr: "--c-gse", sn: "--mute" })[struct]));
+  m.userData = { struct, seg, s, side, pns: true }; M.group.add(m); pns.push(m);
+}
+const _Y = new THREE.Vector3(0, 1, 0), _a = new THREE.Vector3(), _d = new THREE.Vector3();
+function rodBetween(m, p, q, z, r) {
+  _a.set(p[0], p[1], z); _d.set(q[0] - p[0], q[1] - p[1], 0); const L = _d.length() || 1e-4;
+  m.position.copy(_a).addScaledVector(_d, .5); m.quaternion.setFromUnitVectors(_Y, _d.normalize()); m.scale.set(r, L, r);
+}
+const [planeMarker, planeEdge] = planeFrame(.06, .35);
+for (const o of [planeMarker, planeEdge]) M.group.add(o);
+const capGroup = new THREE.Group(); M.group.add(capGroup);
+
+const BB = { x: 0, y0: 0, y1: 0 };
+let seeMode = null, geoKey = null, capKey = null;
+const tmpC = new THREE.Color(), tmpD = new THREE.Color();
+function wallColor(u, t, ring) {
+  const st = sm(29.5, 32, t);
+  const reg = u < UF ? "--c-floor" : u > 1 - UR ? "--c-roof" : u < uSL ? "--c-basal" : "--c-alar";
+  tmpC.copy(colOf("--c-neuro")).lerp(colOf(reg), st);
+  if (Math.abs(u - uSL) < .03 && st > .5) tmpC.multiplyScalar(.6); // 界溝畫一條深色線
+  return tmpC;
+}
+const see = () => M.flags.cols && state.day >= 33;
+function buildGeo(t) { // 幾何只跟天數（和主題色）有關
+  const Ws = []; for (let i = 0; i < NZ; i++) Ws.push(wallAt(sOfRing(i), t));
+  BB.x = 0; BB.y0 = 1e9; BB.y1 = -1e9;
+  SIDES.forEach((side, k) => fillLoft(walls[k], (i) => {
+    const poly = outline(Ws[i], side);
+    for (const p of poly) { BB.x = Math.max(BB.x, Math.abs(p[0])); BB.y0 = Math.min(BB.y0, p[1]); BB.y1 = Math.max(BB.y1, p[1]); }
+    return [zOf(sOfRing(i)), poly, (kk) => wallColor(OUTU[kk], t)];
+  }));
+  fillLoft(roofM, (i) => [zOf(sOfRing(i)), roofArc(Ws[i])]);
+  for (let i = 0; i < NZ; i++) if (Ws[i].phi > .05) BB.y1 = Math.max(BB.y1, roofArc(Ws[i])[NA >> 1][1] + .04);
+  roofM.visible = Ws.some((W) => W.phi > .05);
+  for (const m of rods) {
+    const n = m.userData.nuc; let any = false;
+    fillLoft(m, (i) => {
+      const s = lerp(n.s0, n.s1, i / (NZR - 1)), f = nucF(n, s, t); if (f > .02) any = true;
+      return [zOf(s), nucPoly(n, wallAt(s, t), m.userData.side, Math.max(f, 1e-3))];
+    });
+    m.visible = any;
+  }
+  SIDES.forEach((side, k) => fillLoft(bands[k], (i) => {
+    const s = lerp(SEC2[0], SEC2[1], i / (NB - 1));
+    return [zOf(s), offsetPoly(outline(wallAt(s, t), side), .035)];
+  }));
+  const fp = pnsF(t);
+  for (const m of pns) {
+    m.visible = fp > .02; if (!m.visible) continue;
+    const { seg, s, side } = m.userData, Q = pnsPts(wallAt(s, t), side), z = zOf(s);
+    if (seg === "g") { m.position.set(Q.g[0], Q.g[1], z); m.scale.set(PNS_R.drg[0] * fp, PNS_R.drg[1] * fp, .09 * fp); continue; }
+    const [p, q] = { ag: [Q.a, Q.g], gj: [Q.g, Q.j], bj: [Q.b, Q.j], je: [Q.j, Q.e] }[seg];
+    rodBetween(m, p, [lerp(p[0], q[0], fp), lerp(p[1], q[1], fp)], z, PNS_R.root * (seg === "je" ? 1.3 : 1));
+    if (seg === "je") BB.x = Math.max(BB.x, Math.abs(Q.e[0]) + .05);
+  }
+}
+M.update = function () {
+  const t = state.day, gk = t + "|" + themeGen;
+  if (geoKey !== gk) { geoKey = gk; buildGeo(t); }
+  for (const m of rods) m.material = nucMat(m.userData.nuc);
+  for (const m of pns) m.material = colMat(pnsCss(m.userData.struct));
+  // 透視模式：管壁變透明
+  const sv = see();
+  if (sv !== seeMode) {
+    seeMode = sv;
+    wallMat.transparent = sv; wallMat.opacity = sv ? .16 : 1; wallMat.depthWrite = !sv; wallMat.side = sv ? THREE.FrontSide : THREE.DoubleSide; wallMat.needsUpdate = true;
+    roofMat.opacity = sv ? .12 : .45; roofMat.needsUpdate = true;
+    bandMat.opacity = sv ? .12 : .35; bandMat.needsUpdate = true;
+  }
+  // 切面（保留尾側 z ≤ 切面）
+  const zc = zOf(M.cut);
+  clipPlane.constant = zc;
+  for (const m of [wallMat, roofMat, bandMat, ...Object.values(colMat.all), ...Object.values(fadeMat.all)]) m.clippingPlanes = state.cut3d ? [clipPlane] : [];
+  for (const o of [planeMarker, planeEdge]) { o.position.set(0, (BB.y0 + BB.y1) / 2, zc); o.scale.set(2 * BB.x + .6, BB.y1 - BB.y0 + .6, 1); o.visible = !state.cut3d; }
+  buildCaps();
+};
+function buildCaps() { // 天數、切面、透視、簡化、主題都沒變就不重建
+  const key = [state.day, state.cut3d ? M.cut : "-", state.cut3d, see(), M.flags.simple, themeGen].join();
+  if (key === capKey) return; capKey = key;
+  clearGroup(capGroup);
+  const t = state.day, ends = [];
+  if (state.cut3d) ends.push([M.cut, 1]);
+  if (!see()) { ends.push([0, -1]); if (!state.cut3d) ends.push([1, 1]); }
+  for (const [s, dir] of ends) {
+    const { polys } = secPolys(clamp(s, .0005, .9995), t), z = zOf(s);
+    polys.forEach(([struct, cv, poly, , , dim], k) => {
+      if (struct === "lumen") return;
+      const g = capGeometry(poly, (x, y) => [x, y, z + dir * (.002 + k * .0004)]); if (!g) return;
+      const m = capMesh(g, colMat(cv), struct); m.material.polygonOffset = true; m.material.polygonOffsetFactor = -1 - k * .05; m.renderOrder = 1;
+      if (dim) Object.assign(m.material, { transparent: true, opacity: FADE, depthWrite: false });
+      capGroup.add(m);
+    });
+  }
+}
+
+/* ---------- 橫切面 ---------- */
+M.drawSection = function (ctx, W_, H, dpr) {
+  const t = state.day, { W, polys } = secPolys(M.cut, t), pn = pnsPolys(W);
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for (const [, , poly] of [...polys, ...pn]) for (const [x, y] of poly) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  const sc = Math.min(W_ * (pn.length ? .6 : .5) / (x1 - x0), H * .8 / (y1 - y0));
+  const ox = W_ / 2 - (x0 + x1) / 2 * sc, oy = H * .5 + (y0 + y1) / 2 * sc;
+  const Pp = ([x, y]) => [ox + x * sc, oy - y * sc];
+  const hits = [], labs = [], seen = new Set(), grp = {};
+  for (const [struct, cv, poly, side, m] of pn) { // 右側標周邊神經
+    const q = poly.map(Pp); fillPoly(ctx, q, css(cv), struct); hits.push([struct, q]);
+    if (side === 1) labs.push([NAME[struct], Pp(m), "R", struct]);
+  }
+  for (const [struct, cv, poly, side, nm, dim, n] of polys) {
+    const q = poly.map(Pp);
+    if (dim) ctx.globalAlpha = FADE;
+    fillPoly(ctx, q, css(cv), struct);
+    ctx.globalAlpha = 1;
+    hits.push([struct, q]);
+    // 左半標分層／分板，右半標核；簡化模式的腦幹核柱只標群（感覺核標最外側那顆、運動核標最內側那顆、SVE 另標）
+    const isNuc = !!nm, want = isNuc ? side === 1 : side !== 1;
+    if (want && isNuc && simple() && isBrainCol(n)) {
+      const c = q.reduce((a, p) => [a[0] + p[0] / q.length, a[1] + p[1] / q.length], [0, 0]);
+      const k = dim ? "sve" : SENS.has(n.id) ? "alar" : "basal", better = k === "alar" ? (g) => c[0] > g.c[0] : (g) => c[0] < g.c[0];
+      if (!grp[k] || better(grp[k])) grp[k] = { c, struct };
+      continue;
+    }
+    const key = isNuc ? nm : struct;
+    if (want && !seen.has(key)) {
+      seen.add(key);
+      let m;
+      if (isNuc) { m = q.reduce((a, p) => [a[0] + p[0] / q.length, a[1] + p[1] / q.length], [0, 0]); }
+      else if (struct === "lumen" || (struct === "roof" && side === 0)) m = q[Math.floor(q.length * (struct === "lumen" ? .5 : .25))];
+      else { const k = Math.floor(q.length / 4); m = [(q[k][0] + q[q.length - 1 - k][0]) / 2, (q[k][1] + q[q.length - 1 - k][1]) / 2]; }
+      if (struct === "lumen") m = [m[0], (Pp(P(W, -1, uSL, 0))[1] + m[1]) / 2];
+      labs.push([isNuc ? nm : struct === "lumen" ? lumenName(M.cut) : NAME[struct], m, isNuc ? "R" : "L", struct]);
+    }
+  }
+  // 界溝
+  if (t >= 30.5) {
+    const c = Pp(P(W, -1, uSL, 0)), r = 5 * dpr;
+    ctx.beginPath(); ctx.arc(c[0], c[1], r * .6, 0, Math.PI * 2); ctx.fillStyle = css("--warn"); ctx.fill();
+    hits.push(["sl", ellipse(c[0], c[1], r * 1.6, r * 1.6, 10)]);
+    labs.push([NAME.sl, c, "L", "sl"]);
+  }
+  for (const k of ["alar", "basal", "sve"]) if (grp[k]) labs.push([GRP_LBL[k], grp[k].c, "R", grp[k].struct]);
+  drawLeaders(ctx, labs, W_, H, dpr);
+  // 方向字：腦幹打開後（第四腦室）翼板在外、基板在內，改標內側／外側；脊髓、未打開的延腦尾端與中腦維持背側／腹側
+  if (M.cut >= SPINAL && W.phi > .3) {
+    const txt = "內側 ← 界溝 → 外側", sx = Pp(P(W, 1, uSL, 0))[0];   // 對著右半的界溝（右半由內往外讀）
+    dirText(ctx, W_, H, dpr, null, "基板＝運動（內）　翼板＝感覺（外）");
+    const hw = ctx.measureText(txt).width / 2 + 4 * dpr;
+    ctx.fillText(txt, clamp(sx, hw, W_ - hw), 9 * dpr);
+  } else dirText(ctx, W_, H, dpr, "背側", "腹側");
+  const g = segAt(M.cut), lh = LH.find(([a, b]) => M.cut > a && M.cut < b);
+  return { hits, where: `${g.name}${lh ? `（${lh[2]}）` : ""}${W.phi > .3 ? " · 第四腦室打開" : ""}` };
+};
+const GRP_LBL = { alar: "翼板：感覺核（外）", basal: "基板：運動核（內）", sve: "SVE（未列入 8 個）" };
+const lumenName = (s) => (s < SPINAL + .04 ? "中央管" : s < .8 ? "第四腦室" : "大腦導水管");
+
+/* ---------- 名稱標籤 ---------- */
+// 簡化模式的兩個大字：掛在最外側的前庭核（翼板）與最內側的舌下神經核（基板）上，兩者錯開長軸位置免得重疊
+const GRP_TAG = [["alar", "翼板：4 感覺核（外側）", "前庭核、耳蝸核"], ["basal", "基板：8 運動核（內側）", "舌下神經核"]];
+M.tagAnchors = function () {
+  const t = state.day, A = [];
+  for (const g of SEG) {
+    const s = (g.s0 + Math.min(1, g.s1)) / 2, W = wallAt(s, t);
+    const top = W.phi > .05 ? roofArc(W)[NA >> 1][1] : P(W, -1, 1, 1)[1];
+    A.push([g.name, [0, top + .08, zOf(s)], g.id === "med" || g.id === "pon" || g.id === "mid" ? "basal" : "ah", "flex"]);
+  }
+  { const s = (SEC2[0] + SEC2[1]) / 2, p = P(wallAt(s, t), -1, .5, 1); A.push(["次級神經管化", [p[0] - .04, p[1], zOf(s)], "sec2", "flex"]); }
+  if (pnsF(t) > .5) { const s = PNS_S[5], Q = pnsPts(wallAt(s, t), -1); A.push([NAME.drg, [Q.g[0], Q.g[1] + .1, zOf(s)], "drg", "flex"]); }
+  if (see()) { // 透視時每柱標一次（左側），不逐核標；簡化模式腦幹只標兩群
+    const done = new Set();
+    if (simple()) for (const [k, txt, nm] of GRP_TAG) {
+      const n = NUC.find((x) => x.name === nm), s = (n.s0 + n.s1) / 2;
+      if (nucF(n, s, t) < .3) continue;
+      const W = wallAt(s, t), [uc, vc] = nucCenter(n, W), p = P(W, -1, uc, vc);
+      A.push([txt, [p[0], p[1], zOf(s)], k, "big " + k]);
+    }
+    for (const m of rods) {
+      const n = m.userData.nuc; if (m.userData.side !== -1 || !m.visible || done.has(n.id)) continue;
+      const brain = !["ah", "ph", "lh"].includes(n.id) && n.s0 >= SPINAL - .03;
+      if (["io", "pn", "dc", "ic", "rn"].includes(n.id) || (["gva"].includes(n.id) && !brain) || (brain && simple())) continue;
+      const s = (n.s0 + n.s1) / 2;
+      if (nucF(n, s, t) < .3) continue;
+      done.add(n.id);
+      const W = wallAt(s, t), [uc, vc] = nucCenter(n, W), p = P(W, -1, uc, vc);
+      A.push([brain ? n.id.toUpperCase() : n.name, [p[0], p[1], zOf(s)], n.id]);
+    }
+  }
+  return A;
+};
+M.tagShown = (p) => !state.cut3d || p[2] <= zOf(M.cut) + .02;
+
+/* ---------- 卡片 ---------- */
+const nucList = (id) => NUC.filter((n) => n.id === id).map((n) => n.name);
+const P33 = "核名依 Haines（老師 p.33）；柱的排列依 Haines（老師 p.34）。";
+const colCard = (id, full, en, kind, plate, extra = "") => ({
+  name: () => full, en: `${en}（${id.toUpperCase()}）`, meta: `${plate} · ${kind}`,
+  body: () => `<ul>${extra}<li>腦幹：${nucList(id).join("、")}</li></ul><p style="margin-top:6px;font-size:12px;color:var(--mute)">${P33}</p>`,
+});
+M.struct = {
+  vz: { name: () => "腦室區", en: "ventricular zone", meta: "最先出現 · 貼著管腔（Langman：神經上皮層）",
+    body: () => `<p>神經管剛閉合時管壁只有這一層：假複層、正在分裂的梭形細胞（Haines，老師 p.6、p.8）。細胞核在管腔面分裂。</p><ul><li>產生神經母細胞 → 神經元</li><li>產生膠母細胞 → 星狀膠細胞、寡突膠細胞（部分膠細胞）</li><li>停止分裂後留下的一層 → 室管膜細胞，襯在中央管、腦室</li></ul>`,
+    trap: "微膠細胞來自中胚層（骨髓的單核球），不是神經上皮。",
+    more: `<details class="fold"><summary>放射狀膠細胞、細胞核上下移動</summary><ul><li><b>放射狀膠細胞</b>（radial glia）：突起從腦室區一路伸到邊緣區；新生神經元沿著它的突起往外遷移，在腦室區與邊緣區之間聚成中間區（Haines 4th p.71–72，老師 p.29）。上課補充（共筆）：像嚮導。</li><li>之後多數變成星狀膠細胞、室管膜細胞或 tanycytes；小腦的 Bergmann 膠細胞、視網膜的 Müller 細胞也是放射狀膠細胞（Haines 4th p.72）。</li><li><b>細胞核上下移動</b>：Haines 4th p.71 寫腦室區是假複層柱狀上皮，分裂的細胞集中在管腔面。上課補充（共筆）：細胞核隨細胞週期來回（to-and-fro）——G1 → S 往外移、G2 退回、M 期貼著管腔分裂，所以看起來是假複層。</li></ul></details>` },
+  mantle: { name: () => "中間區", en: "intermediate zone（mantle layer）", meta: "三層中最後出現（Haines）· 之後成灰質（Langman：外套層 mantle layer）",
+    body: () => `<p>細胞離開腦室區，移到腦室區與邊緣區之間，聚成中間區，是日後的<b>灰質</b>（Haines，老師 p.8、p.28）。第 5 週起背側增厚成翼板、腹側增厚成基板。</p>`,
+    trap: "Langman：神經上皮層 → 外套層（灰質）、邊緣層（白質）。Haines（老師 p.6、p.8）：腦室區 → 邊緣區 → 中間區（中間區最後）。模型畫 Haines。<br>易錯：中間區在脊髓成<b>灰質</b>，在大腦皮質卻成<b>白質</b>（大腦的灰質是外面的皮質板；Haines 4th p.77，老師 p.39），方向相反。",
+    more: `<details class="fold"><summary>神經元發育事件（老師 p.42–44）</summary><ol><li><b>過量產生與凋亡</b>：神經元先多產生約 1.5–2 倍，再以凋亡（apoptosis）減少；NGF、BDNF 等生長因子可以減少這種細胞死亡（Haines 4th p.78，老師 p.43）。</li><li><b>軸突生長</b>（axonal outgrowth）：軸突前端的生長錐（growth cone）帶著軸突穿過組織，找到遠處的目標（Haines 4th p.72、p.78，老師 p.29、p.43）。上課補充（共筆）：組織學的部分，稍微了解即可。</li><li><b>突觸形成</b>（synaptogenesis）：突觸後細胞要有受器；要留下來的接觸，需要突觸後細胞送回逆向訊號（retrograde signal）給突觸前，沒有回應的會被淘汰（Haines 4th p.78，老師 p.44）。</li><li><b>可塑性與競爭</b>（plasticity and competition）：發育中的腦受傷較能恢復，連結會為突觸位置互相競爭，例如視覺皮質兩眼的輸入（Haines 4th p.78–79，老師 p.44）。上課補充（共筆）：孩童腦傷較能恢復。</li><li><b>髓鞘化</b>（myelination）：約第 6 個月開始，出生到 1 歲最多，持續到成年（Haines 4th p.80，老師 p.44）。上課補充（共筆）：CNS 由寡突膠細胞、PNS 由 Schwann 細胞形成髓鞘。</li></ol></details>` },
+  marg: { name: () => "邊緣區", en: "marginal zone", meta: "最外層 · 在中間區之前出現 · 之後成白質（Langman：邊緣層）",
+    body: () => `<p>先由腦室區細胞往外伸的突起構成，之後加入中間區神經元的軸突；沒有神經元細胞體。軸突髓鞘化後呈白色 → <b>白質</b>。</p>` },
+  alar: { name: () => "翼板", en: "alar plate", meta: "界溝背側 · 感覺（傳入）",
+    body: (st) => `<ul><li>脊髓：<b>後角</b>（感覺中繼）</li><li>腦幹：攤開後在<b>外側</b>；GVA、SVA、GSA、SSA 四柱的感覺核（Haines 4th p.73–74，老師 p.33–34）</li><li>簡化模式：4 個感覺核同一色（翼板色）。孤立核分成 GVA、SVA 兩柱，只算 1 個感覺核（Haines，老師 p.33）</li><li>往外遷移的衍生：下橄欖核、薄核／楔核（末腦）；橋腦核（後腦菱唇尾段，Haines，老師 p.35）；上丘、下丘（中腦頂蓋）；小腦（後腦菱唇）</li></ul>`,
+    trap: "腦幹打開後方位會換：脊髓是「背側＝翼板」，腦幹變成「外側＝翼板、內側＝基板」（橫切面切到第四腦室時方向字改成內側／外側）。", kg: ["107-2-醫學一-36"],
+    more: `<details class="fold"><summary>腦幹翼板的 4 個感覺核（老師 p.33）</summary><p>三叉神經脊髓核、三叉神經主感覺核、孤立核、前庭核與耳蝸核（Haines，老師 p.33）。</p><p>上課補充（共筆）：腦幹的翼板長得比基板快，包到基板外圍、把基板擠到前面，所以變成翼板在外、基板在內。老師說這幾個核分別是誰不用記這麼細，記「翼板 4 個感覺核、基板 8 個運動核」與內外關係就好。</p></details>` },
+  basal: { name: () => "基板", en: "basal plate", meta: "界溝腹側 · 運動（傳出）",
+    body: () => `<ul><li>脊髓：<b>前角</b>（體運動）；T1–L2 另有<b>側角</b>（交感節前）</li><li>腦幹：攤開後在<b>內側</b>；GSE、GVE、SVE 三柱的運動核（Haines 4th p.73–74，老師 p.33–34）</li><li>簡化模式：8 個運動核同一色（基板色）；SVE 的疑核、顏面神經核、三叉神經運動核<b>不在老師 p.33 的 8 個運動核裡</b>，畫淡色</li><li>中腦：動眼、滑車、Edinger-Westphal 核</li></ul>`,
+    trap: "老師投影片（Haines，p.26）把 placode（外胚層增厚處，形成感覺器官與腦神經節）也譯作「基板」，跟這裡神經管的 basal plate 不是同一個構造。", kg: ["107-1-醫學一-36"],
+    more: `<details class="fold"><summary>腦幹基板的 8 個運動核（老師 p.33）</summary><p>舌下神經核、外旋神經核、動眼神經核、滑車神經核、迷走神經背核、下唾液核、上唾液核、Edinger-Westphal 核（Haines，老師 p.33）。SVE 的疑核、顏面神經核、三叉神經運動核這張表沒列。</p><p>上課補充（共筆）：不用記這麼細，記「4 個感覺、8 個運動」與翼板在外、基板在內就好。</p></details>` },
+  sl: { name: () => "界溝", en: "sulcus limitans", meta: "管腔側壁上的縱溝",
+    body: () => `<p>翼板與基板的分界：背側（腦幹是外側）為翼板，腹側（腦幹是內側）為基板。腦幹打開後，界溝在<b>第四腦室底</b>（Haines，老師 p.30、p.32）。上課補充（共筆）：第四腦室的頂是小腦。</p>` },
+  roof: { name: () => "頂板", en: "roof plate", meta: "背中線 · 沒有神經母細胞",
+    body: () => `<p>連接左右翼板的薄壁，只有室管膜與膠細胞，主要讓軸突跨中線。菱腦打開後被拉成一層膜（室管膜＋軟腦膜＝脈絡組織），蓋在第四腦室上面，之後長出脈絡叢。第四腦室的底有界溝（老師 p.32）；上課補充（共筆）：第四腦室的頂（roof）是小腦。小腦由後腦菱唇與小腦板形成（模型不畫，見下方摺疊）。</p>`,
+    more: `<details class="fold"><summary>小腦（老師 p.35–36）</summary><ul><li><b>菱唇</b>（rhombic lip）：後腦翼板的背側緣，構成第四腦室壁的一部分。頭段 → 小腦；尾段 → 下橄欖核、耳蝸核、橋腦核（Haines 4th p.74，老師 p.35）。</li><li><b>小腦板</b>（cerebellar plate）：兩側菱唇在第四腦室頂上方接合而成（老師 p.35）。</li><li><b>裂</b>：先出現後外側裂（posterolateral fissure），分出絨球小結葉（flocculonodular lobe）與小腦體（corpus cerebelli）；小腦體再被初級裂（primary fissure）分成前葉、後葉（Haines 4th p.74–75、p.158，老師 p.35）。上課補充（共筆）：先有後外側裂才有初級裂。</li></ul><table class="cmp"><tr><th></th><th>內生發層（internal germinal layer）</th><th>外生發層（external germinal layer）</th></tr><tr><th>位置</th><td>腦室區（靠第四腦室）</td><td>小腦表面（邊緣區）</td></tr><tr><th>遷移</th><td>沿放射狀膠細胞往外</td><td>往內，顆粒細胞越過 Purkinje 層</td></tr><tr><th>形成</th><td>小腦核、Purkinje 細胞、Golgi 細胞</td><td>顆粒細胞、星狀細胞、籃狀細胞</td></tr></table><p>出處：Haines 4th p.74–75，老師 p.36。上課補充（共筆）：內生發層往外、外生發層往內。</p></details>` },
+  floor: { name: () => "底板", en: "floor plate", meta: "腹中線 · 沒有神經母細胞",
+    body: () => `<p>連接左右基板的薄壁，軸突在這裡交叉到對側。底板分泌 SHH，誘導腹側變成基板（運動神經元）。</p>` },
+  lumen: { name: () => lumenName(M.cut), en: () => ({ 中央管: "central canal", 第四腦室: "fourth ventricle", 大腦導水管: "cerebral aqueduct" })[lumenName(M.cut)], meta: "神經管的管腔",
+    body: () => `<p>脊髓段變小成<b>中央管</b>；菱腦段因橋曲攤開成寬的<b>第四腦室</b>；中腦段變細成<b>大腦導水管</b>。</p>` },
+  ah: { name: () => "前角", en: "anterior horn", meta: "基板 → 脊髓 · GSE 柱",
+    body: () => `<p>兩側基板增厚成前角，含體運動神經元，軸突出前根到骨骼肌（Haines，老師 p.30）。</p>` },
+  ph: { name: () => "後角", en: "posterior horn", meta: "翼板 → 脊髓 · GSA 柱",
+    body: () => `<p>兩側翼板形成後角，是感覺的中繼神經元；感覺神經元本身在背根神經節（神經嵴），不在後角。</p>`,
+    trap: "背角（後角）來自翼板（107-1 的錯誤選項）。", kg: ["107-1-醫學一-36"] },
+  lh: { name: () => "側角", en: "lateral horn", meta: "中間帶 · GVE 柱",
+    body: () => `<ul><li><b>T1–L2</b>：交感神經節前神經元（中間外側柱）</li><li><b>S2–S4</b>：薦副交感神經節前神經元（同一位置，但不形成明顯的角，模型畫得較小）</li></ul>`,
+    trap: "Langman：只把 T1–L2（或 L3）的中間角稱為側角，S2–S4 是同位置的薦副交感核。Haines（老師 p.30）：T1–L2 與 S2–S4。" },
+  gse: colCard("gse", "一般體傳出", "general somatic efferent", "運動", "基板 · 最內側", "<li>脊髓：前角</li>"),
+  gve: colCard("gve", "一般內臟傳出", "general visceral efferent", "副交感／交感節前", "基板", "<li>脊髓：側角（T1–L2、S2–S4）</li>"),
+  sve: { ...colCard("sve", "特殊內臟傳出", "special visceral efferent", "鰓弓肌運動", "基板 · 往腹外側移", "<li>疑核、顏面神經核、三叉神經運動核<b>不在老師 p.33 的 8 個運動核裡</b>（Haines，老師 p.33）；簡化模式畫淡色</li>"),
+    trap: "Langman 基板：內側 GSE、中間 SVE、外側 GVE。Haines（老師 p.34）：GSE、GVE 在第四腦室底，SVE 往腹外側；模型畫 Haines。SVE 三個核（疑核、顏面神經核、三叉神經運動核）Haines（老師 p.33 清單）未列。" },
+  gva: colCard("gva", "一般內臟傳入", "general visceral afferent", "內臟感覺", "翼板 · 緊鄰界溝", "<li>脊髓：後角基部</li><li>孤立核同時屬 GVA、SVA 兩柱，老師 p.33 的 4 個感覺核只算 1 個（Haines，老師 p.33）</li>"),
+  sva: colCard("sva", "特殊內臟傳入", "special visceral afferent", "味覺", "翼板", "<li>孤立核同時屬 GVA、SVA 兩柱，老師 p.33 的 4 個感覺核只算 1 個（Haines，老師 p.33）</li>"),
+  gsa: colCard("gsa", "一般體傳入", "general somatic afferent", "觸、痛、溫", "翼板", "<li>脊髓：後角；往上接三叉神經脊髓核</li>"),
+  ssa: colCard("ssa", "特殊體傳入", "special somatic afferent", "聽覺、平衡", "翼板 · 最外側"),
+  io: { name: () => "下橄欖核", en: "inferior olivary nucleus", meta: "翼板衍生 · 往腹側遷移",
+    body: () => `<p>末腦翼板（菱唇）的神經母細胞往腹側遷移，停在延腦腹側成為下橄欖核，之後投射到小腦。模型第 44–52 天可以看到它從外側往腹側移。</p>`,
+    trap: "位置在腹側，但來源是翼板（107-2）。", kg: ["107-2-醫學一-36"] },
+  dc: { name: () => "薄核、楔核", en: "gracile, cuneate nuclei", meta: "翼板衍生 · 延腦尾側背面",
+    body: () => `<p>末腦翼板形成的感覺中繼核：薄核在內側、楔核在外側，接收脊髓後柱的薄束、楔束。</p>`, kg: ["107-1-醫學一-36", "107-2-醫學一-36"] },
+  ic: { name: () => "下丘", en: "inferior colliculus", meta: "翼板衍生 · 中腦頂蓋",
+    body: () => `<p>中腦翼板的神經母細胞往背側移到頂蓋，形成上丘（視覺反射）與下丘（聽覺中繼）。模型只畫下丘。</p>`, kg: ["107-1-醫學一-36", "107-2-醫學一-36"] },
+  pn: { name: () => "橋腦核", en: "pontine nuclei", meta: "翼板（菱唇）衍生 · 往腹側遷移",
+    body: () => `<p>後腦菱唇尾段的神經母細胞往腹側遷移，停在橋腦基部成為橋腦核，之後投射到小腦（Haines，老師 p.35：菱唇尾段 → 下橄欖核、耳蝸核、橋腦核）。模型第 44–52 天可以看到它從外側往腹側移。</p>`,
+    trap: "位置在腹側，但來源是翼板（菱唇）。" },
+  rn: { name: () => "紅核", en: "red nucleus", meta: "中腦被蓋 · 國考答案（107-1、107-2）：基板",
+    body: () => `<p>位置在中腦被蓋（基板區）。來源兩本書一致寫翼板：Langman（15th ed. Fig. 18.23 圖說）寫中腦翼板的細胞往腹側遷移，形成紅核與黑質；Haines（4th ed. p.169、Fig. 13-2）寫未成熟的翼板神經元也遷移到中腦前方，形成紅核與黑質。國考答案則歸基板，3D 顏色畫國考答案。老師投影片與共筆沒有講紅核的來源。</p>`,
+    trap: "國考 107-1（基板衍生者）與 107-2（不是翼板衍生者）的答案都是紅核，考試照這個答。", kg: ["107-1-醫學一-36", "107-2-醫學一-36"] },
+};
+M.struct.sec2 = { name: () => "次級神經管化", en: "secondary neurulation", meta: "薦、尾段脊髓 · 第 20–42 天（Haines）",
+  body: () => `<p>脊髓的薦段、尾段不是由神經板摺疊而來：神經管尾端下方出現一團細胞——<b>尾部隆起</b>（caudal eminence），長大後中空化，再接上神經管，空腔與神經管腔相通（Haines 4th p.66–67、5th p.75，老師 p.11）。神經板形成頸、胸、腰段，尾部隆起形成薦、尾段（Haines 4th p.124）。老師 p.7D 第 22 天背面圖在後神經孔下方標「Region of secondary neurulation」。Langman 15th ed. 沒寫次級神經管化。</p><p>模型只用淡色帶標出這一段，不畫中空化的過程（初級與次級的比較見模組 1 神經管卡片的摺疊）。</p>`,
+  trap: "「次級腦泡」（五個腦泡）和「次級神經管化」是兩回事。" };
+// 周邊神經（第 4 版 B3）：顏色借現有變數——背根節 --c-crest（神經嵴，同模組 1）、後根 --c-gsa（同後角）、前根 --c-gse（同前角）、脊神經 --mute
+const PNS_NOTE = "兩本書沒寫確切天數，模型在第 32 天畫出；只畫脊髓段，節段位置是示意。";
+M.struct.drg = { name: () => "背根神經節", en: "dorsal root ganglion（DRG）", meta: "神經嵴衍生 · 脊髓兩側",
+  body: () => `<p>神經嵴細胞在脊髓兩側聚集成背根神經節（感覺神經節），裡面的神經元變成<b>偽單極</b>（pseudounipolar）；包住周邊神經的 Schwann 細胞也來自神經嵴（Haines 4th p.71，老師 p.26–27）。</p><p>背根節細胞的<b>中樞突</b>從背外側長進脊髓、接到後角，就是<b>後根</b>；<b>周邊突</b>和前根會合成<b>脊神經</b>（Langman 15th ed. Fig. 18.10 前文）。</p><p style="font-size:12px;color:var(--mute)">${PNS_NOTE}</p>`,
+  trap: "感覺神經元的細胞本體在背根神經節（神經嵴），不在後角（翼板）。" };
+M.struct.dr = { name: () => "後根", en: "dorsal root", meta: "背根神經節的中樞突 · 進入後角",
+  body: () => `<p>背根神經節細胞的中樞突從背外側進入脊髓，接到翼板形成的後角（Langman 15th ed. Fig. 18.10 前文）。後根只有感覺纖維，細胞本體在背根神經節。</p><p style="font-size:12px;color:var(--mute)">${PNS_NOTE}</p>` };
+M.struct.vr = { name: () => "前根", en: "ventral root", meta: "基板運動神經元的軸突 · 第 4 週",
+  body: () => `<p>第 4 週，基板（前角）運動神經元的軸突從脊髓腹外側長出，成為前根，把衝動傳到肌肉（Langman 15th ed. Fig. 18.10 前文）。</p><p style="font-size:12px;color:var(--mute)">${PNS_NOTE}</p>` };
+M.struct.sn = { name: () => "脊神經", en: "spinal nerve", meta: "前根＋後根（背根節周邊突）",
+  body: () => `<p>背根神經節的周邊突和前根會合成脊神經，同時有運動和感覺纖維（Langman 15th ed. Fig. 18.10 前文）。模型只畫到會合後一小段。</p><p style="font-size:12px;color:var(--mute)">${PNS_NOTE}</p>` };
+M.cardState = () => ({ t: state.day });
+M.dayInfo = (t) => ["腦室區", "腦室區＋邊緣區", "三層", "翼板＋基板", "核柱形成"][stage_(t)] + ` · ${segAt(M.cut).name}`;
+M.legendClick = (l) => { if (!l.toggle) { select(l.id); return; } M.flags[l.id] = !M.flags[l.id]; };
+M.legendPressed = (l) => (l.toggle ? M.flags[l.id] : undefined);
+
+/* ---------- 鏡頭、點選 ---------- */
+M.views = [
+  { id: "obl", label: "斜面", v: () => ({ p: [-12, 6.5, -2.5], t: [0, 0, 0] }) },
+  { id: "dors", label: "背面", v: () => ({ p: [0, 14, -1.6], t: [0, 0, 0] }) },
+  { id: "lat", label: "側面", v: () => ({ p: [-15, .6, 0], t: [0, 0, 0] }) },
+  { id: "cut", label: "切面", cut: true, v: () => ({ p: [-4.5, 3.5, zOf(M.cut) + 7], t: [0, 0, zOf(M.cut)] }) },
+];
+M.defaultView = "obl";
+M.autoFit = true;
+M.pick = function (ray) {
+  const objs = [...walls, roofM, ...rods, ...bands, ...pns, ...capGroup.children].filter((o) => o.visible);
+  let hits = ray.intersectObjects(objs, false);
+  const zc = zOf(M.cut);
+  if (state.cut3d) hits = hits.filter((h) => h.object.parent === capGroup || h.point.z <= zc + .01);
+  if (hits.some((h) => h.object.parent === capGroup)) hits = hits.filter((h) => !bands.includes(h.object)); // 切口優先於色帶
+  if (see()) { const r = hits.find((h) => h.object.userData.rod || h.object.userData.pns || h.object.parent === capGroup); if (r) hits = [r]; }
+  if (!hits.length) return null;
+  const h = hits[0], o = h.object;
+  if (walls.includes(o)) {
+    const k = ((h.faceIndex / 2) | 0) % o.userData.nr, u = OUTU[k], t = state.day;
+    if (t < 30.5) return t < 27.5 ? "vz" : "marg";
+    return u < UF ? "floor" : u > 1 - UR ? "roof" : u < uSL ? "basal" : "alar";
+  }
+  return o.userData.struct;
+};
+Object.assign(M, { wallAt, secPolys, NUC, zOf, rods, walls, bands });
+return M;
+})();
+
+
+const MODS = [M1, M2, M3, { id: "m4", name: "眼", soon: true }];
+let mod = MODS.find((m) => m.id === state.mod && !m.soon) || M1;
+
+function update() {
+  mod.update(); applyHidden();
+  drawSection(); renderDay();
+  if (state.sel) showCard(state.sel);
+  needsRender = true; // 名稱標籤在迴圈畫完這一幀時一起更新
+  saveHash();
+}
+
+/* ---------- 名稱標籤 ---------- */
+const tagBox = document.getElementById("labels");
+const v3 = new THREE.Vector3();
+function renderTags() {
+  tagBox.innerHTML = "";
+  if (!state.tags) return;
+  const w = stage.clientWidth, h = stage.clientHeight;
+  for (const [txt, p, struct, cls] of mod.tagAnchors()) {
+    if (!mod.tagShown(p) || hidden.has(struct)) continue;
+    v3.set(...p).project(camera); if (v3.z > 1) continue;
+    const el = document.createElement("div"); el.className = "tag3d" + (cls ? " " + cls : ""); el.textContent = txt;
+    el.style.left = ((v3.x + 1) / 2 * w) + "px"; el.style.top = ((1 - v3.y) / 2 * h - 10) + "px";
+    tagBox.appendChild(el);
+  }
+  // 重疊的往上推
+  const els = [...tagBox.children].map((el) => ({ el, r: el.getBoundingClientRect() })).sort((a, b) => b.r.top - a.r.top);
+  const placed = [];
+  for (const it of els) {
+    let dy = 0;
+    for (let k = 0; k < 6; k++) {
+      const hit = placed.find((p) => it.r.left < p.right && it.r.right > p.left && it.r.top - dy < p.bottom && it.r.bottom - dy > p.top);
+      if (!hit) break; dy += it.r.bottom - dy - hit.top + 2;
+    }
+    if (dy) it.el.style.top = (parseFloat(it.el.style.top) - dy) + "px";
+    placed.push({ left: it.r.left, right: it.r.right, top: it.r.top - dy, bottom: it.r.bottom - dy });
+  }
+}
+
+/* ---------- 2D 切面 ---------- */
+const secCv = document.getElementById("sec"), sctx = secCv.getContext("2d");
+let secHits = [];
+function drawSection() {
+  const dpr = Math.min(2, devicePixelRatio || 1), cw = secCv.clientWidth || 360;
+  const tw = Math.round(cw * dpr), th = Math.round(cw * 460 / 720 * dpr);
+  if (secCv.width !== tw || secCv.height !== th) { secCv.width = tw; secCv.height = th; }
+  const W = secCv.width, H = secCv.height;
+  sctx.setTransform(1, 0, 0, 1, 0, 0); sctx.clearRect(0, 0, W, H);
+  const r = mod.drawSection(sctx, W, H, dpr);
+  secHits = r.hits;
+  document.getElementById("secWhere").textContent = r.where;
+}
+function hitSection(ev) {
+  const r = secCv.getBoundingClientRect();
+  const x = (ev.clientX - r.left) / r.width * secCv.width, y = (ev.clientY - r.top) / r.height * secCv.height;
+  for (let i = secHits.length - 1; i >= 0; i--) {
+    const [s, P] = secHits[i]; let inside = false;
+    for (let a = 0, b = P.length - 1; a < P.length; b = a++) { const [xa, ya] = P[a], [xb, yb] = P[b]; if ((ya > y) !== (yb > y) && x < (xb - xa) * (y - ya) / (yb - ya) + xa) inside = !inside; }
+    if (inside) return s;
+  }
+  return null;
+}
+secCv.addEventListener("click", (e) => select(hitSection(e)));
+new ResizeObserver(() => drawSection()).observe(secCv);
+// 卡片裡的靜態 2D 示意圖：<canvas class="fig" data-fig="名稱" data-r="高寬比">，由 mod.figs[名稱](ctx, W, H, dpr) 畫（摺疊打開時才有寬度）
+const figRO = new ResizeObserver((es) => es.forEach((e) => drawFig(e.target)));
+function drawFig(cv) {
+  const f = mod.figs?.[cv.dataset.fig], cw = cv.clientWidth; if (!f || !cw) return;
+  const dpr = Math.min(2, devicePixelRatio || 1), r = +cv.dataset.r || .8, W = Math.round(cw * dpr), H = Math.round(cw * r * dpr);
+  cv.style.aspectRatio = `1 / ${r}`;
+  if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+  const ctx = cv.getContext("2d"); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, W, H);
+  f(ctx, W, H, dpr);
+}
+
+/* ---------- 卡片 ---------- */
+const cardEl = document.getElementById("card");
+const EMPTY = "點 3D 或下方切面上的構造看說明。";
+function select(s) { // mod.reveal(s)：選到某些構造時模組自己開開關或跳天數，有變就重畫
+  state.sel = s;
+  if (mod.reveal?.(s)) { dayIn.value = state.day; renderLegend(); update(); }
+  showCard(s); drawSection(); saveHash();
+}
+function showCard(s) { // 內容沒變就不動（摺疊維持開關）；變了也把原本打開的摺疊留著
+  const C = s && mod.struct[s];
+  if (!C) { cardEl.className = "empty"; cardEl.innerHTML = EMPTY; cardEl.dataset.sig = ""; return; }
+  const st = mod.cardState(s);
+  const kgs = (C.kg || []).filter((id) => KGI[id]);
+  const en = typeof C.en === "function" ? C.en(st) : C.en;
+  const html = `<h2>${C.name(st)}${kgs.length ? `<span class="kgN">國考 ${kgs.length}</span>` : ""}</h2>${en ? `<div class="en">${en}</div>` : ""}<div class="meta">${C.meta}</div>${C.body(st)}${C.trap ? `<div class="trap">${C.trap}</div>` : ""}${C.more || ""}` +
+    (kgs.length ? `<details class="fold"><summary>國考題（${kgs.length}）</summary>${kgs.map(qHtml).join("")}</details>` : "");
+  const sig = mod.id + "|" + s + "|" + html;
+  if (cardEl.dataset.sig === sig) return;
+  const open = cardEl.dataset.sig?.startsWith(mod.id + "|" + s + "|") ? new Set([...cardEl.querySelectorAll("details[open] > summary")].map((x) => x.textContent)) : new Set();
+  cardEl.className = ""; cardEl.innerHTML = html; cardEl.dataset.sig = sig;
+  cardEl.querySelectorAll("details > summary").forEach((x) => { if (open.has(x.textContent)) x.parentElement.open = true; });
+  figRO.disconnect(); cardEl.querySelectorAll("canvas.fig").forEach((c) => figRO.observe(c));
+}
+
+/* ---------- 國考 ---------- */
+const KGI = Object.fromEntries((window.KG || []).map((q) => [q.id, q]));
+function qHtml(id) {
+  const q = KGI[id]; if (!q) return "";
+  return `<div class="q"><b>${q.id.replace("-醫學一-", "-")}</b>　${q.stem}<ol>${Object.entries(q.options).map(([k, v]) => `<li class="${k === q.answer ? "ok" : ""}">(${k}) ${v}</li>`).join("")}</ol></div>`;
+}
+function renderKg() {
+  // 全部模組共用一份清單：本模組在前，其他模組標上模組名，點了先切過去
+  const all = window.KG || [], ids = [...all.filter((q) => q.mod === mod.id), ...all.filter((q) => q.mod !== mod.id)];
+  document.getElementById("kgLbl").innerHTML = `國考相關<span class="kgN">${ids.length}</span>`;
+  const ul = document.getElementById("kgList"); ul.innerHTML = "";
+  for (const q of ids) {
+    const li = document.createElement("li"), other = q.mod !== mod.id;
+    const tag = other ? `<span class="kgMod">${MODS.find((m) => m.id === q.mod)?.name || q.mod}</span>` : "";
+    li.innerHTML = `<button${other ? ' class="other"' : ""}><span class="id">${q.id.replace("-醫學一-", "-")}</span><span>${tag}${q.options[q.answer]}</span></button>`;
+    li.firstChild.addEventListener("click", () => {
+      const open = li.querySelector(".q"); if (open) { open.remove(); return; }
+      stopPlay();
+      if (q.mod !== mod.id) { setMod(q.mod); const li2 = [...document.querySelectorAll("#kgList li")].find((x) => x.dataset.id === q.id); li2?.insertAdjacentHTML("beforeend", qHtml(q.id)); }
+      else li.insertAdjacentHTML("beforeend", qHtml(q.id));
+      if (q.day) setDay(q.day);
+      if (q.sel) select(q.sel);
+    });
+    li.dataset.id = q.id; ul.appendChild(li);
+  }
+}
+
+/* ---------- 介面 ---------- */
+const $ = (id) => document.getElementById(id);
+const dayIn = $("day"), cutIn = $("cut");
+function setDay(d) { state.day = clamp(d, ...mod.range); dayIn.value = state.day; update(); }
+dayIn.addEventListener("input", () => { state.day = +dayIn.value; stopPlay(); update(); });
+cutIn.addEventListener("input", () => { mod.cut = +cutIn.value; update(); });
+// 點時間軸事件：天數與切面一起跳（事件可帶 cut）；拖天數滑桿、播放時切面不動
+function goEvent(e) { stopPlay(); if (e.cut != null) { mod.cut = e.cut; cutIn.value = e.cut; } setDay(e.d); }
+function renderDay() {
+  const t = state.day;
+  $("dayNum").innerHTML = `第 ${Math.floor(t + .001)} 天<small>第 ${Math.ceil(Math.floor(t + .001) / 7)} 週 · ${mod.dayInfo(t)}</small>`;
+  let cur = -1; mod.events.forEach((e, i) => { if (t >= e.d - .05) cur = i; });
+  document.querySelectorAll("#events button").forEach((b, i) => b.classList.toggle("on", i === cur));
+  document.querySelectorAll("#ticks button").forEach((b, i) => b.classList.toggle("on", i === cur));
+}
+const setCut3d = (v) => { state.cut3d = v; $("cut3d").setAttribute("aria-pressed", String(v)); update(); };
+const setTags = (v) => { state.tags = v; $("tagBtn").setAttribute("aria-pressed", String(v)); saveUi(); renderTags(); };
+function legendPressed(l) { return mod.legendPressed ? mod.legendPressed(l) : mod.layers[l.id]; }
+function renderLegend() { // 圖例內容變了（m3 簡化／詳細）才重建，焦點留在原本的 chip
+  const sig = mod.legend.map((l) => [l.id, l.name, l.css, l.dim, l.toggle].join()).join("|");
+  if ($("legend").dataset.sig !== sig) {
+    const fid = document.activeElement?.closest?.("#legend .chip")?.dataset.lid;
+    buildLegend(); $("legend").dataset.sig = sig;
+    if (fid) document.querySelector(`#legend .chip[data-lid="${fid}"]`)?.focus();
+  }
+  document.querySelectorAll("#legend .chip").forEach((b, i) => {
+    const v = legendPressed(mod.legend[i]);
+    if (v === undefined) b.removeAttribute("aria-pressed"); else b.setAttribute("aria-pressed", String(v));
+  });
+  document.querySelectorAll("#viewBtns [data-toggle]").forEach((b) => b.setAttribute("aria-pressed", String(!!mod.flags[b.dataset.toggle])));
+}
+function toggleFlag(id) { mod.flags[id] = !mod.flags[id]; renderLegend(); update(); }
+function buildLegend() {
+  const lg = $("legend"); lg.innerHTML = "";
+  for (const l of mod.legend) {
+    const b = document.createElement("button"); b.className = l.toggle ? "chip tog" : "chip"; b.dataset.lid = l.id + (l.toggle ? ":t" : "");
+    b.innerHTML = `<i style="background: var(${l.css})${l.dim ? "; opacity: .3" : ""}"></i>${l.name}`;
+    b.addEventListener("click", () => {
+      if (mod.legendClick) mod.legendClick(l); else mod.layers[l.id] = !mod.layers[l.id];
+      renderLegend(); if (mod.legendClick && !l.toggle) return; update();
+    });
+    lg.appendChild(b);
+  }
+}
+// 窄畫面時，與前一個重疊的刻度先藏起來
+function thinTicks() {
+  let last = -Infinity;
+  for (const b of $("ticks").children) {
+    b.style.visibility = "";
+    const r = b.getBoundingClientRect();
+    if (r.left < last + 2) b.style.visibility = "hidden"; else last = r.right;
+  }
+}
+addEventListener("resize", thinTicks);
+function renderMod() {
+  document.querySelectorAll("#mods .tab").forEach((b, i) => b.setAttribute("aria-current", String(MODS[i] === mod)));
+  $("modTitle").textContent = mod.title; $("modSub").textContent = mod.sub; $("evLbl").textContent = mod.evLbl;
+  const [a, b] = mod.range;
+  dayIn.min = a; dayIn.max = b;
+  const ol = $("events"), ticks = $("ticks"); ol.innerHTML = ""; ticks.innerHTML = "";
+  for (const e of mod.events) {
+    const li = document.createElement("li");
+    li.innerHTML = `<button><span class="d">第 ${e.d} 天</span><span><span class="t">${e.t}</span><span class="s">${e.s}</span></span></button>`;
+    li.firstChild.addEventListener("click", () => goEvent(e));
+    ol.appendChild(li);
+    const tb = document.createElement("button"); tb.textContent = e.d; tb.title = e.t;
+    tb.style.left = ((e.d - a) / (b - a) * 100) + "%"; tb.addEventListener("click", () => goEvent(e));
+    ticks.appendChild(tb);
+  }
+  requestAnimationFrame(thinTicks);
+  $("legendLbl").textContent = mod.legendLbl;
+  $("legend").dataset.sig = "";
+  const vb = $("viewBtns"); vb.innerHTML = "";
+  for (const v of mod.views) {
+    const b = document.createElement("button"); b.className = "btn"; b.textContent = v.label;
+    b.addEventListener("click", () => flyTo(v.id)); vb.appendChild(b);
+  }
+  for (const tg of mod.toggles || []) {
+    const b = document.createElement("button"); b.className = "btn"; b.textContent = tg.label; b.title = tg.title; b.dataset.toggle = tg.id;
+    b.addEventListener("click", () => toggleFlag(tg.id)); vb.appendChild(b);
+  }
+  renderLegend();
+  const sb = $("secModes"); sb.innerHTML = ""; sb.hidden = !mod.secModes;
+  for (const o of mod.secModes || []) {
+    const b = document.createElement("button"); b.className = "btn"; b.textContent = o.label; b.title = o.title; b.dataset.mode = o.id;
+    b.addEventListener("click", () => setSecMode(o.id)); sb.appendChild(b);
+  }
+  const [c0, c1, cs] = mod.cutRange; cutIn.min = c0; cutIn.max = c1; cutIn.step = cs; cutIn.value = mod.cut;
+  renderSecMode();
+  $("note").textContent = mod.note;
+}
+// 2D 切面方向（模組有 secModes 才有，例如 m2 矢狀／冠狀）；fixed 的模式是固定示意圖，切面滑桿停用
+function renderSecMode() {
+  const o = mod.secModes?.find((x) => x.id === mod.secMode);
+  $("secTitle").textContent = o?.title ?? mod.secTitle;
+  $("secL").textContent = o?.fixed ? "" : mod.secEnds[0]; $("secR").textContent = o?.fixed ? "" : mod.secEnds[1];
+  $("secHint").textContent = o?.fixed ? o.hint : "拖曳改切面位置"; cutIn.disabled = !!o?.fixed;
+  for (const b of $("secModes").children) b.setAttribute("aria-pressed", b.dataset.mode === mod.secMode);
+}
+function setSecMode(id) { mod.secMode = id; renderSecMode(); drawSection(); saveHash(); }
+function setMod(id, keepPlaying, day) {
+  const m = MODS.find((x) => x.id === id); if (!m || m.soon) return;
+  if (!keepPlaying) stopPlay();
+  mod = m; state.mod = id; state.sel = null; hidden.clear(); saveUi();
+  for (const x of MODS) if (x.group) x.group.visible = x === mod;
+  renderMod(); renderKg(); showCard(null);
+  state.day = clamp(day ?? state.day, ...mod.range); dayIn.value = state.day;
+  update(); // 先建好這一天的幾何，autoFit 才量得到
+  fly = null; const v = fitDist(view(mod.defaultView).v()); camera.position.set(...v.p); controls.target.set(...v.t); setZoomLimits();
+  update();
+}
+function buildUi() {
+  const nav = $("mods");
+  MODS.forEach((m, i) => {
+    const b = document.createElement("button"); b.className = "tab"; b.innerHTML = `${i + 1}. ${m.name}${m.soon ? "<small>製作中</small>" : ""}`;
+    b.disabled = !!m.soon; b.addEventListener("click", () => setMod(m.id)); nav.appendChild(b);
+  });
+  $("cut3d").addEventListener("click", () => setCut3d(!state.cut3d));
+  $("tagBtn").setAttribute("aria-pressed", String(state.tags));
+  $("tagBtn").addEventListener("click", () => setTags(!state.tags));
+  $("play").addEventListener("click", () => state.playing ? stopPlay() : startPlay());
+  $("resetBtn").addEventListener("click", resetMod);
+  $("showAll").addEventListener("click", () => { hidden.clear(); update(); });
+  buildTools();
+  addEventListener("keydown", (e) => {
+    if (document.querySelector("dialog[open]")) return; // 對話框自己處理 Esc
+    if (e.target.closest?.("input") || e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.toLowerCase();
+    if (e.key === "?") { e.preventDefault(); openHelp(); return; }
+    if (e.key === "/") { e.preventDefault(); $("find").focus(); $("find").select(); return; }
+    if (e.key === "Escape") { if (!$("findList").hidden) $("findList").hidden = true; else if (state.sel) select(null); return; }
+    if (k === "h") hideSel();
+    if (k === "r") resetMod();
+    if (k === "c") setCut3d(!state.cut3d);
+    if (k === "n") setTags(!state.tags);
+    const tg = (mod.toggles || []).find((x) => x.key === k); if (tg) toggleFlag(tg.id);
+    if (e.key === " ") { e.preventDefault(); state.playing ? stopPlay() : startPlay(); }
+    if (e.key === "ArrowRight") { stopPlay(); setDay(Math.floor(state.day + 1.0001)); }
+    if (e.key === "ArrowLeft") { stopPlay(); setDay(Math.ceil(state.day - 1.0001)); }
+  });
+}
+let lastT = 0;
+function startPlay() { if (state.day >= mod.range[1] - .05) state.day = mod.range[0]; state.playing = true; setPlayPR(true); $("play").textContent = "❚❚"; $("play").setAttribute("aria-label", "暫停"); lastT = performance.now(); }
+function stopPlay() { state.playing = false; setPlayPR(false); $("play").textContent = "▶"; $("play").setAttribute("aria-label", "播放"); saveHash(); }
+
+/* ---------- 鏡頭 ---------- */
+const view = (id) => mod.views.find((v) => v.id === id) || mod.views[0];
+let fly = null;
+function fitDist(v) { // 窄畫面時沿視線往後拉
+  if (mod.autoFit) return autoFit(v);
+  const k = Math.max(1, (1.05 / Math.max(.3, camera.aspect)) ** 1.6);
+  const p = new THREE.Vector3(...v.p), t = new THREE.Vector3(...v.t);
+  return { p: p.sub(t).multiplyScalar(k).add(t).toArray(), t: v.t };
+}
+const fitCam = new THREE.PerspectiveCamera(), fitV = new THREE.Vector3();
+function autoFit(v, fill = .78) { // 沿視線調距離，讓目前看得到的構造佔畫面約 fill（切面框除外）
+  const t = new THREE.Vector3(...v.t), d = new THREE.Vector3(...v.p).sub(t);
+  for (let it = 0; it < 2; it++) {
+    fitCam.copy(camera); fitCam.position.copy(t).add(d); fitCam.lookAt(t); fitCam.updateMatrixWorld();
+    let mx = 0, my = 0;
+    mod.group.traverseVisible((o) => {
+      if (!o.isMesh || o.material.isMeshBasicMaterial) return;
+      const a = o.geometry.attributes.position; o.updateMatrixWorld();
+      for (let i = 0; i < a.count; i += 3) { fitV.fromBufferAttribute(a, i).applyMatrix4(o.matrixWorld).project(fitCam); mx = Math.max(mx, Math.abs(fitV.x)); my = Math.max(my, Math.abs(fitV.y)); }
+    });
+    if (!mx) break;
+    d.multiplyScalar(Math.max(mx, my) / fill);
+  }
+  return { p: d.add(t).toArray(), t: v.t };
+}
+function flyTo(id) {
+  const V = view(id), v = fitDist(V.v());
+  if (V.cut && !state.cut3d) setCut3d(true);
+  fly = { p0: camera.position.clone(), t0: controls.target.clone(), p1: new THREE.Vector3(...v.p), t1: new THREE.Vector3(...v.t), s: performance.now() };
+}
+
+/* ---------- 點選 ---------- */
+const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2(); let down = null;
+renderer.domElement.addEventListener("pointerdown", (e) => { down = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener("pointerup", (e) => {
+  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  select(mod.pick(ray));
+});
+
+/* ---------- 迴圈 ---------- */
+let needsRender = true;
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); needsRender = true;
+}
+new ResizeObserver(resize).observe(stage);
+controls.addEventListener("change", () => { needsRender = true; });
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (state.playing) {
+    const dt = Math.min(.1, (now - lastT) / 1000); lastT = now;
+    const b = mod.range[1];
+    state.day = Math.min(b, state.day + dt * mod.speed); dayIn.value = state.day; update();
+    if (state.day >= b) { if (mod.next) { const n = MODS.find((x) => x.id === mod.next); setMod(mod.next, true, state.day >= n.range[1] ? n.range[0] : undefined); } else stopPlay(); }
+  }
+  if (fly) {
+    const k = sm(0, 1, (now - fly.s) / 700);
+    camera.position.lerpVectors(fly.p0, fly.p1, k); controls.target.lerpVectors(fly.t0, fly.t1, k);
+    if (k >= 1) fly = null; needsRender = true;
+  }
+  controls.update();
+  if (needsRender) { renderer.render(scene, camera); renderTags(); needsRender = false; }
+}
+function onTheme() { for (const m of THEMED) m.color.set(css(m.userData.css)); for (const v in COLOR) COLOR[v].set(css(v)); themeGen++; for (const m of MODS) m.onTheme?.(); update(); cardEl.querySelectorAll("canvas.fig").forEach(drawFig); }
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", onTheme);
+new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+/* ---------- 隱藏構造（H）：用 three.js layers 藏，相機與 raycaster 只看 layer 0，不動模組自己設的 visible ---------- */
+const hidden = new Set();
+function applyHidden() {
+  mod.group.traverse((o) => { const s = o.userData.struct; if (s) o.layers.set(hidden.has(s) ? 1 : 0); });
+  $("showAll").hidden = !hidden.size; $("showAll").textContent = `全部顯示（${hidden.size}）`;
+}
+function hideable(s) { let ok = false; mod.group.traverse((o) => { if (o.userData.struct === s) ok = true; }); return ok; }
+function hideSel() { // 管壁上的分區（例如中腦、翼板）跟整條管壁是同一個網格，不能單獨藏
+  const s = state.sel; if (!s) return;
+  if (!hideable(s)) { flashTip(`「${nameOf(s)}」是管壁的一段，不能單獨隱藏`); return; }
+  hidden.add(s); select(null); update();
+}
+
+/* ---------- 回到預設：鏡頭、切面、開關、圖層、2D 方向；天數不動 ---------- */
+const DEF = {};
+function snapDefaults() { for (const m of MODS) if (!m.soon) DEF[m.id] = JSON.stringify({ cut: m.cut, flags: m.flags, layers: m.layers, secMode: m.secMode }); }
+function resetMod() {
+  stopPlay(); const d = JSON.parse(DEF[mod.id]);
+  mod.cut = d.cut; cutIn.value = d.cut;
+  if (d.flags) Object.assign(mod.flags, d.flags);
+  if (d.layers) Object.assign(mod.layers, d.layers);
+  if (d.secMode) mod.secMode = d.secMode;
+  hidden.clear(); state.sel = null; state.cut3d = false; $("cut3d").setAttribute("aria-pressed", "false");
+  renderSecMode(); renderLegend(); showCard(null); update(); flyTo(mod.defaultView);
+}
+
+/* ---------- 網址 hash 記狀態：m 模組、d 天、s 選取、c 切面、x 3D 切開、sec 2D 方向、f 開著的開關、off 關掉的胚層、h 隱藏 ---------- */
+const HASH0 = location.hash;
+let booted = false, hashT = 0;
+function hashStr() {
+  const p = new URLSearchParams();
+  p.set("m", mod.id); p.set("d", +state.day.toFixed(2));
+  if (state.sel) p.set("s", state.sel);
+  p.set("c", +(+mod.cut).toFixed(3));
+  if (state.cut3d) p.set("x", 1);
+  if (mod.secModes) p.set("sec", mod.secMode);
+  if (mod.flags) p.set("f", Object.keys(mod.flags).filter((k) => mod.flags[k]).join("."));
+  if (mod.layers) { const off = Object.keys(mod.layers).filter((k) => !mod.layers[k]); if (off.length) p.set("off", off.join(".")); }
+  if (hidden.size) p.set("h", [...hidden].join("."));
+  return "#" + p;
+}
+function writeHash() { clearTimeout(hashT); const h = hashStr(); if (h !== location.hash) try { history.replaceState(null, "", h); } catch (e) {} }
+function saveHash() { if (!booted || state.playing) return; clearTimeout(hashT); hashT = setTimeout(writeHash, 250); }
+function applyHash(h) {
+  const p = new URLSearchParams(h.replace(/^#/, "")), m = MODS.find((x) => x.id === p.get("m") && !x.soon); if (!m) return;
+  const num = (k) => { const v = parseFloat(p.get(k)); return Number.isFinite(v) ? v : undefined; };
+  booted = false;
+  setMod(m.id, false, num("d"));
+  if (num("c") !== undefined) { mod.cut = clamp(num("c"), mod.cutRange[0], mod.cutRange[1]); cutIn.value = mod.cut; }
+  if (p.has("f") && mod.flags) { const on = new Set(p.get("f").split(".")); for (const k in mod.flags) mod.flags[k] = on.has(k); }
+  if (mod.layers) { const off = new Set((p.get("off") || "").split(".")); for (const k in mod.layers) mod.layers[k] = !off.has(k); }
+  if (mod.secModes?.some((o) => o.id === p.get("sec"))) mod.secMode = p.get("sec");
+  state.cut3d = p.get("x") === "1"; $("cut3d").setAttribute("aria-pressed", String(state.cut3d));
+  for (const s of (p.get("h") || "").split(".")) if (mod.struct[s]) hidden.add(s);
+  renderSecMode(); renderLegend(); update();
+  const s = p.get("s"); if (s && mod.struct[s]) select(s);
+  booted = true; saveHash();
+}
+addEventListener("hashchange", () => applyHash(location.hash)); // replaceState 不會觸發，只有使用者改網址或貼連結
+
+/* ---------- 名稱提示（滑鼠停在構造上）---------- */
+const stripTags = (h) => String(h ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+const escH = (x) => String(x).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+function nameOf(s, m = mod, st) { const C = m.struct?.[s]; if (!C) return s; try { return stripTags(C.name(st ?? m.cardState(s))); } catch (e) { return s; } }
+const tipEl = $("tip"); let tipQ = null, overCv = false, flashT = 0;
+function showTip(txt, x, y) {
+  clearTimeout(flashT); tipEl.textContent = txt; tipEl.hidden = false;
+  tipEl.style.left = clamp(x + 12, 4, innerWidth - tipEl.offsetWidth - 4) + "px"; tipEl.style.top = clamp(y + 18, 4, innerHeight - tipEl.offsetHeight - 4) + "px";
+}
+const hideTip = () => { tipEl.hidden = true; };
+function flashTip(msg) {
+  const r = stage.getBoundingClientRect(); showTip(msg, 0, 0);
+  tipEl.style.left = clamp(r.left + (r.width - tipEl.offsetWidth) / 2, 4, innerWidth - tipEl.offsetWidth - 4) + "px"; tipEl.style.top = (r.top + 12) + "px";
+  flashT = setTimeout(hideTip, 2200);
+}
+function hoverAt(el, s, x, y) { el.style.cursor = s ? "pointer" : ""; if (s) showTip(nameOf(s), x, y); else hideTip(); }
+renderer.domElement.addEventListener("pointermove", (e) => {
+  if (e.pointerType !== "mouse" || e.buttons) { if (e.buttons) hideTip(); return; }
+  overCv = true; const pending = tipQ; tipQ = [e.clientX, e.clientY]; if (pending) return;
+  requestAnimationFrame(() => {
+    const [x, y] = tipQ; tipQ = null; if (!overCv) return;
+    const r = renderer.domElement.getBoundingClientRect();
+    ndc.set((x - r.left) / r.width * 2 - 1, -(y - r.top) / r.height * 2 + 1); ray.setFromCamera(ndc, camera);
+    hoverAt(renderer.domElement, mod.pick(ray), x, y);
+  });
+});
+renderer.domElement.addEventListener("pointerleave", () => { overCv = false; hideTip(); });
+secCv.addEventListener("pointermove", (e) => { if (e.pointerType === "mouse") hoverAt(secCv, hitSection(e), e.clientX, e.clientY); });
+secCv.addEventListener("pointerleave", hideTip);
+
+/* ---------- 搜尋（跨模組）、分享、說明、來源 ---------- */
+let findIdx = null, findRes = [], findSel = 0;
+function buildIndex() { // 名稱會隨天數變（例如菱唇／小腦板），取目前、最早、最晚三種狀態的名稱
+  findIdx = [];
+  for (const m of MODS) {
+    if (m.soon || !m.struct) continue;
+    for (const s in m.struct) {
+      const C = m.struct[s], names = new Set();
+      let st = {}; try { st = m.cardState(s) || {}; } catch (e) {}
+      for (const x of [st, { ...st, t: m.range[0] }, { ...st, t: m.range[1], hemi: true }]) try { names.add(stripTags(C.name(x))); } catch (e) {}
+      let en = ""; try { en = stripTags(typeof C.en === "function" ? C.en(st) : C.en); } catch (e) {}
+      const nm = [...names].filter(Boolean);
+      findIdx.push({ m, s, names: nm, en, hay: [...nm, en, s].join(" ").toLowerCase() });
+    }
+  }
+}
+function findMatches(q) {
+  if (!findIdx) buildIndex();
+  const r = [];
+  for (const e of findIdx) {
+    if (!e.hay.includes(q)) continue;
+    const pre = e.names.some((n) => n.toLowerCase().startsWith(q)) || e.en.toLowerCase().startsWith(q);
+    r.push([e, (pre ? 0 : 2) + (e.m === mod ? 0 : 1)]);
+  }
+  return r.sort((a, b) => a[1] - b[1]).slice(0, 12).map((x) => x[0]);
+}
+function renderFind() {
+  const q = $("find").value.trim().toLowerCase(), ul = $("findList");
+  if (!q) { ul.hidden = true; findRes = []; return; }
+  findRes = findMatches(q); findSel = Math.min(findSel, Math.max(0, findRes.length - 1));
+  ul.innerHTML = findRes.length ? findRes.map((e, i) => `<li><button type="button" tabindex="-1" data-i="${i}" class="${i === findSel ? "on" : ""}">${escH(e.names.join("／"))}<small>${MODS.indexOf(e.m) + 1}. ${escH(e.m.name)}${e.en ? "　" + escH(e.en) : ""}</small></button></li>`).join("")
+    : `<li class="none">找不到「${escH($("find").value.trim())}」</li>`;
+  ul.hidden = false;
+  ul.querySelector("button.on")?.scrollIntoView({ block: "nearest" });
+}
+function pickFind(e) {
+  $("find").value = ""; $("findList").hidden = true; $("find").blur();
+  if (e.m !== mod) setMod(e.m.id);
+  select(e.s);
+}
+function keyRows() {
+  const rows = [["空白", "播放／暫停"], ["← →", "前一天／後一天"], ["C", "3D 切開"], ["N", "名稱標籤開關"]];
+  MODS.forEach((m, i) => (m.toggles || []).forEach((tg) => rows.push([tg.key.toUpperCase(), `${tg.label}（模組 ${i + 1} ${m.name}）`])));
+  rows.push(["H", "隱藏選取的構造（按「全部顯示」還原）"], ["R", "回到預設（天數不變）"], ["Esc", "關搜尋清單；取消選取"], ["/", "搜尋構造"], ["?", "這個說明"]);
+  return rows.map(([k, v]) => `<tr><td>${k.split(" ").map((x) => `<kbd>${x}</kbd>`).join(" ")}</td><td>${v}</td></tr>`).join("");
+}
+function openHelp() { $("keyTbl").innerHTML = keyRows(); $("helpDlg").showModal(); }
+function buildTools() {
+  const f = $("find"), ul = $("findList");
+  f.addEventListener("input", () => { findSel = 0; renderFind(); });
+  f.addEventListener("focus", renderFind);
+  f.addEventListener("blur", () => { ul.hidden = true; });
+  f.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); if (!findRes.length) return; findSel = (findSel + (e.key === "ArrowDown" ? 1 : -1) + findRes.length) % findRes.length; renderFind(); }
+    else if (e.key === "Enter") { e.preventDefault(); if (findRes[findSel]) pickFind(findRes[findSel]); }
+    else if (e.key === "Escape") { e.preventDefault(); if (f.value) { f.value = ""; renderFind(); } else f.blur(); }
+  });
+  ul.addEventListener("mousedown", (e) => e.preventDefault()); // 點清單時輸入框不失焦
+  ul.addEventListener("click", (e) => { const b = e.target.closest("button[data-i]"); if (b) pickFind(findRes[+b.dataset.i]); });
+  const sb = $("shareBtn");
+  if (window.top !== window) sb.hidden = true; // 嵌在別的頁面裡（例如 Artifact）時，這頁的網址不是使用者看到的網址
+  sb.addEventListener("click", async () => {
+    writeHash();
+    try { await navigator.clipboard.writeText(location.href); sb.textContent = "已複製"; }
+    catch (e) { prompt("複製這個連結", location.href); }
+    setTimeout(() => { sb.textContent = "分享"; }, 1600);
+  });
+  $("helpBtn").addEventListener("click", openHelp);
+  $("srcBtn").addEventListener("click", () => $("srcDlg").showModal());
+  for (const d of document.querySelectorAll("dialog")) d.addEventListener("click", (e) => { // 點對話框外面（backdrop）關閉
+    const r = d.getBoundingClientRect();
+    if (e.target === d && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) d.close();
+  });
+}
+
+buildUi(); resize(); snapDefaults(); setMod(mod.id);
+if (HASH0) applyHash(HASH0);
+booted = true; saveHash();
+requestAnimationFrame(loop);
+window.__emb = { hidden, resetMod, applyHash, hashStr, findMatches, nameOf, goEvent, THREE, scene, camera, controls, state, setDay, setMod, update, select, flyTo, MODS, M1, M2, M3, get mod() { return mod; } };
+</script>
+</html>
