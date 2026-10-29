@@ -12,6 +12,7 @@
   --c-ecto: #8fc3e6; --c-neuro: #4f62c4; --c-crest: #3fa35c; --c-meso: #d9786b; --c-somite: #b8463b;
   --c-noto: #c84f9a; --c-endo: #e8c547; --c-streak: #6b5a4c;
   --c-pros: #c95b5b; --c-tel: #b8383f; --c-dien: #e58a7d; --c-mes: #4fa36a; --c-rhomb: #4f7fc4; --c-met: #2f5ea8; --c-myel: #7fb0e3; --c-spin: #d8c9a3; --c-vent: #f2c14e;
+  --c-cc: #847f68; --c-v4: #5885c7; --c-aq: #366345; --c-v3: #81574e; --c-latv: #d89295; --c-ivf: #d89295; --c-menin: #a984b8; /* 腦室：同腦區色系，加深或調淡跟腦壁拉開 */
   --c-alar: #8fb3e3; --c-basal: #eb9a86; --c-roof: #a7b3aa; --c-floor: #7d8a80; --c-mantle: #b9b2a0; --c-marg: #e9e4d6; --c-alard: #6fa8dc; --c-basald: #d9786b;
   --c-gse: #c0392b; --c-gve: #e67e22; --c-sve: #c84f9a; --c-gva: #2e9e8f; --c-sva: #3fa35c; --c-gsa: #2f5ea8; --c-ssa: #7b5bc4;
   --f-display: "Noto Serif TC", "Songti TC", serif;
@@ -24,6 +25,7 @@
   --c-ecto: #7fb6dc; --c-neuro: #7f90ea; --c-crest: #5cc479; --c-meso: #e08a7e; --c-somite: #d15a4e;
   --c-noto: #e06cb3; --c-endo: #e8c547; --c-streak: #b39d89;
   --c-pros: #e07373; --c-tel: #d9545a; --c-dien: #f0a194; --c-mes: #62bf7f; --c-rhomb: #6f9be0; --c-met: #4f7fd0; --c-myel: #9cc4ee; --c-spin: #c9b88e; --c-vent: #f5cc5f;
+  --c-cc: #625d49; --c-v4: #354963; --c-aq: #346042; --c-v3: #684b45; --c-latv: #743335; --c-ivf: #743335; --c-menin: #b896c8;
   --c-alar: #6f93c9; --c-basal: #d98471; --c-roof: #7f8b82; --c-floor: #5f6b62; --c-mantle: #8c8676; --c-marg: #4a4a40; --c-alard: #7fb6e6; --c-basald: #e08a7e;
   --c-gse: #e5584a; --c-gve: #f39c45; --c-sve: #e06cb3; --c-gva: #45c1b0; --c-sva: #5cc479; --c-gsa: #5f8ee0; --c-ssa: #a387e8;
   color-scheme: dark; } }
@@ -33,6 +35,7 @@
   --c-ecto: #7fb6dc; --c-neuro: #7f90ea; --c-crest: #5cc479; --c-meso: #e08a7e; --c-somite: #d15a4e;
   --c-noto: #e06cb3; --c-endo: #e8c547; --c-streak: #b39d89;
   --c-pros: #e07373; --c-tel: #d9545a; --c-dien: #f0a194; --c-mes: #62bf7f; --c-rhomb: #6f9be0; --c-met: #4f7fd0; --c-myel: #9cc4ee; --c-spin: #c9b88e; --c-vent: #f5cc5f;
+  --c-cc: #625d49; --c-v4: #354963; --c-aq: #346042; --c-v3: #684b45; --c-latv: #743335; --c-ivf: #743335; --c-menin: #b896c8;
   --c-alar: #6f93c9; --c-basal: #d98471; --c-roof: #7f8b82; --c-floor: #5f6b62; --c-mantle: #8c8676; --c-marg: #4a4a40; --c-alard: #7fb6e6; --c-basald: #e08a7e;
   --c-gse: #e5584a; --c-gve: #f39c45; --c-sve: #e06cb3; --c-gva: #45c1b0; --c-sva: #5cc479; --c-gsa: #5f8ee0; --c-ssa: #a387e8;
   color-scheme: dark; }
@@ -265,7 +268,7 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
   <ul>
     <li><b>Langman's Medical Embryology</b>，15th ed.（卡片標「Langman 15th」與圖號）。</li>
     <li><b>Haines, Fundamental Neuroscience for Basic and Clinical Applications</b>，4th ed.；少數 5th ed.（標「Haines 4th p.XX」）。</li>
-    <li><b>上課投影片</b>：卡片標「老師 p.XX」是投影片頁碼。</li>
+    <li><b>上課投影片</b>（李怡琛老師）：卡片標「老師 p.XX」是〈神經系統的發生〉投影片頁碼；標「老師〈腦室〉p.XX」是〈腦室、脈絡叢、腦脊髓液、腦膜〉投影片頁碼。</li>
     <li><b>上課補充（共筆）</b>：投影片與兩本書都沒寫、只在上課共筆出現的內容，另外標出。</li>
     <li><b>國考題</b>：考選部醫師第一階段國家考試歷屆試題，題號寫成「年-次-題」。</li>
     <li><b>2D 示意圖</b>：依上面書中的圖簡化重畫，不是原圖；圖上標了依據的圖號。</li>
@@ -452,6 +455,7 @@ const STRUCT = {
       + `<li><b>腦膨出</b>（encephalocele，顱裂）：顱骨缺損，最常見在枕骨。meningocele（腦膜＋CSF）→ meningoencephalocele（再加腦組織）→ meningohydroencephalocele（再加腦室，最嚴重）</li>`
       + `<li><b>Arnold-Chiari 畸形</b>：枕骨大孔發育不全，小腦（蚓部、扁桃體）往下疝入枕骨大孔；可合併延腦或脊髓空洞症</li>`
       + `<li><b>脊柱裂</b>（spina bifida）：尾側神經孔沒關。<b>隱性</b>（occulta）只缺椎弓、沒有囊；<b>囊性</b>（cystica）分 meningocele（腦膜＋CSF 膨出）與 meningomyelocele（再加脊髓；約萬分之五）</li>`
+      + `<li><b>先天性皮膚竇</b>（congenital dermal sinus）：多在腰薦部；表皮外胚層沒有和神經外胚層、原始腦膜完全分開，留下一條從皮膚表面連到腦膜的通道（Haines 4th p.95 Fig. 7-1E；老師〈腦室〉p.39）。Langman 沒寫。</li>`
       + `<li>羊水與母血 AFP 上升；孕前起每天補充葉酸 400 µg 可降低發生率（Haines 4th p.65：約 70%）</li></ul></details>`
       + `<details class="fold"><summary>致畸因子</summary><p>Haines 4th p.69（老師 p.21、45）：</p><ul><li>感染：TORCH（toxoplasmosis 弓漿蟲、syphilis 梅毒、rubella 德國麻疹、cytomegalovirus、herpes simplex virus），以及 HIV</li><li>藥物、葉酸缺乏、母親糖尿病、基因缺陷（老師 p.45）</li></ul></details>` },
   ecto: { layer: "ecto", name: () => "表面外胚層", en: "surface ectoderm", meta: "外胚層",
@@ -460,7 +464,7 @@ const STRUCT = {
       + `<details class="fold"><summary>基板（placode）</summary><p>頭部表面外胚層局部增厚，參與形成感覺器官與腦神經（Haines 4th p.70–71，老師 p.26）：</p><ul><li>嗅基板 → 嗅神經（CN I）</li><li>耳基板 → 前庭耳蝸神經（CN VIII）、內耳</li><li>水晶體基板 → 水晶體</li><li>CN V、VII、IX、X 的感覺神經節有一部分細胞來自基板</li></ul><p>模組 3 的 basal plate 也譯作「基板」，是神經管腹側的運動區，兩者不同。</p></details>` },
   crest: { layer: "crest", name: () => "神經嵴", en: "neural crest", meta: "外胚層（神經褶頂端）",
     body: () => `<p>位在神經褶頂端；神經褶接合時脫離神經外胚層，經上皮—間質轉換遷移到全身。頭部的神經嵴在神經管閉合前就開始遷出。</p><p>圖中兩條路線：腹側（貼著神經管往下 → 背根神經節、交感鏈）與背外側（表面外胚層下方 → 黑色素細胞）。</p>`,
-    trap: "甲狀腺濾泡細胞來自內胚層，不是神經嵴；神經嵴衍生的是濾泡旁 C 細胞（114-2-32）。<br>腦膜：硬腦膜來自中胚層，軟腦膜、蜘蛛膜來自神經嵴（Langman）。Haines 4th p.95–96 寫神經嵴與中胚層一起形成原始腦膜，外層成硬腦膜、內層成蜘蛛膜與軟腦膜。",
+    trap: "甲狀腺濾泡細胞來自內胚層，不是神經嵴；神經嵴衍生的是濾泡旁 C 細胞（114-2-32）。<br>腦膜：硬腦膜來自中胚層，軟腦膜、蜘蛛膜來自神經嵴（Langman 15th 頭頸章；Table 6.1 寫前腦的腦膜來自神經嵴）。Haines 4th p.95（老師〈腦室〉p.38）寫神經嵴與間葉一起形成原始腦膜，外層 ectomeninx 成硬腦膜、內層 endomeninx 成蜘蛛膜與軟腦膜；見模組 3「原始腦膜」卡片。",
     kg: ["114-2-醫學一-32", "112-1-醫學一-35"],
     more: `<details class="fold"><summary>衍生物（Haines Table 5-1）</summary><p>Haines 4th p.71 Table 5-1（5th p.80 Table 5.1；老師 p.27）：</p><p><b>神經元</b></p><ul><li>背根神經節（DRG）</li><li>交感神經節：脊柱旁（paravertebral）、脊柱前（prevertebral，又稱 preaortic）</li><li>腸神經節（Auerbach、Meissner 神經叢）</li><li>CN VII、IX、X 的副交感神經節（5th 版多列 CN III）</li><li>CN V、VII、VIII、IX、X 的感覺神經節（＊部分細胞來自基板）</li></ul><p><b>非神經元</b></p><ul><li>許旺細胞、周邊神經節的衛星細胞</li><li>黑色素細胞、牙本質母細胞</li><li>咽弓軟骨</li><li>睫狀肌與瞳孔肌（見下方易錯）</li><li>腎上腺髓質嗜鉻細胞</li><li>軟腦膜、蜘蛛膜</li></ul><p>Table 5-1 沒列、Langman 有的：顏面與顱骨的結締組織與骨、顏面頸部真皮、甲狀腺 C 細胞、心臟的錐幹隔。</p><p>上課補充（共筆）：脊柱旁神經節在脊柱兩側（交感鏈）；脊柱前神經節在主動脈前（腹腔、上下腸繫膜神經節）。</p><p class="trap">睫狀肌、瞳孔肌：Haines Table 5-1（老師 p.27）列為神經嵴；瞳孔括約肌與擴大肌在 Langman 與國考答案（106-1、115-2）是神經外胚層（視杯），睫狀肌在 Langman 是外覆的間葉。國考答神經外胚層；校內考題同時有 neural crest 與 neuroectoderm 選項時，依老師的表答 neural crest。Langman：一般平滑肌來自中胚層。</p></details>`
       + `<details class="fold"><summary>周邊神經系統的來源</summary><p>Haines 4th p.70–71（老師 p.26）：周邊神經系統主要來自神經嵴，另有基板（placode）：</p><ul><li>嗅基板 → CN I；耳基板 → CN VIII</li><li>CN V、VII、IX、X 的感覺神經節：神經嵴＋基板</li><li>背根神經節、交感神經節、腸神經節（Auerbach、Meissner）、許旺細胞：神經嵴</li></ul><p>上課補充（共筆）：腦神經的神經節不是來自神經嵴，就是來自基板。</p></details>` },
@@ -956,6 +960,7 @@ function compute(t) {
   }
   for (const h of G.hemi) { G.bb.y0 = Math.min(G.bb.y0, h.p[1] - h.ry); G.bb.y1 = Math.max(G.bb.y1, h.p[1] + h.ry); G.bb.z0 = Math.min(G.bb.z0, h.p[2] - h.ry); G.bb.z1 = Math.max(G.bb.z1, h.p[2] + h.ry); }
   G.ivfA = at(G.C, .88); G.ivfB = G.hemi[Math.round(.3 * (NH - 1))].p;
+  G.ivfR = lerp(.08, .04, sm(32, 60, t)); // 室間孔隨發育變細（上課補充，共筆）
   // 視泡：間腦腹外側
   const se = .78, Ce = at(G.C, se), Ne = at(G.N, se), ae = at(G.a, se), be = at(G.b, se);
   G.eye = { c: add(Ce, Ne, -be * .7), x: ae + .12, r: .2, stalk: add(Ce, Ne, -be * .55), sx: ae * .5 };
@@ -998,9 +1003,10 @@ const M = {
 };
 scene.add(M.group);
 const colMat = matBank();
-const wallMat = std({ vertexColors: true }), hemiMat = std(), eyeMat = std(), ventMat = mat("--c-vent", { roughness: .45 });
+const wallMat = std({ vertexColors: true }), hemiMat = std(), eyeMat = std(), ventMat = std({ vertexColors: true, roughness: .45 }); // 腦室依段上頂點色（--c-cc…--c-v3）
+const latvMat = mat("--c-latv", { roughness: .45 }), ivfMat = mat("--c-ivf", { roughness: .45 });
 const cblMat = mat("--c-met"), cpMat = mat("--c-roof", { roughness: .5 }); // 脈絡叢借頂板色（脈絡組織由頂板拉成）
-const MATS2 = [wallMat, hemiMat, eyeMat, ventMat, cblMat, cpMat];
+const MATS2 = [wallMat, hemiMat, eyeMat, ventMat, latvMat, ivfMat, cblMat, cpMat];
 const clipPlane = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
 
 function makeTube(n, nr, material, ud, colors) {
@@ -1020,11 +1026,11 @@ function fillTube(mesh, ring) { // ring(i) → [中心, 寬軸, 高軸, 半寬, 
   g.computeVertexNormals(); g.computeBoundingSphere();
 }
 const wall = makeTube(NS, NR, wallMat, { struct: "wall" }, true);
-const vent = makeTube(NS, 20, ventMat, { struct: "vent", vent: true });
+const vent = makeTube(NS, 20, ventMat, { struct: "vent", vent: true }, true);
 const SIDES = [-1, 1];
 const hemi = SIDES.map(() => makeTube(NH, NR, hemiMat, { struct: "tel" }));
-const latv = SIDES.map(() => makeTube(NH, 16, ventMat, { struct: "latv", vent: true }));
-const ivf = SIDES.map(() => makeTube(2, 12, ventMat, { struct: "ivf", vent: true }));
+const latv = SIDES.map(() => makeTube(NH, 16, latvMat, { struct: "latv", vent: true }));
+const ivf = SIDES.map(() => makeTube(2, 12, ivfMat, { struct: "ivf", vent: true }));
 const stalk = SIDES.map(() => makeTube(2, 12, eyeMat, { struct: "optic" }));
 const eye = SIDES.map(() => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), eyeMat); m.userData = { struct: "optic" }; M.group.add(m); return m; });
 const cbl = SIDES.map(() => makeTube(NC, 16, cblMat, { struct: "cbl" }));
@@ -1047,13 +1053,13 @@ function buildGeo(t) { // 幾何只跟天數（和主題色）有關
   compute(t);
   const rc = REG.map((r) => tmpC.copy(colOf(r.p)).lerp(colOf(r.css), sp).clone());
   fillTube(wall, (i) => { const s = sOf(i), k = REG.findIndex((r) => s < r.s1); return [G.C[i], X, G.N[i], G.a[i], G.b[i], rc[k < 0 ? 5 : k]]; });
-  fillTube(vent, (i) => [add(G.C[i], G.N[i], G.vo[i]), X, G.N[i], G.va[i], G.vb[i]]);
+  fillTube(vent, (i) => [add(G.C[i], G.N[i], G.vo[i]), X, G.N[i], G.va[i], G.vb[i], colOf("--c-" + ventAt(sOf(i)))]);
   SIDES.forEach((side, k) => {
     const H = G.hemi, xs = (p) => [side * G.xh, p[1], p[2]];
     fillTube(hemi[k], (j) => [xs(H[j].p), X, H[j].N, H[j].rx, H[j].ry]);
     fillTube(latv[k], (j) => { const q = lerp(.08, .92, j / (NH - 1)), h = H[Math.round(q * (NH - 1))]; return [xs(h.p), X, h.N, h.vx, h.vy]; });
     const A = G.ivfA, B = xs(G.ivfB), T = norm(add(B, A, -1)), Xi = norm(cross(G.N[Math.round(.88 * (NS - 1))], T)), Ni = cross(T, Xi);
-    fillTube(ivf[k], (i) => [i ? B : A, Xi, Ni, .05, .05]);
+    fillTube(ivf[k], (i) => [i ? B : A, Xi, Ni, G.ivfR, G.ivfR]);
     const E = G.eye, ec = [side * E.x, E.c[1], E.c[2]], es = [side * E.sx, E.stalk[1], E.stalk[2]];
     eye[k].position.set(...ec); eye[k].scale.setScalar(E.r);
     const Ts = norm(add(ec, es, -1)), Xs = norm(cross([0, 1, 0], Ts)), Ns = cross(Ts, Xs);
@@ -1113,9 +1119,9 @@ function secPolys(c) {
     const hf = (rk, hk) => (j) => { const h = H[j], d = c - G.xh; return Math.abs(d) < h[rk] ? [h.p[2], h.p[1], h.N[2], h.N[1], h[hk] * Math.sqrt(1 - (d / h[rk]) ** 2)] : null; };
     for (const P of runs(0, NH - 1, hf("rx", "ry"))) out.push(["tel", five_ ? "--c-tel" : "--c-pros", P, "wall"]);
     if (G.g0 > .4) {
-      for (const P of runs(Math.round(.08 * (NH - 1)), Math.round(.92 * (NH - 1)), hf("vx", "vy"))) out.push(["latv", "--c-vent", P, "vent"]);
+      for (const P of runs(Math.round(.08 * (NH - 1)), Math.round(.92 * (NH - 1)), hf("vx", "vy"))) out.push(["latv", "--c-latv", P, "vent"]);
       const f = c / G.xh;
-      if (f >= 0 && f <= 1) { const A = G.ivfA, B = G.ivfB; out.push(["ivf", "--c-vent", ellipse(lerp(A[2], B[2], f), lerp(A[1], B[1], f), .05, .05, 12), "vent"]); }
+      if (f >= 0 && f <= 1) { const A = G.ivfA, B = G.ivfB; out.push(["ivf", "--c-ivf", ellipse(lerp(A[2], B[2], f), lerp(A[1], B[1], f), G.ivfR, G.ivfR, 12), "vent"]); }
     }
   }
   const E = G.eye, d = Math.abs(c - E.x);
@@ -1132,7 +1138,7 @@ function secPolys(c) {
   }
   for (const r of VREG) {
     const [i0, i1] = ringRange(r);
-    for (const P of runs(i0, i1, (i) => { const h = half(c, G.va[i], G.vb[i]); return h == null ? null : [G.C[i][2] + G.N[i][2] * G.vo[i], G.C[i][1] + G.N[i][1] * G.vo[i], G.N[i][2], G.N[i][1], h]; })) out.push([r.id, "--c-vent", P, "vent"]);
+    for (const P of runs(i0, i1, (i) => { const h = half(c, G.va[i], G.vb[i]); return h == null ? null : [G.C[i][2] + G.N[i][2] * G.vo[i], G.C[i][1] + G.N[i][1] * G.vo[i], G.N[i][2], G.N[i][1], h]; })) out.push([r.id, "--c-" + r.id, P, "vent"]);
   }
   // 脈絡叢（畫在腦室上面）
   const cpRun = (R, g) => { if (g > .01) for (const P of runs(0, NP - 1, (j) => { const q = R[j], h = half(c - q.x, q.rx, q.ry); return h == null ? null : [q.p[2], q.p[1], q.N[2], q.N[1], h]; })) out.push(["cp", "--c-roof", P, "vent"]); };
@@ -1179,8 +1185,68 @@ M.drawSection = function (ctx, W, H, dpr) {
   return { hits, where: M.cut < .03 ? "正中矢狀切面" : `旁矢狀切面${hitHemi ? "（切到大腦半球）" : ""}` };
 };
 
+/* ---------- 卡片小圖共用：單位座標 → 畫布 ---------- */
+function figMap(W, H, dpr, x0, x1, y0, y1, fw) {
+  const sc = Math.min(W * fw / (x1 - x0), (H - 30 * dpr) / (y1 - y0)), ox = W / 2 - (x0 + x1) / 2 * sc, oy = H / 2 + 2 * dpr + (y0 + y1) / 2 * sc;
+  return ([x, y]) => [ox + x * sc, oy - y * sc];
+}
+const mirX = (q) => q.map(([x, y]) => [-x, y]);
+function offLine(q, d) { // 折線沿左手法線推 d（往上）
+  return q.map((p, i) => {
+    const a = q[Math.max(0, i - 1)], b = q[Math.min(q.length - 1, i + 1)], tx = b[0] - a[0], ty = b[1] - a[1], l = Math.hypot(tx, ty) || 1;
+    return [p[0] - d * ty / l, p[1] + d * tx / l];
+  });
+}
+// 第四腦室孔：延腦橫切（約第 2–3 個月；依老師〈腦室〉p.5 中間兩圖、Haines 4th p.83 簡化重畫）。k = 0 脈絡組織，1 三個憩室
+function v4fig(k) {
+  return (ctx, W, H, dpr) => {
+    const Pp = figMap(W, H, dpr, -1.12, 1.12, -.7, .95, .5), fill = (q, cv) => fillPoly(ctx, q.map(Pp), css(cv), "");
+    const outR = [[0, -.62], [.3, -.6], [.6, -.48], [.82, -.25], [.92, 0], [.88, .14]], inR = [[.74, .12], [.55, -.02], [.3, -.12], [.1, -.16], [0, -.26]];
+    fill(outR.concat(inR, mirX(inR).reverse(), mirX(outR).reverse()), "--c-myel");
+    const roof = []; for (let i = 0; i <= 64; i++) { const x = lerp(-.78, .78, i / 64); roof.push([x, .12 + .3 * (1 - (x / .78) ** 2) + (k ? .28 * Math.exp(-((x / .1) ** 2)) : 0)]); }
+    const pocket = (sg) => ellipse(sg * .95, .17, .15, .065, 20);
+    if (k) for (const sg of [-1, 1]) fill(pocket(sg), "--c-v4");
+    fill(inR.concat(mirX(inR).reverse(), roof), "--c-v4");
+    fill(roof.concat(offLine(roof, -.05).reverse()), "--c-roof");
+    const labs = [], L = (t, xy) => labs.push([t, Pp(xy), "L"]), R = (t, xy) => labs.push([t, Pp(xy), "R"]);
+    if (!k) {
+      for (const [x, y] of [[-.2, .32], [-.1, .26], [.1, .26], [.2, .32]]) fill(ellipse(x, y, .06, .09, 14), "--c-roof");
+      L("脈絡組織", [-.6, .33]); L("第四腦室", [-.45, .1]); R("脈絡叢", [.2, .26]); R("延腦壁", [.75, -.3]);
+    } else {
+      const ring = (x, y, r) => { const q = Pp([x, y]); ctx.save(); ctx.setLineDash([3 * dpr, 2 * dpr]); ctx.lineWidth = 1.4 * dpr; ctx.strokeStyle = css("--warn"); ctx.beginPath(); ctx.arc(q[0], q[1], r * dpr, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); };
+      ring(0, .73, 9); ring(-1.08, .17, 8); ring(1.08, .17, 8);
+      R("正中孔處", [.04, .76]); L("外側孔處", [-1.08, .2]); R("外側孔處", [1.08, .14]); L("正中憩室", [-.07, .62]); R("第四腦室", [.4, .1]);
+    }
+    drawLeaders(ctx, labs, W, H, dpr);
+    dirText(ctx, W, H, dpr, k ? "② 頂部鼓出 3 個憩室 → 開孔" : "① 頂板＝脈絡組織", "腹側");
+  };
+}
+// 脈絡叢形成三步（依老師〈腦室〉p.6、Haines 4th p.83–84 簡化重畫；以第四腦室頂為例）
+function cpfig(k) {
+  return (ctx, W, H, dpr) => {
+    const Pp = figMap(W, H, dpr, -1, 1, -1, .42, .56), fill = (q, cv) => fillPoly(ctx, q.map(Pp), css(cv), "");
+    const D = [0, .5, .62][k], ep = [];
+    for (let i = 0; i <= 120; i++) {
+      const x = lerp(-1, 1, i / 120), g = Math.exp(-((x / (k === 2 ? .36 : .22)) ** 4));
+      ep.push([x, -D * g - (k === 2 ? .16 * g * (.5 - .5 * Math.cos(2 * Math.PI * 3.5 * (x + .43))) : 0)]);
+    }
+    const inner = offLine(ep, -.05);
+    fill([[-1, .03], [1, .03], [1, -1], [-1, -1]], "--c-v4");
+    fill(ep.concat([[1, .42], [-1, .42]]), "--c-menin");
+    fill(ep.concat(inner.slice().reverse()), "--c-roof");
+    const ves = k === 0 ? [[0, .2, .11]] : k === 1 ? [[0, -.25, .11]] : [[-.27, -.5, .05], [0, -.48, .05], [.27, -.5, .05], [0, -.12, .08]];
+    for (const [x, y, r] of ves) fill(ellipse(x, y, r, r, 18), "--c-gse");
+    const labs = [], L = (t, xy) => labs.push([t, Pp(xy), "L"]), R = (t, xy) => labs.push([t, Pp(xy), "R"]);
+    if (k === 0) { R("動脈", [.08, .22]); L("軟腦膜", [-.6, .25]); L("室管膜", [-.7, -.02]); L("腦室", [-.5, -.6]); R("脈絡組織＝兩層", [.6, -.01]); }
+    if (k === 1) { R("動脈", [.08, -.23]); L("脈絡裂", [0, .02]); L("脈絡組織頂入", [-.18, -.4]); L("腦室", [-.6, -.6]); }
+    if (k === 2) { R("血管", [.29, -.5]); L("絨毛", [-.36, -.72]); R("脈絡上皮", [.2, -.73]); L("脈絡裂", [0, .02]); }
+    drawLeaders(ctx, labs, W, H, dpr);
+    dirText(ctx, W, H, dpr, ["① 動脈貼在腦室頂外", "② 動脈把頂板頂進腦室", "③ 分枝成絨毛＝脈絡叢"][k], "");
+  };
+}
 /* ---------- 間腦冠狀切面（卡片裡的靜態示意圖；約 8 週，依 Haines 4th Fig. 5-16 B（老師 p.37）簡化重畫） ---------- */
 M.figs = {
+  v4a: v4fig(0), v4b: v4fig(1), cp1: cpfig(0), cp2: cpfig(1), cp3: cpfig(2),
   coronal(ctx, W, H, dpr) {
     const sc = Math.min(W * .46 / 2, H * .86 / 2.3), ox = W * .47, oy = H / 2 - .1 * sc;
     const Pp = ([x, y]) => [ox + x * sc, oy - y * sc], mir = (q) => q.map(([x, y]) => [-x, y]);
@@ -1189,7 +1255,7 @@ M.figs = {
     // 端腦半球與側腦室（新月形：腦室外框再蓋一塊半球組織）
     for (const k of [-1, 1]) {
       fill(ellipse(k * .52, .58, .44, .34, 40), "--c-tel");
-      fill(ellipse(k * .5, .6, .3, .2, 32), "--c-vent");
+      fill(ellipse(k * .5, .6, .3, .2, 32), "--c-latv");
       fill(ellipse(k * .43, .5, .21, .12, 28), "--c-tel");
     }
     // 間腦（右半輪廓，左右對稱）
@@ -1201,7 +1267,7 @@ M.figs = {
       const y = lerp(.2, -1.08, i / 60);
       wall.push([(.035 + .065 * G(y, SE, .035) + .065 * G(y, SH, .035)) * lerp(.5, 1, sm(-1.08, -.9, y)), y]);
     }
-    fill(wall.concat(mir(wall).reverse()), "--c-vent");
+    fill(wall.concat(mir(wall).reverse()), "--c-v3");
     // 視丘間黏合（虛線框，橫跨第三腦室）
     const mi = [[-.1, -.18], [.1, -.18], [.1, -.34], [-.1, -.34]];
     fill(mi, "--c-dien");
@@ -1295,20 +1361,20 @@ M.struct = {
   spin: { name: () => "脊髓", en: "spinal cord", meta: "神經管尾段（這裡只畫最上面一小段）", body: () => `<ul><li>腔室 → 中央管</li></ul>`,
     more: `<details class="fold"><summary>馬尾</summary><p>Haines 4th p.73–74 Fig. 5-14（5th p.82–83；老師 p.31）：脊柱長得比脊髓快。</p><ul><li>約 12 週：脊髓和脊柱一樣長</li><li>16–18 週：脊髓尾端開始落後，脊神經根要往下走一段才出椎間孔</li><li>約 1 歲：脊髓尾端在上腰椎；以下椎管裡只剩往下走的神經根，就是馬尾（cauda equina）</li></ul><p>1 歲時的位置：投影片圖畫在 L1–L2 附近；上課補充（共筆）寫約 L1。</p></details>` },
   latv: { name: () => "側腦室", en: "lateral ventricle", meta: "端腦（大腦半球）的腔室", body: () => `<p>隨大腦半球往前、上、後延伸，經室間孔通第三腦室（老師 p.23）。</p>` },
-  ivf: { name: () => "室間孔", en: "interventricular foramen（of Monro）", meta: "側腦室 ↔ 第三腦室", body: () => `<p>左右側腦室各經一個室間孔，通到中線的第三腦室（老師 p.23；Haines 4th p.70）。</p>` },
+  ivf: { name: () => "室間孔", en: "interventricular foramen（of Monro）", meta: "側腦室 ↔ 第三腦室", body: () => `<p>左右側腦室各經一個室間孔，通到中線的第三腦室（老師 p.23；Haines 4th p.70）。</p><p>上課補充（共筆）：左右各一，隨發育逐漸變小。模型第 32–60 天把室間孔由粗畫到細（示意）。</p>` },
   v3: { name: () => "第三腦室", en: "third ventricle", meta: "間腦（加上端腦中線部分）的腔室", body: () => `<p>窄而高的中線腔室，前壁是終板。往前經室間孔通側腦室，往後接大腦導水管（老師 p.23）。</p>` },
   aq: { name: () => "大腦導水管", en: "cerebral aqueduct", meta: "中腦的腔室", body: () => `<p>中腦壁增厚，管腔變成細管，連接第三與第四腦室（老師 p.23）。</p><p>上課補充（共筆）：腦室系統最窄、最容易阻塞，也是唯一沒有脈絡叢的部分。</p>`, kg: ["113-1-醫學一-36"],
     more: CSF },
   v4: { name: () => "第四腦室", en: "fourth ventricle", meta: "菱腦（後腦＋末腦）的腔室",
-    body: () => `<p>橋曲讓末腦兩側壁往外攤開、頂板變薄，成為菱形的寬腔室。之後頂部開出正中孔（Magendie）與兩個外側孔（Luschka），通蜘蛛膜下腔（老師 p.23）。</p><p>時間：Haines（4th ed. p.83）寫第 2–3 個月開孔，p.70 寫孔長得慢、第一孕期末才暢通。Langman（15th ed. Fig. 18.20B）把孔畫在 4 個月胚胎。超出本模組的第 60 天，模型沒畫孔。</p>`,
-    more: CSF },
+    body: () => `<p>橋曲讓末腦兩側壁往外攤開、頂板變薄，成為菱形的寬腔室。之後頂部開出正中孔（Magendie）與兩個外側孔（Luschka），通蜘蛛膜下腔（老師 p.23）。</p><p>時間：Haines（4th ed. p.83）寫第 2–3 個月開孔，p.70 寫孔長得慢、第一孕期末才暢通。Langman（15th ed. Fig. 18.20B）把孔畫在 4 個月胚胎。超出本模組的第 60 天，3D 沒畫孔。</p>`,
+    more: `<details class="fold"><summary>第四腦室孔的形成（老師〈腦室〉p.5）</summary><canvas class="fig" data-fig="v4a" data-r=".6"></canvas><canvas class="fig" data-fig="v4b" data-r=".6"></canvas><p>Haines 4th p.83（5th p.94；老師〈腦室〉p.5）：第 2–3 個月，第四腦室頂的脈絡組織往外鼓出憩室：正中的憩室（medial diverticulum）是正中孔（Magendie）的位置，兩側的外側憩室（lateral diverticulum）是外側孔（Luschka）的位置。第一孕期末孔才暢通，CSF 開始流到蜘蛛膜下腔（Haines 4th p.70、83）。</p><p style="font-size:12px;color:var(--mute)">延腦橫切示意，依投影片簡化重畫；3D 不畫孔。</p></details>` + CSF },
   cc: { name: () => "中央管", en: "central canal", meta: "脊髓的腔室", body: () => `<p>上端通第四腦室。</p><p>上課補充（共筆）：裡面有 CSF，但沒有脈絡叢、不製造 CSF。</p>` },
   cbl: { name: (s) => s.t >= 56 ? "小腦板" : "菱唇", en: (s) => s.t >= 56 ? "cerebellar plate" : "rhombic lip", meta: "後腦翼板背外側（第 6–8 週，天數為示意）",
     body: () => `<p>後腦翼板的背外側緣往內折、增厚成<b>菱唇</b>，左右各一。橋曲加深後，菱唇頭尾向被壓扁，兩側在中線接起來成為<b>小腦板</b>（Langman 15th ed. Fig. 18.18、18.20，約 8 週）。老師 p.18 的 8.5 週圖已標出 Cerebellum。</p><ul><li>Haines 4th p.74（老師 p.35）：菱唇頭段 → 小腦；尾段 → 下橄欖核、耳蝸核、橋腦核</li><li>Langman：約 12 週小腦板分出中線的蚓部（vermis）與兩側半球；橫裂分出小結（nodule）與絨球（flocculus），是最早出現的部分。模型只畫到第 60 天的小腦板，蚓部、半球、小結、絨球沒畫</li></ul><p>模型畫法：第 40–50 天菱唇長出，第 50–58 天在中線接合；天數為示意。小腦的分層見模組 3 頂板卡片的小腦摺疊。</p>`,
     trap: "小腦來自後腦（菱腦）的翼板（菱唇），不是前腦（106-2）。", more: VES, kg: ["106-2-醫學一-36"] },
   cp: { name: () => "脈絡叢", en: "choroid plexus", meta: "腦室頂（第 7–8 週，天數為示意）",
-    body: () => `<p>腦室頂板只剩一層室管膜，外面貼著富含血管的軟腦膜，兩層合稱<b>脈絡組織</b>（tela choroidea）。血管把脈絡組織頂進腦室，形成<b>脈絡叢</b>，負責分泌腦脊髓液（Haines 5th p.93–96，老師 p.25；4th 頁碼沒查到）。</p><ul><li>第四腦室：最早出現，Haines 5th Fig. 11.1 畫約 7 週的第四腦室脈絡叢</li><li>第三腦室頂、側腦室內側壁（脈絡裂）：Langman 15th ed. Fig. 18.24、18.25（7、8 週）</li><li>Langman：脈絡叢由特化的室管膜製造腦脊髓液，每天 400–500 mL</li></ul><p>上課補充（共筆）：大腦導水管與中央管沒有脈絡叢。</p><p>模型只在腦室模式畫：第四腦室第 44 天起、第三腦室與側腦室第 48 天起，天數與形狀都是示意。</p>`,
-    more: CSF },
+    body: () => `<p>形成分三步（Haines 4th p.83–84，5th p.94–95；老師〈腦室〉p.6）：</p><ol><li>腦室頂板只剩一層室管膜（ependyma），外面貼著富含血管的軟腦膜（pia mater），兩層合稱<b>脈絡組織</b>（tela choroidea）</li><li>附近發育中的動脈把脈絡組織頂進腦室，頂進去的窄溝叫<b>脈絡裂</b>（choroid fissure）</li><li>頂進去的部分分枝成許多<b>絨毛</b>（villi），表面的室管膜成為脈絡上皮（choroid epithelium），就是<b>脈絡叢</b>，負責分泌腦脊髓液</li></ol><p>Haines 4th p.82–83：脈絡細胞在第一孕期特化成分泌細胞；第一孕期末脈絡叢已有功能、第四腦室的孔已暢通，CSF 開始循環。</p><ul><li>第四腦室：最早出現，Haines 5th Fig. 11.1 畫約 7 週的第四腦室脈絡叢</li><li>第三腦室頂、側腦室內側壁（脈絡裂）：做法相同（Haines 4th p.84）；Langman 15th ed. Fig. 18.24、18.25（7、8 週）</li><li>Langman：脈絡叢由特化的室管膜製造腦脊髓液，每天 400–500 mL</li></ul><p>上課補充（共筆）：大腦導水管與中央管沒有脈絡叢。</p><p>模型只在腦室模式畫：第四腦室第 44 天起、第三腦室與側腦室第 48 天起，天數與形狀都是示意。</p>`,
+    more: `<details class="fold"><summary>形成三步圖（老師〈腦室〉p.6）</summary><canvas class="fig" data-fig="cp1" data-r=".5"></canvas><canvas class="fig" data-fig="cp2" data-r=".5"></canvas><canvas class="fig" data-fig="cp3" data-r=".5"></canvas><p style="font-size:12px;color:var(--mute)">依投影片簡化重畫，以第四腦室頂為例；紅色是血管，紫色是軟腦膜（結締組織）。</p></details>` + CSF },
   cerv: { name: () => "頸曲", en: "cervical flexure", meta: "第 4 週（老師 p.17）", body: () => `<p>在菱腦與脊髓交界，往腹側彎。</p>` },
   ceph: { name: () => "頭曲", en: "cephalic flexure", meta: "第 4 週（老師 p.17）", body: () => `<p>在中腦，往腹側彎，讓前腦折向腹側。</p><p>上課補充（共筆）：頭曲在中腦本身，不在腦泡交界。第 4 週平的胚盤因頭尾摺疊（folding）變成 C 型，裡面的神經管跟著折，形成腦曲。</p>` },
   pont: { name: () => "橋曲", en: "pontine flexure", meta: "第 5 週（老師 p.18）",
@@ -1377,7 +1443,7 @@ return M;
 
 /* ===== 模組 3：翼板與基板（第 26–56 天；Langman＋Haines；三層順序與柱序畫 Haines，不同處卡片並列） ===== */
 const M3 = (() => {
-// cut：點事件時切面跳到的位置（0 薦髓、1 中腦）：脊髓事件切胸髓（側角 T1–L2），第 34、47 天延腦（下橄欖核），第 43 天延腦上端（.57：GVA 孤立核到 .56、SSA 前庭核從 .56 起，七柱最多同時切到六柱）
+// cut：點事件時切面跳到的位置（0 薦髓、1 中腦）：脊髓事件切胸髓（側角 T1–L2），第 34、47 天延腦（下橄欖核），第 43 天延腦上端（.57：GVA 孤立核到 .56、SSA 前庭核從 .56 起，七柱最多同時切到六柱）；第 48 天原始腦膜也切胸髓（看一整圈）
 const EVENTS = [
   { d: 26, cut: 0.2, t: "腦室區", s: "管壁只有腦室區（ventricular zone）：假複層的梭形細胞，在管腔面分裂。" },
   { d: 28, cut: 0.2, t: "邊緣區出現", s: "腦室區細胞的突起往外伸，形成邊緣區（marginal zone）。" },
@@ -1388,10 +1454,11 @@ const EVENTS = [
   { d: 38, cut: 0.2, t: "前角、後角、側角", s: "基板 → 前角，翼板 → 後角；T1–L2 中間帶形成側角（交感）。" },
   { d: 43, cut: 0.57, t: "腦幹核柱", s: "由內往外：GSE、GVE、SVE｜界溝｜GVA、SVA、GSA、SSA。Langman 基板：內側 GSE、中間 SVE、外側 GVE。Haines（老師 p.34）：GSE、GVE 在第四腦室底，SVE 往腹外側。模型畫 Haines。" },
   { d: 47, cut: 0.5, t: "翼板細胞往腹側移", s: "菱唇尾段（翼板）的神經母細胞往腹側遷移，成為下橄欖核、橋腦核（Haines，老師 p.35）。" },
+  { d: 48, cut: 0.2, t: "原始腦膜分化", s: "神經嵴＋間葉包住神經管成原始腦膜；老師〈腦室〉p.38：E34–E48 分化成外層（→ 硬膜）與內層（→ 蜘蛛膜＋軟膜）。Haines 4th p.95：包住是第 20–35 天、分化第 34–48 天。模型第 34 天淡入、第 48 天畫完，只畫一層。" },
 ];
 const NAME = { vz: "腦室區", mantle: "中間區", marg: "邊緣區", alar: "翼板", basal: "基板 basal plate", roof: "頂板", floor: "底板", sl: "界溝", lumen: "管腔",
   gse: "GSE", gve: "GVE", sve: "SVE", gva: "GVA", sva: "SVA", gsa: "GSA", ssa: "SSA", ah: "前角", ph: "後角", lh: "側角",
-  io: "下橄欖核", pn: "橋腦核", dc: "薄核／楔核", ic: "下丘", rn: "紅核", drg: "背根神經節", dr: "後根", vr: "前根", sn: "脊神經" };
+  io: "下橄欖核", pn: "橋腦核", dc: "薄核／楔核", ic: "下丘", rn: "紅核", drg: "背根神經節", dr: "後根", vr: "前根", sn: "脊神經", menin: "原始腦膜" };
 // 沿長軸 s：0 = 薦髓（尾端），1 = 中腦（頭端）；示意長度，不照比例
 const SEG = [
   { id: "sac", name: "薦髓", s0: 0, s1: .07 }, { id: "lum", name: "腰髓", s0: .07, s1: .13 }, { id: "tho", name: "胸髓", s0: .13, s1: .30 },
@@ -1517,6 +1584,21 @@ function lumenPoly(W) {
   if (W.phi > .02) { const r = roofArc(W).slice(0, NA); poly.push(...r.slice(1, -1).reverse()); }
   return poly;
 }
+// 原始腦膜：貼著管壁外表面＋第四腦室頂外層的一圈（左外側 u 0→1、頂由左到右、右外側 u 1→0，固定 2NU+NA 點）
+// 透明度第 33–36 天淡入，厚度第 34–48 天長滿（老師〈腦室〉p.38 E34–E48；天數為示意）
+const meninA = (t) => sm(33, 36, t), meninF = (t) => sm(34, 48, t), NMEN = 2 * NU + NA;
+function meninContour(W) {
+  const o = [], L1 = P(W, -1, 1, 1), R1 = P(W, 1, 1, 1);
+  for (let i = 0; i < NU; i++) o.push(P(W, -1, i / (NU - 1), 1));
+  roofArc(W).slice(NA).reverse().forEach(([x, y], i) => o.push([x, Math.max(y, lerp(L1[1], R1[1], i / (NA - 1)))])); // 閉合段不凹進管腔
+  for (let i = NU - 1; i >= 0; i--) o.push(P(W, 1, i / (NU - 1), 1));
+  return o;
+}
+const meninOut = (W) => offsetPoly(meninContour(W), .03 + .05 * meninF(W.t));
+function meninRing(W) { // 環形（外圈＋內圈反向，腹中線一道縫）：2D 填色、3D 切口都不會蓋住管子
+  const c = meninContour(W), o = offsetPoly(c, .03 + .05 * meninF(W.t));
+  return [...o.slice(0, -1), o[0], c[0], ...c.slice(1, -1).reverse(), c[0]];
+}
 // 核的出現程度（沿長軸兩端收尖 × 隨天數長大）
 function nucF(n, s, t) {
   if (s <= n.s0 || s >= n.s1) return 0;
@@ -1537,6 +1619,7 @@ const stage_ = (t) => (t < 27.5 ? 0 : t < 29 ? 1 : t < 30.5 ? 2 : t < 32 ? 3 : 4
 // 截面多邊形：[構造, 顏色變數, 多邊形, 側別]（畫的順序＝前後）
 function secPolys(s, t) {
   const W = wallAt(s, t), out = [], st = t >= 30.5;
+  if (M.flags.menin && meninA(t) > .02) out.push(["menin", "--c-menin", meninRing(W), -1]); // 最底層
   for (const side of [-1, 1]) {
     out.push([t < 27.5 ? "vz" : "marg", t < 27.5 ? "--c-neuro" : "--c-marg", outline(W, side), side]);
     if (t >= 27.5) {
@@ -1603,16 +1686,17 @@ const M = {
       { id: "alar", name: "翼板", css: "--c-alar" }, { id: "basal", name: "基板 basal plate", css: "--c-basal" }, { id: "roof", name: "頂板", css: "--c-roof" }, { id: "floor", name: "底板", css: "--c-floor" },
       ...(s ? [{ id: "alar", name: "翼板：4 感覺核（外側）", css: "--c-alard" }, { id: "basal", name: "基板：8 運動核（內側）", css: "--c-basald" }, { id: "sve", name: "SVE 3 核（不在 8 個內）", css: "--c-basald", dim: true }]
         : COLS.map((c) => ({ id: c.id, name: NAME[c.id], css: c.css }))),
-      { id: "sec2", name: "次級神經管化", css: "--c-streak" },
+      { id: "sec2", name: "次級神經管化", css: "--c-streak" }, { id: "menin", name: "原始腦膜", css: "--c-menin", dim: !this.flags.menin },
       { id: "drg", name: "背根神經節", css: "--c-crest" }, { id: "dr", name: "後根", css: pnsCss("dr") }, { id: "vr", name: "前根", css: pnsCss("vr") }, { id: "sn", name: "脊神經", css: "--mute" },
       { id: "cols", name: "透視核柱", css: "--c-gse", toggle: true }, { id: "simple", name: "簡化 4／8", css: "--c-alard", toggle: true },
     ];
   },
   secTitle: "橫切面", secEnds: ["尾端（薦髓）", "頭端（中腦）"], cutRange: [.01, .99, .005], cut: .2,
   note: "示意模型：把脊髓到中腦拉直成一條管子，長度不照比例，沒畫腦曲、小腦、大腦；天數為示意。腦幹核依 Haines（老師 p.33）清單，柱序依 Haines（老師 p.34）；SVE 三個核 p.33 未列。預設「簡化 4／8」：翼板 4 個感覺核同一色、基板 8 個運動核同一色，SVE 淡化；關掉（快捷鍵 S）看 7 個核柱各自的顏色與縮寫。來源：Langman 與 Haines《Fundamental Neuroscience》（老師用書），兩者不同處並列。",
-  flags: { cols: true, simple: true },
+  flags: { cols: true, simple: true, menin: true },
   toggles: [{ id: "cols", label: "透視核柱", title: "管壁變透明、看縱向的核柱（快捷鍵 T）", key: "t" },
-    { id: "simple", label: "簡化 4／8", title: "翼板 4 感覺核、基板 8 運動核兩色；關掉看 7 個核柱（快捷鍵 S）", key: "s" }],
+    { id: "simple", label: "簡化 4／8", title: "翼板 4 感覺核、基板 8 運動核兩色；關掉看 7 個核柱（快捷鍵 S）", key: "s" },
+    { id: "menin", label: "原始腦膜", title: "神經管外面半透明的一層原始腦膜，第 34 天出現（快捷鍵 M）", key: "m" }],
   struct: null, group: new THREE.Group(),
 };
 scene.add(M.group);
@@ -1650,13 +1734,17 @@ for (const n of NUC) for (const side of SIDES) {
 const SEC2 = [0, .07], NB = 10;
 const bandMat = mat("--c-streak", { transparent: true, opacity: .35, depthWrite: false });
 const bands = SIDES.map((side) => { const m = makeLoft(NB, NOUT, bandMat, { struct: "sec2", side }); m.renderOrder = 3; return m; });
-function offsetPoly(poly, d) { // 沿外法線往外推 d
+function offsetPoly(poly, d) { // 沿外法線往外推 d；相鄰重疊的點跳過，往前後找第一個不同的點
   const sg = Math.sign(area(poly)) || 1, n = poly.length;
+  const nb = (i, k) => { for (let c = 1; c < n; c++) { const q = poly[(i + k * c + n * n) % n]; if (Math.hypot(q[0] - poly[i][0], q[1] - poly[i][1]) > 1e-6) return q; } return poly[i]; };
   return poly.map((p, i) => {
-    const a = poly[(i + n - 1) % n], b = poly[(i + 1) % n], tx = b[0] - a[0], ty = b[1] - a[1], l = Math.hypot(tx, ty) || 1;
+    const a = nb(i, -1), b = nb(i, 1), tx = b[0] - a[0], ty = b[1] - a[1], l = Math.hypot(tx, ty) || 1;
     return [p[0] + sg * d * ty / l, p[1] - sg * d * tx / l];
   });
 }
+// 原始腦膜：整條管子外面一層半透明殼（不透明度 < .2，不擋圖上名稱的取樣）
+const meninMat = mat("--c-menin", { transparent: true, opacity: .18, depthWrite: false });
+const meninM = makeLoft(NZ, NMEN, meninMat, { struct: "menin" }); meninM.renderOrder = 3;
 // 周邊神經：每節段左右各一組（背根節橢球＋後根兩段、前根、脊神經圓柱）
 const UNIT_S = new THREE.SphereGeometry(1, 18, 12), UNIT_C = new THREE.CylinderGeometry(1, 1, 1, 10, 1, true);
 const pns = [];
@@ -1707,6 +1795,7 @@ function buildGeo(t) { // 幾何只跟天數（和主題色）有關
     const s = lerp(SEC2[0], SEC2[1], i / (NB - 1));
     return [zOf(s), offsetPoly(outline(wallAt(s, t), side), .035)];
   }));
+  if (meninA(t) > .02) fillLoft(meninM, (i) => [zOf(sOfRing(i)), meninOut(Ws[i])]);
   const fp = pnsF(t);
   for (const m of pns) {
     m.visible = fp > .02; if (!m.visible) continue;
@@ -1730,15 +1819,16 @@ M.update = function () {
     roofMat.opacity = sv ? .12 : .45; roofMat.needsUpdate = true;
     bandMat.opacity = sv ? .12 : .35; bandMat.needsUpdate = true;
   }
+  meninM.visible = M.flags.menin && meninA(t) > .02; meninMat.opacity = (sv ? .07 : .18) * meninA(t);
   // 切面（保留尾側 z ≤ 切面）
   const zc = zOf(M.cut);
   clipPlane.constant = zc;
-  for (const m of [wallMat, roofMat, bandMat, ...Object.values(colMat.all), ...Object.values(fadeMat.all)]) m.clippingPlanes = state.cut3d ? [clipPlane] : [];
+  for (const m of [wallMat, roofMat, bandMat, meninMat, ...Object.values(colMat.all), ...Object.values(fadeMat.all)]) m.clippingPlanes = state.cut3d ? [clipPlane] : [];
   for (const o of [planeMarker, planeEdge]) { o.position.set(0, (BB.y0 + BB.y1) / 2, zc); o.scale.set(2 * BB.x + .6, BB.y1 - BB.y0 + .6, 1); o.visible = !state.cut3d; }
   buildCaps();
 };
 function buildCaps() { // 天數、切面、透視、簡化、主題都沒變就不重建
-  const key = [state.day, state.cut3d ? M.cut : "-", state.cut3d, see(), M.flags.simple, themeGen].join();
+  const key = [state.day, state.cut3d ? M.cut : "-", state.cut3d, see(), M.flags.simple, M.flags.menin, themeGen].join();
   if (key === capKey) return; capKey = key;
   clearGroup(capGroup);
   const t = state.day, ends = [];
@@ -1771,7 +1861,7 @@ M.drawSection = function (ctx, W_, H, dpr) {
   }
   for (const [struct, cv, poly, side, nm, dim, n] of polys) {
     const q = poly.map(Pp);
-    if (dim) ctx.globalAlpha = FADE;
+    ctx.globalAlpha = dim ? FADE : struct === "menin" ? .6 * meninA(t) : 1; // 腦膜半透明，背根、前根透得過去
     fillPoly(ctx, q, css(cv), struct);
     ctx.globalAlpha = 1;
     hits.push([struct, q]);
@@ -1788,10 +1878,11 @@ M.drawSection = function (ctx, W_, H, dpr) {
       seen.add(key);
       let m;
       if (isNuc) { m = q.reduce((a, p) => [a[0] + p[0] / q.length, a[1] + p[1] / q.length], [0, 0]); }
+      else if (struct === "menin") m = q[Math.floor(M.cut < SPINAL ? NU * .55 : NU + NA + NU * .45)]; // 脊髓標左外側；腦幹左欄滿了，改標右外側
       else if (struct === "lumen" || (struct === "roof" && side === 0)) m = q[Math.floor(q.length * (struct === "lumen" ? .5 : .25))];
       else { const k = Math.floor(q.length / 4); m = [(q[k][0] + q[q.length - 1 - k][0]) / 2, (q[k][1] + q[q.length - 1 - k][1]) / 2]; }
       if (struct === "lumen") m = [m[0], (Pp(P(W, -1, uSL, 0))[1] + m[1]) / 2];
-      labs.push([isNuc ? nm : struct === "lumen" ? lumenName(M.cut) : NAME[struct], m, isNuc ? "R" : "L", struct]);
+      labs.push([isNuc ? nm : struct === "lumen" ? lumenName(M.cut) : NAME[struct], m, isNuc || (struct === "menin" && M.cut >= SPINAL) ? "R" : "L", struct]);
     }
   }
   // 界溝
@@ -1827,6 +1918,7 @@ M.tagAnchors = function () {
     A.push([g.name, [0, top + .08, zOf(s)], g.id === "med" || g.id === "pon" || g.id === "mid" ? "basal" : "ah", "flex"]);
   }
   { const s = (SEC2[0] + SEC2[1]) / 2, p = P(wallAt(s, t), -1, .5, 1); A.push(["次級神經管化", [p[0] - .04, p[1], zOf(s)], "sec2", "flex"]); }
+  if (M.flags.menin && meninA(t) > .5) { const s = .19, p = meninOut(wallAt(s, t))[Math.floor(NU * .55)]; A.push([NAME.menin, [p[0], p[1], zOf(s)], "menin", "flex"]); }
   if (pnsF(t) > .5) { const s = PNS_S[5], Q = pnsPts(wallAt(s, t), -1); A.push([NAME.drg, [Q.g[0], Q.g[1] + .1, zOf(s)], "drg", "flex"]); }
   if (see()) { // 透視時每柱標一次（左側），不逐核標；簡化模式腦幹只標兩群
     const done = new Set();
@@ -1919,6 +2011,14 @@ M.struct = {
 M.struct.sec2 = { name: () => "次級神經管化", en: "secondary neurulation", meta: "薦、尾段脊髓 · 第 20–42 天（Haines）",
   body: () => `<p>脊髓的薦段、尾段不是由神經板摺疊而來：神經管尾端下方出現一團細胞——<b>尾部隆起</b>（caudal eminence），長大後中空化，再接上神經管，空腔與神經管腔相通（Haines 4th p.66–67、5th p.75，老師 p.11）。神經板形成頸、胸、腰段，尾部隆起形成薦、尾段（Haines 4th p.124）。老師 p.7D 第 22 天背面圖在後神經孔下方標「Region of secondary neurulation」。Langman 15th ed. 沒寫次級神經管化。</p><p>模型只用淡色帶標出這一段，不畫中空化的過程（初級與次級的比較見模組 1 神經管卡片的摺疊）。</p>`,
   trap: "「次級腦泡」（五個腦泡）和「次級神經管化」是兩回事。" };
+// 原始腦膜（第 11 版）：Haines＋老師〈腦室〉p.38 與 Langman 並列；3D 只畫一層、天數為示意；不掛國考（題庫沒有腦膜發育的題）
+M.struct.menin = { name: () => "原始腦膜", en: "meninx primitiva（primitive meninx）", meta: "神經嵴＋間葉 · 包住整條神經管",
+  body: () => `<p>神經嵴細胞和間葉（mesenchyme）在神經管外面聚集、包住整個中樞神經系統，形成<b>原始腦膜</b>；這時還沒有腔隙（Haines 4th p.95、5th p.107；老師〈腦室〉p.38）。之後分成兩層：</p>`
+    + `<table class="cmp"><tr><th>原始腦膜分成</th><th>成體</th></tr><tr><td>外層 ectomeninx</td><td>硬膜（dura mater）＝ pachymeninx</td></tr><tr><td>內層 endomeninx</td><td>蜘蛛膜＋軟膜（arachnoid＋pia）＝ leptomeninges</td></tr></table>`
+    + `<p><b>天數</b>：Haines 4th p.95 寫第 20–35 天包住 CNS、第 34–48 天分化成兩層；老師〈腦室〉p.38 寫 E34–E48（第 5–7 週），和 Haines 的分化期一樣。Langman 15th ed.（神經系統章，腦膜）只寫第 4–5 週開始形成，胎兒早期外層增厚成硬膜、內層成 pia-arachnoid。模型第 34 天淡入、第 48 天畫完（示意）。</p>`
+    + `<p style="font-size:12px;color:var(--mute)">3D 只畫一層半透明殼（M 鍵開關），不分內外層，也沒畫腔隙；只畫脊髓到中腦這一段。</p>`,
+  more: `<details class="fold"><summary>腔隙與來源細節</summary><ul><li>Haines 5th p.107：第 45–60 天，外層出現靜脈竇的腔隙；內層裡面的腔隙合成<b>蜘蛛膜下腔</b>與腦池。第一孕期末腦膜的基本架構已經建立。</li><li>Langman 15th ed.：軟膜之後貼緊腦與脊髓表面、和蜘蛛膜分開，中間就是蜘蛛膜下腔，CSF 在裡面流。</li><li>來源：Langman 15th ed. Table 6.1（p.79）寫前腦的腦膜來自神經嵴；頭頸章寫前腦以後的腦膜來自軸旁中胚層（paraxial mesoderm）。</li><li>先天性皮膚竇（congenital dermal sinus）見模組 1 神經管卡片「神經管缺損」。</li></ul></details>`,
+  trap: "硬膜來自外層 ectomeninx；蜘蛛膜和軟膜一起來自內層 endomeninx（leptomeninges），不是三層各自來源。" };
 // 周邊神經（第 4 版 B3）：顏色借現有變數——背根節 --c-crest（神經嵴，同模組 1）、後根 --c-gsa（同後角）、前根 --c-gse（同前角）、脊神經 --mute
 const PNS_NOTE = "兩本書沒寫確切天數，模型在第 32 天畫出；只畫脊髓段，節段位置是示意。";
 M.struct.drg = { name: () => "背根神經節", en: "dorsal root ganglion（DRG）", meta: "神經嵴衍生 · 脊髓兩側",
@@ -1934,6 +2034,11 @@ M.cardState = () => ({ t: state.day });
 M.dayInfo = (t) => ["腦室區", "腦室區＋邊緣區", "三層", "翼板＋基板", "核柱形成"][stage_(t)] + ` · ${segAt(M.cut).name}`;
 M.legendClick = (l) => { if (!l.toggle) { select(l.id); return; } M.flags[l.id] = !M.flags[l.id]; };
 M.legendPressed = (l) => (l.toggle ? M.flags[l.id] : undefined);
+// 選到原始腦膜（圖例、搜尋）時：開關沒開就打開，第 34 天前跳到第 48 天
+M.reveal = (s) => {
+  if (s !== "menin" || (M.flags.menin && state.day >= 34)) return false;
+  M.flags.menin = true; if (state.day < 34) state.day = 48; return true;
+};
 
 /* ---------- 鏡頭、點選 ---------- */
 M.views = [
@@ -1945,11 +2050,12 @@ M.views = [
 M.defaultView = "obl";
 M.autoFit = true;
 M.pick = function (ray) {
-  const objs = [...walls, roofM, ...rods, ...bands, ...pns, ...capGroup.children].filter((o) => o.visible);
+  const objs = [...walls, roofM, ...rods, ...bands, meninM, ...pns, ...capGroup.children].filter((o) => o.visible);
   let hits = ray.intersectObjects(objs, false);
   const zc = zOf(M.cut);
   if (state.cut3d) hits = hits.filter((h) => h.object.parent === capGroup || h.point.z <= zc + .01);
   if (hits.some((h) => h.object.parent === capGroup)) hits = hits.filter((h) => !bands.includes(h.object)); // 切口優先於色帶
+  if (hits.some((h) => h.object !== meninM)) hits = hits.filter((h) => h.object !== meninM); // 腦膜殼只在打不到別的時才算
   if (see()) { const r = hits.find((h) => h.object.userData.rod || h.object.userData.pns || h.object.parent === capGroup); if (r) hits = [r]; }
   if (!hits.length) return null;
   const h = hits[0], o = h.object;
