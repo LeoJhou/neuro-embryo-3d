@@ -51,9 +51,26 @@ header h1 { font: 600 18px/1.2 var(--f-display); margin: 0; letter-spacing: .02e
 .tab[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .tab:disabled { opacity: .55; cursor: default; }
 .tab small { font-size: 11px; opacity: .8; margin-left: 4px; }
-main { min-height: 0; display: grid; grid-template-columns: 300px minmax(0, 1fr) 360px; }
+main { --lw: 300px; --rw: 360px; min-height: 0; display: grid; grid-template-columns: var(--lw) minmax(0, 1fr) var(--rw); }
+main.noL { --lw: 0px; } main.noR { --rw: 0px; }
+#notes { grid-column: 1; } #center { grid-column: 2; } #bench { grid-column: 3; }
+main.noL #notes, main.noR #bench { display: none; }
+/* 面板開關：3D 左右邊緣中間的小箭頭（≤860px 不顯示） */
+.edge { position: absolute; top: 50%; z-index: 5; transform: translateY(-50%); width: 16px; height: 46px; padding: 0; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 90%, transparent); color: var(--mute); font-size: 15px; line-height: 1; cursor: pointer; }
+.edge:hover { color: var(--accent); background: var(--panel); }
+#edgeL { left: 0; border-left: 0; border-radius: 0 6px 6px 0; }
+#edgeR { right: 0; border-right: 0; border-radius: 6px 0 0 6px; }
 aside { min-height: 0; overflow: auto; background: var(--panel); padding: 12px 14px; }
-#notes { border-right: 1px solid var(--line); }
+#notes { border-right: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; padding-bottom: 0; }
+#notes > * { flex: none; }
+#modNote { margin: 6px 0 0; cursor: pointer; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+#modNote.open { display: block; }
+#ltabs { display: flex; gap: 2px; margin-top: 12px; border-bottom: 1px solid var(--line); }
+#ltabs button { border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; padding: 4px 12px; font-size: 13px; color: var(--mute); cursor: pointer; }
+#ltabs button[aria-selected="true"] { color: var(--ink); font-weight: 700; border-bottom-color: var(--accent); }
+.lpane { flex: 1 1 auto !important; min-height: 0; overflow: auto; padding: 8px 2px 12px; margin: 0 -2px; }
+.lpane[hidden] { display: none; }
+.lpane > .lbl:first-child { margin-top: 0; }
 #bench { border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
 #center { min-width: 0; min-height: 0; display: grid; grid-template-rows: 1fr auto; }
 #stage { position: relative; min-height: 0; background: var(--stage); overflow: hidden; }
@@ -72,7 +89,8 @@ aside { min-height: 0; overflow: auto; background: var(--panel); padding: 12px 1
 #heatLg { position: absolute; left: 10px; bottom: 10px; display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11.5px; padding: 3px 8px; border-radius: 6px; background: color-mix(in srgb, var(--panel) 85%, transparent); color: var(--ink); pointer-events: none; }
 #heatLg[hidden] { display: none; }
 #heatLg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
-#views { position: absolute; top: 10px; left: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+#views { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none; }
+#views > * { pointer-events: auto; }
 .btn { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 3px 10px; font-size: 13px; cursor: pointer; }
 .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .btn[data-toggle], .chip.tog { border-width: 2px; font-weight: 700; } /* 模組開關（腦室、透視核柱）：只加粗，不改顏色 */
@@ -103,9 +121,20 @@ ol.ev .s { display: block; font-weight: 400; color: var(--mute); font-size: 12.5
 .chip i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
 .chip[aria-pressed="false"] { opacity: .45; }
 .chip[aria-pressed="false"] i { background: transparent !important; outline: 1px solid var(--mute); }
-#card { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--bg); }
-#card h2 { font: 600 15px/1.3 var(--f-display); margin: 0 0 2px; }
-#card .en { color: var(--mute); font-size: 12.5px; margin-bottom: 2px; }
+/* 構造說明小卡：浮在 3D 上該構造的名稱旁；「完整說明」在卡內展開（內部捲動）；≤860px 改成從底部滑出 */
+#pop { position: absolute; z-index: 6; width: 290px; max-width: calc(100% - 16px); box-sizing: border-box; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 6px 22px rgba(0, 0, 0, .2); }
+#pop:not(.show) { display: none; }
+#pop.full { width: 390px; }
+#popX { position: absolute; top: 6px; right: 6px; z-index: 1; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 5px; background: none; color: var(--mute); font-size: 14px; cursor: pointer; }
+#popX:hover { background: var(--chip); color: var(--ink); }
+#card { padding: 10px 12px 4px; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+#popMore { flex: none; border: 0; border-top: 1px solid var(--line); background: none; padding: 5px 12px 6px; text-align: left; font-size: 12.5px; color: var(--accent); cursor: pointer; border-radius: 0 0 10px 10px; }
+#popMore:hover { background: var(--chip); }
+#pop:not(.full) #card > :not(h2):not(.en):not(.cbody) { display: none; }
+#pop:not(.full) .cbody { max-height: 4.9em; overflow: hidden; -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+#pop:not(.full) .cbody :is(table, canvas, details, .wide) { display: none; }
+#card h2 { font: 600 15px/1.3 var(--f-display); margin: 0 26px 2px 0; }
+#card .en { color: var(--mute); font-size: 12.5px; margin-bottom: 4px; }
 #card .meta { font-size: 12px; color: var(--mute); margin-bottom: 6px; }
 #card p { margin: 0 0 6px; font-size: 13.5px; }
 #card ul { margin: 0; padding-left: 18px; font-size: 13px; }
@@ -114,7 +143,7 @@ ol.ev .s { display: block; font-weight: 400; color: var(--mute); font-size: 12.5
 #card .cmp th, #card .cmp td { border: 1px solid var(--line); padding: 3px 5px; text-align: left; vertical-align: top; }
 #card .cmp th { color: var(--mute); font-weight: 600; }
 #card .wide { overflow-x: auto; }
-#card.empty { color: var(--mute); font-size: 13px; }
+#card > :last-child { margin-bottom: 6px; }
 details.fold > summary { cursor: pointer; font-size: 13px; color: var(--accent); margin-top: 4px; }
 .kgN { font-size: 11px; background: var(--kg); color: var(--kg-ink); border-radius: 4px; padding: 0 5px; margin-left: 6px; font-weight: 700; white-space: nowrap; }
 .tag3d .kgN { font-size: 10px; padding: 0 3px; margin-left: 4px; font-style: normal; }
@@ -145,6 +174,9 @@ details.fold > summary { cursor: pointer; font-size: 13px; color: var(--accent);
 .row2 { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--mute); }
 .note { font-size: 12px; color: var(--mute); margin: 0; }
 #tools { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+#moreMenu { display: contents; }
+#moreBtn, #findIco { display: none; }
+#findIco svg { width: 15px; height: 15px; display: block; }
 /* 作者署名：桌面在最右；手機排到標題同一行的右邊 */
 #author { display: flex; flex-direction: column; align-items: flex-end; font-size: 12px; line-height: 1.25; color: var(--ink); font-weight: 600; letter-spacing: .02em; white-space: nowrap; }
 #author small { font-size: 10.5px; font-weight: 400; color: var(--mute); }
@@ -169,18 +201,55 @@ dialog ul { padding-left: 18px; margin: 0; font-size: 13px; }
 dialog li { margin-bottom: 3px; }
 dialog form { float: right; }
 kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--bg); }
-@media (max-width: 1100px) { main { grid-template-columns: 260px minmax(0, 1fr) 300px; } }
+@media (min-width: 1400px) { main { --rw: 400px; } } /* 右欄有空：切面圖放大 */
+@media (max-width: 1100px) { main { --lw: 260px; --rw: 300px; } }
 @media (max-width: 860px) {
   body { overflow: auto; }
   #app { height: auto; grid-template-rows: auto auto; }
   main { display: flex; flex-direction: column; }
+  main.noL #notes, main.noR #bench { display: block; }
   #center { order: 1; } #bench { order: 2; } #notes { order: 3; }
   #stage { height: 56vh; min-height: 300px; }
   aside { overflow: visible; border: 0 !important; border-top: 1px solid var(--line) !important; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  #notes { display: block; padding-bottom: 12px; }
+  .lpane { overflow: visible; }
+  .edge { display: none; }
   #scrub { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  /* 3D 上方按鈕：單行橫向捲動，底色不透明，不蓋到模型（模型預設置中、留邊） */
+  #views { top: 0; left: 0; right: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 6px 10px; background: color-mix(in srgb, var(--panel) 92%, transparent); border-bottom: 1px solid var(--line); pointer-events: auto; }
+  #views::-webkit-scrollbar { display: none; }
+  #views > * { flex: none; white-space: nowrap; }
+  /* 小卡：從底部滑出；「完整說明」變高的抽屜 */
+  #pop { position: fixed; left: 0; right: 0; bottom: 0; top: auto !important; width: auto !important; max-width: none; max-height: 46vh; border-radius: 14px 14px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); transform: translateY(105%); transition: transform .22s ease; visibility: hidden; }
+  #pop:not(.show) { display: flex; }
+  #pop.show { transform: none; visibility: visible; }
+  #pop.full { max-height: 82vh; }
+  #pop::before { content: ""; align-self: center; flex: none; width: 36px; height: 4px; border-radius: 2px; background: var(--line); margin-top: 6px; }
+  #card { padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); }
+  #popMore { border-radius: 0; padding-left: max(14px, env(safe-area-inset-left, 0px)); }
 }
-@media (max-width: 560px) { header h1 { order: -2; } #author { order: -1; margin-left: auto; } #tools { width: 100%; } #findBox { flex: 1; } #find { width: 100%; } }
-@media (max-width: 560px) { #scrub { grid-template-columns: minmax(0, 1fr); } #dayBox { grid-row: auto; } }
+@media (max-width: 560px) {
+  /* 標題列壓成一行：標題＋作者疊兩小行｜模組分頁橫向捲動｜搜尋圖示｜⋯ 選單 */
+  header { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 10px; row-gap: 0; padding-block: 6px; }
+  header h1 { grid-area: 1 / 1; font-size: 15px; align-self: end; }
+  #author { grid-area: 2 / 1; flex-direction: row; align-items: baseline; gap: 4px; font-size: 10px; font-weight: 500; color: var(--mute); }
+  #author small { font-size: 9.5px; }
+  #mods { grid-area: 1 / 2 / 3 / 3; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; align-self: center; }
+  #mods::-webkit-scrollbar { display: none; }
+  #mods .tab { flex: none; }
+  #tools { grid-area: 1 / 3 / 3 / 4; margin: 0; gap: 4px; }
+  #findIco, #moreBtn { display: inline-block; padding: 4px 8px; }
+  #find { display: none; }
+  #findBox.open { position: absolute; left: 8px; right: 8px; top: 50%; transform: translateY(-50%); z-index: 21; }
+  #findBox.open #find { display: block; width: 100%; padding: 6px 10px; font-size: 16px; }
+  #findBox.open #findIco { display: none; }
+  #findBox.open #findList { left: 0; right: 0; max-width: none; }
+  #moreMenu { display: none; position: absolute; right: 8px; top: calc(100% + 4px); z-index: 22; flex-direction: column; align-items: stretch; gap: 4px; padding: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, .18); }
+  #moreMenu.open { display: flex; }
+  #moreMenu .btn { text-align: left; padding: 6px 14px; }
+  #helpBtn::after { content: "　說明與快捷鍵"; }
+  #scrub { grid-template-columns: minmax(0, 1fr); } #dayBox { grid-row: auto; }
+}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
@@ -189,10 +258,13 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
     <h1>神經發育 3D</h1>
     <nav id="mods" aria-label="模組"></nav>
     <div id="tools">
-      <div id="findBox"><input id="find" type="search" placeholder="搜尋構造（/）" aria-label="搜尋構造" autocomplete="off" spellcheck="false"><ul id="findList" hidden></ul></div>
-      <button class="btn" id="shareBtn" title="複製目前畫面的連結">分享</button>
-      <button class="btn" id="srcBtn" title="資料來源">來源</button>
-      <button class="btn" id="helpBtn" aria-label="說明與快捷鍵" title="說明與快捷鍵（?）">?</button>
+      <div id="findBox"><button class="btn" id="findIco" aria-label="搜尋構造" title="搜尋構造"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.8" cy="6.8" r="4.6"/><path d="M10.3 10.3 14 14"/></svg></button><input id="find" type="search" placeholder="搜尋構造（/）" aria-label="搜尋構造" autocomplete="off" spellcheck="false"><ul id="findList" hidden></ul></div>
+      <button class="btn" id="moreBtn" aria-label="更多" aria-expanded="false" aria-controls="moreMenu">⋯</button>
+      <div id="moreMenu">
+        <button class="btn" id="shareBtn" title="複製目前畫面的連結">分享</button>
+        <button class="btn" id="srcBtn" title="資料來源">來源</button>
+        <button class="btn" id="helpBtn" aria-label="說明與快捷鍵" title="說明與快捷鍵（?）">?</button>
+      </div>
     </div>
     <div id="author"><small>作者</small>INMU_KING_2026</div>
   </header>
@@ -201,10 +273,19 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
       <div class="lbl">模組</div>
       <h2 id="modTitle"></h2>
       <p id="modSub"></p>
-      <div class="lbl" id="evLbl"></div>
-      <ol class="ev" id="events"></ol>
-      <div class="lbl" id="kgLbl"></div>
-      <ul id="kgList"></ul>
+      <p class="note" id="modNote" title="點一下展開／收起"></p>
+      <div id="ltabs" role="tablist" aria-label="左欄">
+        <button role="tab" id="tabEv" aria-controls="paneEv" aria-selected="true">事件</button>
+        <button role="tab" id="tabKg" aria-controls="paneKg" aria-selected="false">國考</button>
+      </div>
+      <div class="lpane" id="paneEv" role="tabpanel" aria-labelledby="tabEv">
+        <div class="lbl" id="evLbl"></div>
+        <ol class="ev" id="events"></ol>
+      </div>
+      <div class="lpane" id="paneKg" role="tabpanel" aria-labelledby="tabKg" hidden>
+        <div class="lbl" id="kgLbl"></div>
+        <ul id="kgList"></ul>
+      </div>
     </aside>
     <div id="center">
       <div id="stage">
@@ -220,6 +301,13 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
           <button class="btn" id="showAll" hidden title="把 H 隱藏的構造全部顯示"></button>
         </div>
         <div id="labels"></div>
+        <button class="edge" id="edgeL" aria-label="收起左欄" title="收起左欄（[）">‹</button>
+        <button class="edge" id="edgeR" aria-label="收起右欄" title="收起右欄（]）">›</button>
+        <div id="pop" role="dialog" aria-label="構造說明">
+          <button id="popX" aria-label="關閉說明" title="關閉（Esc）">✕</button>
+          <div id="card"></div>
+          <button id="popMore" aria-expanded="false">完整說明 ▾</button>
+        </div>
         <div id="heatLg" hidden><span><i style="background:#f7e7a6"></i>1 題</span><span><i style="background:#f3c977"></i>2 題</span><span><i style="background:#f0a54a"></i>3–4 題</span><span><i style="background:#c8331b"></i>5 題以上</span><span><i style="background:#9aa3a8"></i>沒考過</span></div>
       </div>
       <div id="scrub">
@@ -238,9 +326,7 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
       <input id="cut" type="range" aria-label="切面位置">
       <div class="lbl" id="legendLbl"></div>
       <div id="legend"></div>
-      <div class="lbl">構造</div>
-      <div id="card" class="empty">點 3D 或下方切面上的構造看說明。</div>
-      <p class="note" id="note"></p>
+      <p class="note" id="selHint">點 3D 或切面上的構造，說明會浮在 3D 上的名稱旁。</p>
     </aside>
   </main>
 </div>
@@ -252,7 +338,9 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
   <h3>操作</h3>
   <table>
     <tr><td>旋轉／平移／縮放</td><td>拖曳 3D；右鍵拖曳或兩指拖曳平移；滾輪或捏合縮放</td></tr>
-    <tr><td>看構造說明</td><td>點 3D 或右欄切面上的構造；滑鼠停在構造上會顯示名稱</td></tr>
+    <tr><td>看構造說明</td><td>點 3D 或右欄切面上的構造（搜尋、國考清單也可以），說明小卡會浮在 3D 上該構造的名稱旁，轉動時跟著走；按「完整說明」在卡內展開（表格、示意圖、國考題）；✕ 或 Esc 關閉。滑鼠停在構造上會顯示名稱。手機版小卡從底部滑出。</td></tr>
+    <tr><td>收起左右欄</td><td>點 3D 左右邊緣的 ‹ › 小箭頭（快捷鍵 <kbd>[</kbd> <kbd>]</kbd>），3D 會變寬；會記住上次的狀態</td></tr>
+    <tr><td>左欄</td><td>「事件」「國考」兩個分頁，各自捲動；國考清單點題目會跳到對應模組、天數與構造</td></tr>
     <tr><td>換天數</td><td>拖下方天數滑桿，或點左欄事件、滑桿下的刻度（事件會連切面一起跳）</td></tr>
     <tr><td>換切面位置</td><td>拖右欄切面下方的滑桿</td></tr>
     <tr><td>找構造</td><td>右上搜尋框，三個模組一起找，中英文都可以</td></tr>
@@ -394,7 +482,7 @@ const PINCH_GAIN = 2.6;
 stage.addEventListener("pointerdown", (e) => { controls.zoomSpeed = e.pointerType === "touch" ? PINCH_GAIN : 1; }, true);
 // 觸控板捏合是 ctrl+wheel；OrbitControls 每個事件固定縮 5%，不管手指動多少 → 改照實際 deltaY 縮放。
 stage.addEventListener("wheel", (e) => {
-  if (!e.ctrlKey) return;
+  if (!e.ctrlKey || e.target.closest?.("#pop")) return;
   e.preventDefault(); e.stopPropagation(); fly = null;
   const off = camera.position.clone().sub(controls.target);
   const d = THREE.MathUtils.clamp(off.length() * Math.exp(e.deltaY * .025), controls.minDistance, controls.maxDistance);
@@ -410,9 +498,10 @@ const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(3, 8, -4
 const fill = new THREE.DirectionalLight(0xffffff, .5); fill.position.set(-4, 2, 6); scene.add(fill);
 
 /* ---------- 狀態 ---------- */
-const state = { mod: "m1", day: 22, cut3d: false, tags: true, labs: true, kg: true, heat: false, sel: null, playing: false };
-try { const s = JSON.parse(localStorage.getItem("neuroembryo.ui") || "{}"); if (typeof s.tags === "boolean") state.tags = s.tags; if (typeof s.labs === "boolean") state.labs = s.labs; if (typeof s.kg === "boolean") state.kg = s.kg; if (typeof s.mod === "string") state.mod = s.mod; } catch (e) {}
-const saveUi = () => { try { localStorage.setItem("neuroembryo.ui", JSON.stringify({ tags: state.tags, labs: state.labs, kg: state.kg, mod: state.mod })); } catch (e) {} };
+const state = { mod: "m1", day: 22, cut3d: false, tags: true, labs: true, kg: true, heat: false, sel: null, playing: false, pl: true, pr: true, ltab: "ev" };
+// 記在這台電腦的介面偏好（不進網址）：名稱開關、國考、模組、左右欄開關（pl／pr）、左欄分頁（ltab）
+try { const s = JSON.parse(localStorage.getItem("neuroembryo.ui") || "{}"); for (const k of ["tags", "labs", "kg", "pl", "pr"]) if (typeof s[k] === "boolean") state[k] = s[k]; if (typeof s.mod === "string") state.mod = s.mod; if (s.ltab === "ev" || s.ltab === "kg") state.ltab = s.ltab; } catch (e) {}
+const saveUi = () => { try { localStorage.setItem("neuroembryo.ui", JSON.stringify({ tags: state.tags, labs: state.labs, kg: state.kg, mod: state.mod, pl: state.pl, pr: state.pr, ltab: state.ltab })); } catch (e) {} };
 
 /* ===== 模組 1：神經管（第 17–30 天，Langman） ===== */
 const M1 = (() => {
@@ -2092,7 +2181,7 @@ function renderTags() {
   for (const [txt, p, struct, cls] of mod.tagAnchors()) {
     if (!mod.tagShown(p) || hidden.has(struct)) continue;
     v3.set(...p).project(camera); if (v3.z > 1) continue;
-    const el = document.createElement("div"); el.className = "tag3d" + (cls ? " " + cls : ""); el.innerHTML = escH(txt) + kgMini(tagKg(txt, struct));
+    const el = document.createElement("div"); el.className = "tag3d" + (cls ? " " + cls : ""); el.innerHTML = escH(txt) + kgMini(tagKg(txt, struct)); el.dataset.s = struct;
     el.style.left = ((v3.x + 1) / 2 * w) + "px"; el.style.top = ((1 - v3.y) / 2 * h - 10) + "px";
     tagBox.appendChild(el);
   }
@@ -2118,14 +2207,15 @@ const labRay = new THREE.Raycaster(), labNdc = new THREE.Vector2();
 function clearLabs() { labBox.replaceChildren(); LAB_EL.clear(); labs = []; labJob = null; }
 const labName = (s) => nameOf(s).replace(/（.*?）/g, "").trim();
 const sameName = (t, name) => name.split("／").some((p) => p && (t.includes(p) || p.includes(t)));
-function labAnchor() { // 射線打到的第一個看得到的點；切開時只算留下的那半（切口在切面上，tagShown 有容差）
-  for (const h of labRay.intersectObject(mod.group, true)) {
-    let o = h.object, ok = o.isMesh && o.material.visible !== false && (o.material.opacity ?? 1) >= .2 && o.layers.test(labRay.layers);
+function firstHit(rc) { // 射線打到的第一個看得到的點；切開時只算留下的那半（切口在切面上，tagShown 有容差）
+  for (const h of rc.intersectObject(mod.group, true)) {
+    let o = h.object, ok = o.isMesh && o.material.visible !== false && (o.material.opacity ?? 1) >= .2 && o.layers.test(rc.layers);
     for (; ok && o; o = o.parent) ok = o.visible;
     if (ok && mod.tagShown(h.point.toArray())) return h.point.clone();
   }
-  return labRay.ray.at(camera.position.distanceTo(controls.target), new THREE.Vector3());
+  return null;
 }
+const labAnchor = () => firstHit(labRay) || labRay.ray.at(camera.position.distanceTo(controls.target), new THREE.Vector3());
 function labStart() {
   const W = stage.clientWidth, H = stage.clientHeight, step = Math.max(14, Math.sqrt(W * H / 700));
   labJob = W && H ? { nx: Math.max(2, Math.round(W / step)), ny: Math.max(2, Math.round(H / step)), i: 0, st: new Map() } : null;
@@ -2143,6 +2233,15 @@ function labRun(budget) { // 跑完回傳 true
 }
 function labFinish() {
   const J = labJob; labJob = null;
+  // 選取中構造的錨點（小卡用）：圖上名稱關掉、或它的名稱被擋住時，小卡貼這個點
+  const me = state.sel && J.st.get(state.sel);
+  if (me) {
+    const cx = me.sx / me.n, cy = me.sy / me.n; let best = me.pts[0], bd = 1e9;
+    for (const p of me.pts) { const d = (p[0] - cx) ** 2 + (p[1] - cy) ** 2; if (d < bd) { bd = d; best = p; } }
+    labNdc.set((best[0] + .5) / J.nx * 2 - 1, 1 - (best[1] + .5) / J.ny * 2); labRay.setFromCamera(labNdc, camera);
+    selAnchor = firstHit(labRay) || selAnchor;
+  }
+  if (!state.labs) { placePop(); return; }
   // 地標名稱已經標了的（同名）不再標
   const fixed = state.tags ? [...tagBox.children].map((e) => (e.firstChild?.textContent || "").replace(/（.*?）/g, "").trim()) : [];
   const cand = [...J.st].map(([s, r]) => ({ s, ...r, m: s === state.sel })).filter((c) => c.m || c.n >= 2)
@@ -2162,7 +2261,7 @@ function labFinish() {
   for (const [k, el] of LAB_EL) if (!keep.has(el)) { el.remove(); LAB_EL.delete(k); }
   for (const L of labs) if (!L.el.parentNode) labBox.append(L.el);
   for (const L of labs) { L.el.style.display = ""; L.ow = L.el.offsetWidth; }
-  placeLabs();
+  placeLabs(); placePop();
 }
 function placeLabs() { // 重疊的藏起來，先放的（選取的、面積大的）留著；也避開地標名稱
   if (!labs.length) return;
@@ -2214,27 +2313,71 @@ function drawFig(cv) {
 }
 
 /* ---------- 卡片 ---------- */
-const cardEl = document.getElementById("card");
-const EMPTY = "點 3D 或下方切面上的構造看說明。";
-function select(s) { // mod.reveal(s)：選到某些構造時模組自己開開關或跳天數，有變就重畫
-  state.sel = s; labDirty = true;
+const cardEl = document.getElementById("card"), popEl = document.getElementById("pop");
+let popFull = false, popSel = null, selPt = null, selAnchor = null;
+function select(s, pt = null) { // mod.reveal(s)：選到某些構造時模組自己開開關或跳天數，有變就重畫；pt＝在 3D 上點到的點（小卡錨點）
+  state.sel = s; labDirty = true; selPt = pt; selAnchor = s ? structPt(s) : null;
   if (mod.reveal?.(s)) { dayIn.value = state.day; renderLegend(); update(); }
   showCard(s); drawSection(); saveHash();
 }
+function structPt(s) { // 構造自己有網格時，先用外框中心當錨點（掃完畫面格點後改用 selAnchor）
+  const box = new THREE.Box3(), b = new THREE.Box3();
+  mod.group.traverseVisible((o) => { if (o.isMesh && o.userData.struct === s && o.layers.test(camera.layers) && o.geometry) { o.updateMatrixWorld(); o.geometry.computeBoundingBox(); box.union(b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld)); } });
+  return box.isEmpty() ? null : box.getCenter(new THREE.Vector3());
+}
+function setPopFull(v) {
+  popFull = v; popEl.classList.toggle("full", v);
+  const b = document.getElementById("popMore"); b.textContent = v ? "收起 ▴" : "完整說明 ▾"; b.setAttribute("aria-expanded", String(v));
+  placePop();
+}
 function showCard(s) { // 內容沒變就不動（摺疊維持開關）；變了也把原本打開的摺疊留著
   const C = s && mod.struct[s];
-  if (!C) { cardEl.className = "empty"; cardEl.innerHTML = EMPTY; cardEl.dataset.sig = ""; return; }
+  if (!C) { popEl.classList.remove("show"); cardEl.innerHTML = ""; cardEl.dataset.sig = ""; popSel = null; return; }
+  if (s !== popSel) { popSel = s; if (popFull) setPopFull(false); }
   const st = mod.cardState(s);
   const kgs = (C.kg || []).filter((id) => KGI[id]);
   const en = typeof C.en === "function" ? C.en(st) : C.en;
-  const html = `<h2>${C.name(st)}${kgTag(kgs.length)}</h2>${en ? `<div class="en">${en}</div>` : ""}<div class="meta">${C.meta}</div>${C.body(st)}${C.trap ? `<div class="trap">${C.trap}</div>` : ""}${C.more || ""}` +
+  const html = `<h2>${C.name(st)}${kgTag(kgs.length)}</h2>${en ? `<div class="en">${en}</div>` : ""}<div class="meta">${C.meta}</div><div class="cbody">${C.body(st)}</div>${C.trap ? `<div class="trap">${C.trap}</div>` : ""}${C.more || ""}` +
     (kgs.length && state.kg ? `<details class="fold"><summary>國考題（${kgs.length}）</summary>${kgs.map(qHtml).join("")}</details>` : "");
   const sig = mod.id + "|" + s + "|" + html;
+  popEl.classList.add("show");
   if (cardEl.dataset.sig === sig) return;
-  const open = cardEl.dataset.sig?.startsWith(mod.id + "|" + s + "|") ? new Set([...cardEl.querySelectorAll("details[open] > summary")].map((x) => x.textContent)) : new Set();
-  cardEl.className = ""; cardEl.innerHTML = html; cardEl.dataset.sig = sig;
+  const same = cardEl.dataset.sig?.startsWith(mod.id + "|" + s + "|");
+  const open = same ? new Set([...cardEl.querySelectorAll("details[open] > summary")].map((x) => x.textContent)) : new Set();
+  cardEl.innerHTML = html; cardEl.dataset.sig = sig; if (!same) cardEl.scrollTop = 0;
   cardEl.querySelectorAll("details > summary").forEach((x) => { if (open.has(x.textContent)) x.parentElement.open = true; });
   figRO.disconnect(); cardEl.querySelectorAll("canvas.fig").forEach((c) => figRO.observe(c));
+  placePop();
+}
+/* 小卡位置：貼在該構造圖上名稱的右邊（放不下翻到左邊），上下夾在 3D 裡、不壓到上方按鈕；
+   沒有名稱（圖上名稱關掉或被擋）時用 3D 點選的點，再來是掃畫面格點得到的點；都沒有就停在右上 */
+const MOBILE = matchMedia("(max-width: 860px)");
+function placePop() {
+  if (!popEl.classList.contains("show")) return;
+  if (MOBILE.matches) { popEl.style.left = popEl.style.top = popEl.style.maxHeight = ""; return; }
+  const W = stage.clientWidth, H = stage.clientHeight, m = 8, side = 20, gap = 14, sr = stage.getBoundingClientRect();
+  let vb = 0, vr = 0;
+  for (const b of document.querySelectorAll("#views .btn")) { const r = b.getBoundingClientRect(); if (r.width) { vb = Math.max(vb, r.bottom - sr.top); vr = Math.max(vr, r.right - sr.left); } }
+  popEl.style.maxHeight = (popFull ? H - 2 * m : Math.min(H - 2 * m, 360)) + "px";
+  const pw = popEl.offsetWidth, ph = popEl.offsetHeight;
+  let ax = null, ay = 0, hw = 0;
+  // 錨點：圖上名稱 → 地標名稱（同名構造只標地標）→ 命中點 → 構造中心
+  const L = labs.find((x) => x.s === state.sel);
+  const lel = L && L.el.isConnected && L.el.style.display !== "none" ? L.el : [...tagBox.children].find((e) => e.dataset.s === state.sel);
+  if (lel) { const r = lel.getBoundingClientRect(); ax = (r.left + r.right) / 2 - sr.left; ay = r.top - sr.top + 22; hw = r.width / 2; }
+  else for (const P of [selPt, selAnchor]) {
+    if (!P) continue; v3.copy(P).project(camera);
+    if (v3.z < 1) { ax = (v3.x + 1) / 2 * W; ay = (1 - v3.y) / 2 * H; hw = 5; break; }
+  }
+  let x, y;
+  if (ax !== null && ax > -40 && ax < W + 40 && ay > -40 && ay < H + 40) {
+    x = ax + hw + gap;
+    if (x + pw > W - side) { const xl = ax - hw - gap - pw; x = xl >= side ? xl : (W - ax > ax ? W - side - pw : side); }
+    x = clamp(x, side, Math.max(side, W - side - pw));
+    y = clamp(ay - 22, m, Math.max(m, H - ph - m));
+    if (x < vr && y < vb + 6) y = Math.min(vb + 6, Math.max(m, H - ph - m));
+  } else { x = Math.max(side, W - side - pw); y = Math.min(vb + 6, Math.max(m, H - ph - m)); }
+  popEl.style.left = Math.round(x) + "px"; popEl.style.top = Math.round(y) + "px";
 }
 
 /* ---------- 國考 ---------- */
@@ -2287,7 +2430,8 @@ function qHtml(id) {
 function renderKg() {
   // 全部模組共用一份清單：本模組在前，其他模組標上模組名，點了先切過去
   const all = window.KG || [], ids = [...all.filter((q) => q.mod === mod.id), ...all.filter((q) => q.mod !== mod.id)];
-  document.getElementById("kgLbl").innerHTML = `國考相關<span class="kgN">${ids.length}</span>`;
+  document.getElementById("kgLbl").textContent = "國考相關（本模組在前；點題目跳到構造）";
+  document.getElementById("tabKg").innerHTML = `國考<span class="kgN">${ids.length}</span>`;
   const ul = document.getElementById("kgList"); ul.innerHTML = "";
   for (const q of ids) {
     const li = document.createElement("li"), other = q.mod !== mod.id;
@@ -2359,6 +2503,7 @@ function thinTicks() {
   }
 }
 addEventListener("resize", thinTicks);
+new ResizeObserver(() => thinTicks()).observe($("ticks")); // 收起左右欄時天數軸變寬
 function renderMod() {
   document.querySelectorAll("#mods .tab").forEach((b, i) => b.setAttribute("aria-current", String(MODS[i] === mod)));
   $("modTitle").textContent = mod.title; $("modSub").textContent = mod.sub; $("evLbl").textContent = mod.evLbl;
@@ -2394,7 +2539,23 @@ function renderMod() {
   }
   const [c0, c1, cs] = mod.cutRange; cutIn.min = c0; cutIn.max = c1; cutIn.step = cs; cutIn.value = mod.cut;
   renderSecMode();
-  $("note").textContent = mod.note;
+  $("modNote").textContent = mod.note; $("modNote").classList.remove("open");
+  const cur = document.querySelector('#mods .tab[aria-current="true"]'), nav = $("mods"); // 手機上模組分頁橫向捲動：捲到目前這個
+  if (cur && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = cur.offsetLeft - nav.offsetLeft - 8;
+}
+/* 左右欄開關（記在 localStorage，不進網址）、左欄「事件｜國考」分頁 */
+function setPanels() {
+  const mn = document.querySelector("main"); mn.classList.toggle("noL", !state.pl); mn.classList.toggle("noR", !state.pr);
+  const L = $("edgeL"), R = $("edgeR");
+  L.textContent = state.pl ? "‹" : "›"; L.setAttribute("aria-label", state.pl ? "收起左欄" : "打開左欄"); L.title = (state.pl ? "收起左欄" : "打開左欄") + "（[）";
+  R.textContent = state.pr ? "›" : "‹"; R.setAttribute("aria-label", state.pr ? "收起右欄" : "打開右欄"); R.title = (state.pr ? "收起右欄" : "打開右欄") + "（]）";
+  saveUi();
+}
+const togglePanel = (k) => { if (MOBILE.matches) return; state[k] = !state[k]; setPanels(); };
+function setLtab(t) {
+  state.ltab = t; saveUi();
+  $("tabEv").setAttribute("aria-selected", String(t === "ev")); $("tabKg").setAttribute("aria-selected", String(t === "kg"));
+  $("paneEv").hidden = t !== "ev"; $("paneKg").hidden = t !== "kg";
 }
 // 2D 切面方向（模組有 secModes 才有，例如 m2 矢狀／冠狀）；fixed 的模式是固定示意圖，切面滑桿停用
 function renderSecMode() {
@@ -2434,13 +2595,24 @@ function buildUi() {
   $("resetBtn").addEventListener("click", resetMod);
   $("showAll").addEventListener("click", () => { hidden.clear(); update(); });
   buildTools();
+  $("edgeL").addEventListener("click", () => togglePanel("pl"));
+  $("edgeR").addEventListener("click", () => togglePanel("pr"));
+  setPanels();
+  $("tabEv").addEventListener("click", () => setLtab("ev"));
+  $("tabKg").addEventListener("click", () => setLtab("kg"));
+  setLtab(state.ltab);
+  $("modNote").addEventListener("click", (e) => e.currentTarget.classList.toggle("open"));
+  $("popX").addEventListener("click", () => select(null));
+  $("popMore").addEventListener("click", () => setPopFull(!popFull));
   addEventListener("keydown", (e) => {
     if (document.querySelector("dialog[open]")) return; // 對話框自己處理 Esc
     if (e.target.closest?.("input") || e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key.toLowerCase();
     if (e.key === "?") { e.preventDefault(); openHelp(); return; }
-    if (e.key === "/") { e.preventDefault(); $("find").focus(); $("find").select(); return; }
-    if (e.key === "Escape") { if (!$("findList").hidden) $("findList").hidden = true; else if (state.sel) select(null); return; }
+    if (e.key === "/") { e.preventDefault(); $("findBox").classList.add("open"); $("find").focus(); $("find").select(); return; }
+    if (e.key === "Escape") { if (!$("findList").hidden) $("findList").hidden = true; else if ($("moreMenu").classList.contains("open")) setMore(false); else if (state.sel) select(null); return; }
+    if (e.key === "[") { togglePanel("pl"); return; }
+    if (e.key === "]") { togglePanel("pr"); return; }
     if (k === "h") hideSel();
     if (k === "r") resetMod();
     if (k === "c") setCut3d(!state.cut3d);
@@ -2497,7 +2669,7 @@ renderer.domElement.addEventListener("pointerup", (e) => {
   const r = renderer.domElement.getBoundingClientRect();
   ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
   ray.setFromCamera(ndc, camera);
-  select(mod.pick(ray));
+  const s = mod.pick(ray); select(s, s ? firstHit(ray) : null);
 });
 
 /* ---------- 迴圈 ---------- */
@@ -2522,8 +2694,8 @@ function loop(now) {
     if (k >= 1) fly = null; needsRender = true;
   }
   controls.update();
-  if (needsRender) { renderer.render(scene, camera); renderTags(); placeLabs(); needsRender = false; }
-  if (state.labs) {
+  if (needsRender) { renderer.render(scene, camera); renderTags(); placeLabs(); placePop(); needsRender = false; }
+  if (state.labs || state.sel) { // 圖上名稱關掉時，有選取也照樣掃格點，只為了算小卡的錨點
     if (state.playing) { if (labs.length) clearLabs(); }
     else if (!fly && labDirty && now - lastMove > 220) { labDirty = false; labStart(); }
     if (labJob && !state.playing && labRun(6)) labFinish();
@@ -2666,15 +2838,20 @@ function pickFind(e) {
 function keyRows() {
   const rows = [["空白", "播放／暫停"], ["← →", "前一天／後一天"], ["C", "3D 切開"], ["N", "圖上名稱（標出看得到的構造）"], ["L", "地標名稱（區域、地標的固定名稱）"], ["K", "國考標記（考過幾題、卡片的國考題）"], ["G", "國考上色（依考過題數上色）"]];
   MODS.forEach((m, i) => (m.toggles || []).forEach((tg) => rows.push([tg.key.toUpperCase(), `${tg.label}（模組 ${i + 1} ${m.name}）`])));
-  rows.push(["H", "隱藏選取的構造（按「全部顯示」還原）"], ["R", "回到預設（天數不變）"], ["Esc", "關搜尋清單；取消選取"], ["/", "搜尋構造"], ["?", "這個說明"]);
+  rows.push(["H", "隱藏選取的構造（按「全部顯示」還原）"], ["R", "回到預設（天數不變）"], ["[ ]", "收起／打開左欄、右欄"], ["Esc", "關搜尋清單；關說明小卡（取消選取）"], ["/", "搜尋構造"], ["?", "這個說明"]);
   return rows.map(([k, v]) => `<tr><td>${k.split(" ").map((x) => `<kbd>${x}</kbd>`).join(" ")}</td><td>${v}</td></tr>`).join("");
 }
+function setMore(v) { $("moreMenu").classList.toggle("open", v); $("moreBtn").setAttribute("aria-expanded", String(v)); }
 function openHelp() { $("keyTbl").innerHTML = keyRows(); $("helpDlg").showModal(); }
 function buildTools() {
   const f = $("find"), ul = $("findList");
   f.addEventListener("input", () => { findSel = 0; renderFind(); });
   f.addEventListener("focus", renderFind);
-  f.addEventListener("blur", () => { ul.hidden = true; });
+  f.addEventListener("blur", () => { ul.hidden = true; $("findBox").classList.remove("open"); });
+  $("findIco").addEventListener("click", () => { $("findBox").classList.add("open"); f.focus(); });
+  $("moreBtn").addEventListener("click", (e) => { e.stopPropagation(); setMore(!$("moreMenu").classList.contains("open")); });
+  $("moreMenu").addEventListener("click", () => setMore(false));
+  document.addEventListener("click", (e) => { if (!e.target.closest?.("#moreMenu, #moreBtn")) setMore(false); });
   f.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); if (!findRes.length) return; findSel = (findSel + (e.key === "ArrowDown" ? 1 : -1) + findRes.length) % findRes.length; renderFind(); }
     else if (e.key === "Enter") { e.preventDefault(); if (findRes[findSel]) pickFind(findRes[findSel]); }
