@@ -2050,8 +2050,8 @@ return null;
 }
 const labAnchor = () => firstHit(labRay) || labRay.ray.at(camera.position.distanceTo(controls.target), new THREE.Vector3());
 function labStart() {
-const W = stage.clientWidth, H = stage.clientHeight, step = Math.max(14, Math.sqrt(W * H / 700));
-labJob = W && H ? { nx: Math.max(2, Math.round(W / step)), ny: Math.max(2, Math.round(H / step)), i: 0, st: new Map() } : null;
+const lo = TOUCH || MOBILE.matches, W = stage.clientWidth, H = stage.clientHeight, step = Math.max(lo ? 18 : 14, Math.sqrt(W * H / (lo ? 350 : 700)));
+labJob = W && H ? { nx: Math.max(2, Math.round(W / step)), ny: Math.max(2, Math.round(H / step)), th: lo ? 1 : 2, i: 0, st: new Map() } : null;
 }
 function labRun(budget) {
 const J = labJob, t0 = performance.now();
@@ -2075,7 +2075,7 @@ const me = state.sel && J.st.get(state.sel);
 if (me) { bestRay(J, me); selAnchor = firstHit(labRay) || selAnchor; }
 if (!state.labs) { placePop(); return; }
 const fixed = state.tags ? [...tagBox.children].map((e) => (e.firstChild?.textContent || "").replace(/（.*?）/g, "").trim()) : [];
-const cand = [...J.st].map(([s, r]) => ({ s, ...r, m: s === state.sel })).filter((c) => c.m || c.n >= 2)
+const cand = [...J.st].map(([s, r]) => ({ s, ...r, m: s === state.sel })).filter((c) => c.m || c.n >= J.th)
 .filter((c) => !fixed.some((t) => t && sameName(t, labName(c.s)))).sort((a, b) => (b.m - a.m) || b.n - a.n).slice(0, 40);
 labs = [];
 for (const c of cand) {
