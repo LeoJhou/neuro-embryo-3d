@@ -129,7 +129,7 @@ ol.ev .s { display: block; font-weight: 400; color: var(--mute); font-size: 12.5
 .chip i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
 .chip[aria-pressed="false"] { opacity: .45; }
 .chip[aria-pressed="false"] i { background: transparent !important; outline: 1px solid var(--mute); }
-#pop { position: absolute; z-index: 6; width: 290px; max-width: calc(100% - 16px); box-sizing: border-box; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 6px 22px rgba(0, 0, 0, .2); }
+#pop { position: absolute; z-index: 6; width: 290px; max-width: calc(100% - 20px); box-sizing: border-box; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 6px 22px rgba(0, 0, 0, .2); }
 #pop:not(.show) { display: none; }
 #pop.full { width: 390px; }
 #popX { position: absolute; top: 6px; right: 6px; z-index: 1; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 5px; background: none; color: var(--mute); font-size: 14px; cursor: pointer; }
@@ -224,13 +224,10 @@ aside { overflow: visible; border: 0 !important; border-top: 1px solid var(--lin
 #views { top: 0; left: 0; right: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 6px 10px; background: color-mix(in srgb, var(--panel) 92%, transparent); border-bottom: 1px solid var(--line); pointer-events: auto; }
 #views::-webkit-scrollbar { display: none; }
 #views > * { flex: none; white-space: nowrap; }
-#pop { position: fixed; left: 0; right: 0; bottom: 0; top: auto !important; width: auto !important; max-width: none; max-height: 46vh; border-radius: 14px 14px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); transform: translateY(105%); transition: transform .22s ease; visibility: hidden; }
-#pop:not(.show) { display: flex; }
-#pop.show { transform: none; visibility: visible; }
-#pop.full { max-height: 82vh; }
-#pop::before { content: ""; align-self: center; flex: none; width: 36px; height: 4px; border-radius: 2px; background: var(--line); margin-top: 6px; }
-#card { padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); }
-#popMore { border-radius: 0; padding-left: max(14px, env(safe-area-inset-left, 0px)); }
+#pop.full { position: fixed; left: 0; right: 0; bottom: 0; top: auto; width: auto; max-width: none; max-height: 82vh; border-radius: 14px 14px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); animation: popUp .22s ease; }
+#pop.full::before { content: ""; align-self: center; flex: none; width: 36px; height: 4px; border-radius: 2px; background: var(--line); margin-top: 6px; }
+#pop.full #card { padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); }
+#pop.full #popMore { border-radius: 0; padding-left: max(14px, env(safe-area-inset-left, 0px)); }
 }
 @media (max-width: 560px) {
 header { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 10px; row-gap: 0; padding-block: 6px; }
@@ -253,7 +250,8 @@ header h1 { grid-area: 1 / 1; font-size: 15px; align-self: end; }
 #helpBtn::after { content: "　說明與快捷鍵"; }
 #scrub { grid-template-columns: minmax(0, 1fr); } #dayBox { grid-row: auto; }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }</style>
+@keyframes popUp { from { transform: translateY(100%); } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } #pop { animation: none !important; } }</style>
 
 <div id="app">
   <header>
@@ -340,7 +338,7 @@ header h1 { grid-area: 1 / 1; font-size: 15px; align-self: end; }
   <h3>操作</h3>
   <table>
     <tr><td>旋轉／平移／縮放</td><td>拖曳 3D；右鍵拖曳或兩指拖曳平移；滾輪或捏合縮放</td></tr>
-    <tr><td>看構造說明</td><td>點 3D 或右欄切面上的構造（搜尋、國考清單也可以），說明小卡會浮在 3D 上該構造的名稱旁，轉動時跟著走；按「完整說明」在卡內展開（表格、示意圖、國考題）；✕ 或 Esc 關閉。滑鼠停在構造上會顯示名稱。手機版小卡從底部滑出。</td></tr>
+    <tr><td>看構造說明</td><td>點 3D 或右欄切面上的構造（搜尋、國考清單也可以），說明小卡固定在 3D 畫面角落（預設右下），蓋到選到的構造就自動換角落；按「完整說明」在卡內展開（表格、示意圖、國考題）；✕ 或 Esc 關閉。滑鼠停在構造上會顯示名稱。手機版「完整說明」從底部滑出。</td></tr>
     <tr><td>收起左右欄</td><td>點左欄、右欄頂端的 ‹ ›（快捷鍵 <kbd>[</kbd> <kbd>]</kbd>），收起後剩一條窄邊、點一下就展開，3D 會變寬；會記住上次的狀態</td></tr>
     <tr><td>左欄</td><td>「事件」「國考」兩個分頁，各自捲動；國考清單點題目會跳到對應模組、天數與構造</td></tr>
     <tr><td>換天數</td><td>拖下方天數滑桿，或點左欄事件、滑桿下的刻度（事件會連切面一起跳）</td></tr>
@@ -2005,6 +2003,7 @@ const MODS = [M1, M2, M3, { id: "m4", name: "眼", soon: true }];
 let mod = MODS.find((m) => m.id === state.mod && !m.soon) || M1;
 function update() {
 heatColors(); mod.update(); applyHidden(); applyHeat(); labDirty = true; labJob = null;
+selMesh = state.sel ? meshBox(state.sel) : null;
 drawSection(); renderDay();
 if (state.sel) showCard(state.sel);
 needsRender = true;
@@ -2074,16 +2073,36 @@ if (performance.now() - t0 > budget) return false;
 }
 return true;
 }
+function cellRay(J, i) { labNdc.set((i % J.nx + .5) / J.nx * 2 - 1, 1 - (((i / J.nx) | 0) + .5) / J.ny * 2); labRay.setFromCamera(labNdc, camera); }
 function bestRay(J, r) {
 const cx = r.sx / r.n, cy = r.sy / r.n; let best = r.pts[0], bd = 1e9;
 for (const i of r.pts) { const d = (i % J.nx - cx) ** 2 + (((i / J.nx) | 0) - cy) ** 2; if (d < bd) { bd = d; best = i; } }
-labNdc.set((best % J.nx + .5) / J.nx * 2 - 1, 1 - (((best / J.nx) | 0) + .5) / J.ny * 2); labRay.setFromCamera(labNdc, camera);
+cellRay(J, best);
+}
+function anyHit(rc) {
+for (const h of rc.intersectObject(mod.group, true)) {
+let o = h.object, ok = o.isMesh && o.material.visible !== false && o.layers.test(rc.layers);
+for (; ok && o; o = o.parent) ok = o.visible;
+if (ok && mod.tagShown(h.point.toArray())) return h.point;
+}
+return rc.ray.at(camera.position.distanceTo(controls.target), new THREE.Vector3());
+}
+function scanBox(J, r) {
+const ext = new Array(8).fill(null), val = new Array(8).fill(-Infinity), box = new THREE.Box3();
+for (const i of r.pts) {
+const x = i % J.nx, y = (i / J.nx) | 0, v = [x, -x, y, -y, x + y, -x - y, x - y, y - x];
+for (let k = 0; k < 8; k++) if (v[k] > val[k]) { val[k] = v[k]; ext[k] = i; }
+}
+for (const i of new Set(ext)) { cellRay(J, i); box.expandByPoint(anyHit(labRay)); }
+bestRay(J, r); box.expandByPoint(anyHit(labRay));
+return box;
 }
 function labFinish() {
 const J = labJob; labJob = null;
 const me = state.sel && J.st.get(state.sel);
-if (me) { bestRay(J, me); selAnchor = firstHit(labRay) || selAnchor; }
-if (!state.labs) { placePop(); return; }
+selScan = me ? scanBox(J, me) : null;
+placePop();
+if (!state.labs) return;
 const fixed = state.tags ? [...tagBox.children].map((e) => (e.firstChild?.textContent || "").replace(/（.*?）/g, "").trim()) : [];
 const cand = [...J.st].map(([s, r]) => ({ s, ...r, m: s === state.sel })).filter((c) => c.m || c.n >= J.th)
 .filter((c) => !fixed.some((t) => t && sameName(t, labName(c.s)))).sort((a, b) => (b.m - a.m) || b.n - a.n).slice(0, 40);
@@ -2101,11 +2120,12 @@ for (const [k, el] of LAB_EL) if (!keep.has(el)) { el.remove(); LAB_EL.delete(k)
 for (const L of labs) if (!L.el.parentNode) labBox.append(L.el);
 for (const L of labs) L.el.style.display = "";
 for (const L of labs) { L.ow = L.el.offsetWidth; L.oh = L.el.offsetHeight; }
-placeLabs(); placePop();
+placeLabs();
 }
 function placeLabs() {
 if (!labs.length) return;
 const w = stW, h = stH, boxes = tagRects.map((t) => t.b);
+if (popRect) boxes.push(popRect);
 for (const L of labs) {
 v3.copy(L.p).project(camera);
 const x = Math.max(2 + L.ow / 2, Math.min((v3.x + 1) / 2 * w, w - 2 - L.ow / 2)), y = (1 - v3.y) / 2 * h, b = [x - L.ow / 2, y - 9, x + L.ow / 2, y + 9];
@@ -2149,25 +2169,27 @@ const ctx = cv.getContext("2d"); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRe
 f(ctx, W, H, dpr);
 }
 const cardEl = document.getElementById("card"), popEl = document.getElementById("pop");
-let popFull = false, popSel = null, selPt = null, selAnchor = null;
-function select(s, pt = null) {
-state.sel = s; labDirty = true; selPt = pt; selAnchor = s ? structPt(s) : null;
+let popFull = false, popSel = null, selMesh = null, selScan = null;
+function select(s) {
+if (s !== state.sel) selScan = null;
+state.sel = s; labDirty = true; selMesh = s ? meshBox(s) : null;
 if (mod.reveal?.(s)) { dayIn.value = state.day; renderLegend(); update(); }
 showCard(s); drawSection(); saveHash();
 }
-function structPt(s) {
+function meshBox(s) {
 const box = new THREE.Box3(), b = new THREE.Box3();
 mod.group.traverseVisible((o) => { if (o.isMesh && o.userData.struct === s && o.layers.test(camera.layers) && o.geometry) { o.updateMatrixWorld(); o.geometry.computeBoundingBox(); box.union(b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld)); } });
-return box.isEmpty() ? null : box.getCenter(new THREE.Vector3());
+return box.isEmpty() ? null : box;
 }
 function setPopFull(v) {
 popFull = v; popEl.classList.toggle("full", v);
 const b = document.getElementById("popMore"); b.textContent = v ? "收起 ▴" : "完整說明 ▾"; b.setAttribute("aria-expanded", String(v));
-placePop();
+placePop(true);
 }
 function showCard(s) {
 const C = s && mod.struct[s];
-if (!C) { popEl.classList.remove("show"); cardEl.innerHTML = ""; cardEl.dataset.sig = ""; popSel = null; return; }
+if (!C) { popEl.classList.remove("show"); cardEl.innerHTML = ""; cardEl.dataset.sig = ""; popSel = null; popRect = null; needsRender = true; return; }
+if (!popSel) popCorner = null;
 if (s !== popSel) { popSel = s; if (popFull) setPopFull(false); }
 const st = mod.cardState(s);
 const kgs = (C.kg || []).filter((id) => KGI[id]);
@@ -2184,39 +2206,67 @@ cardEl.querySelectorAll("details > summary").forEach((x) => { if (open.has(x.tex
 figRO.disconnect(); cardEl.querySelectorAll("canvas.fig").forEach((c) => figRO.observe(c));
 placePop();
 }
-const MOBILE = matchMedia("(max-width: 860px)");
-let viewsBox = null;
-const viewsRO = new ResizeObserver(() => { viewsBox = null; needsRender = true; });
-function watchViews() { viewsRO.disconnect(); viewsBox = null; viewsRO.observe(stage); for (const b of document.querySelectorAll("#views .btn")) viewsRO.observe(b); }
-function placePop() {
-if (!popEl.classList.contains("show")) return;
-if (MOBILE.matches) { popEl.style.left = popEl.style.top = popEl.style.maxHeight = ""; return; }
-const W = stW, H = stH, m = 8, side = 20, gap = 14;
-if (!viewsBox) {
-const sr = stage.getBoundingClientRect(); let vb = 0, vr = 0;
-for (const b of document.querySelectorAll("#views .btn")) { const r = b.getBoundingClientRect(); if (r.width) { vb = Math.max(vb, r.bottom - sr.top); vr = Math.max(vr, r.right - sr.left); } }
-viewsBox = [vb, vr];
+const MOBILE = matchMedia("(max-width: 860px)"), REDUCED = matchMedia("(prefers-reduced-motion: reduce)");
+let obsRects = null, popCorner = null, popRect = null;
+const viewsRO = new ResizeObserver(() => { obsRects = null; needsRender = true; });
+function watchViews() { viewsRO.disconnect(); obsRects = null; viewsRO.observe(stage); viewsRO.observe($("heatLg")); for (const b of document.querySelectorAll("#views .btn")) viewsRO.observe(b); }
+function stageObs() {
+const sr = stage.getBoundingClientRect(), out = [];
+const add = (el) => { if (!el || el.hidden) return; const r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return; out.push([r.left - sr.left, r.top - sr.top, r.right - sr.left, r.bottom - sr.top]); };
+if (MOBILE.matches) add($("views")); else document.querySelectorAll("#views .btn").forEach(add);
+add($("heatLg"));
+return out;
 }
-const [vb, vr] = viewsBox, mh = (popFull ? H - 2 * m : Math.min(H - 2 * m, 360)) + "px";
-if (popEl.style.maxHeight !== mh) popEl.style.maxHeight = mh;
-const pw = popEl.offsetWidth, ph = popEl.offsetHeight;
-let ax = null, ay = 0, hw = 0;
-const L = labs.find((x) => x.s === state.sel && x.vis), T = !L && tagRects.find((t) => t.s === state.sel);
-if (L) { ax = L.x; ay = L.y - L.oh / 2 + 22; hw = L.ow / 2; }
-else if (T) { ax = (T.b[0] + T.b[2]) / 2; ay = T.b[1] + 22; hw = (T.b[2] - T.b[0]) / 2; }
-else for (const P of [selPt, selAnchor]) {
-if (!P) continue; v3.copy(P).project(camera);
-if (v3.z < 1) { ax = (v3.x + 1) / 2 * W; ay = (1 - v3.y) / 2 * H; hw = 5; break; }
+const _pv = new THREE.Vector3();
+function placePop(force) {
+const el = popEl;
+if (!el.classList.contains("show")) { popRect = null; return; }
+const narrow = MOBILE.matches;
+if (narrow && popFull) { for (const k of ["top", "bottom", "left", "right", "maxHeight"]) el.style[k] = ""; popRect = null; return; }
+const W = stW || stage.clientWidth, H = stH || stage.clientHeight, w = el.offsetWidth, obs = obsRects || (obsRects = stageObs());
+const nat = cardEl.scrollHeight + el.offsetHeight - cardEl.clientHeight;
+const h0 = Math.min(nat, narrow ? Math.max(120, .45 * H) : popFull ? H - 20 : Math.min(H - 20, 360));
+const C = narrow
+? { br: { bottom: 10, right: 10 }, bl: { bottom: 10, left: 10 }, t: { top: 10, left: 10 } }
+: { br: { bottom: 10, right: 10 }, tr: { top: 10, right: 10 }, tl: { top: 10, left: 10 }, bl: { bottom: 10, left: 10 } };
+const m = Math.min(120, h0), rect = (p) => {
+const L = p.left ?? W - p.right - w, R = L + w, col = obs.filter((o) => o[0] < R && o[2] > L);
+let T, B;
+if (p.top != null) {
+T = p.top; for (let k = 0; k < 6; k++) { const o = col.find((o) => o[3] > T && o[1] < T + m); if (!o || o[3] + 66 > H) break; T = o[3] + 6; }
+B = Math.min(H - 10, ...col.filter((o) => o[1] >= T).map((o) => o[1] - 6));
+} else {
+B = H - p.bottom; for (let k = 0; k < 6; k++) { const o = col.find((o) => o[1] < B && o[3] > B - m); if (!o || o[1] - 66 < 0) break; B = o[1] - 6; }
+T = Math.max(10, ...col.filter((o) => o[3] <= B).map((o) => o[3] + 6));
 }
-let x, y;
-if (ax !== null && ax > -40 && ax < W + 40 && ay > -40 && ay < H + 40) {
-x = ax + hw + gap;
-if (x + pw > W - side) { const xl = ax - hw - gap - pw; x = xl >= side ? xl : (W - ax > ax ? W - side - pw : side); }
-x = clamp(x, side, Math.max(side, W - side - pw));
-y = clamp(ay - 22, m, Math.max(m, H - ph - m));
-if (x < vr && y < vb + 6) y = Math.min(vb + 6, Math.max(m, H - ph - m));
-} else { x = Math.max(side, W - side - pw); y = Math.min(vb + 6, Math.max(m, H - ph - m)); }
-popEl.style.left = Math.round(x) + "px"; popEl.style.top = Math.round(y) + "px";
+const h = Math.min(h0, B - T);
+return p.top != null ? [L, T, R, T + h, h] : [L, B - h, R, B, h];
+};
+let x0 = W, y0 = H, x1 = 0, y1 = 0;
+const box = selMesh || selScan;
+if (box) for (let i = 0; i < 8; i++) {
+_pv.set(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).project(camera);
+if (_pv.z > 1) continue;
+const sx = (_pv.x + 1) / 2 * W, sy = (1 - _pv.y) / 2 * H;
+x0 = Math.min(x0, sx); y0 = Math.min(y0, sy); x1 = Math.max(x1, sx); y1 = Math.max(y1, sy);
+}
+x0 = Math.max(x0, 0); y0 = Math.max(y0, 0); x1 = Math.min(x1, W); y1 = Math.min(y1, H);
+const area = Math.max(0, x1 - x0) * Math.max(0, y1 - y0);
+const score = (r) => r[4] < m ? Infinity : Math.max(0, Math.min(r[2], x1) - Math.max(r[0], x0)) * Math.max(0, Math.min(r[3], y1) - Math.max(r[1], y0)) + (h0 - r[4]) * w * 2;
+const R = {}; for (const k in C) R[k] = rect(C[k]);
+if (!(popCorner in C)) { popCorner = "br"; force = true; }
+const cur = score(R[popCorner]);
+let best = popCorner, bo = cur;
+for (const k in C) { const o = score(R[k]); if (o < bo) { bo = o; best = k; } }
+if (bo === Infinity) for (const k in C) if (R[k][4] > R[best][4]) best = k;
+if (best !== popCorner && (cur === Infinity || cur - bo > .15 * area)) {
+popCorner = best; force = true; needsRender = true;
+if (!REDUCED.matches) el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180 });
+}
+const p = C[popCorner], r = R[popCorner];
+const sty = { top: p.top != null ? Math.round(r[1]) + "px" : "auto", bottom: p.top != null ? "auto" : Math.round(H - r[3]) + "px", left: p.left != null ? p.left + "px" : "auto", right: p.left != null ? "auto" : p.right + "px", maxHeight: Math.round(r[4]) + "px" };
+for (const k in sty) if (force || el.style[k] !== sty[k]) el.style[k] = sty[k];
+popRect = [r[0], r[1], r[2], r[3]];
 }
 const KGI = Object.fromEntries((window.KG || []).map((q) => [q.id, q]));
 const kgOf = (m, s) => (m.struct?.[s]?.kg || []).filter((id) => KGI[id]).length;
@@ -2434,6 +2484,7 @@ setLtab(state.ltab);
 $("modNote").addEventListener("click", (e) => e.currentTarget.classList.toggle("open"));
 $("popX").addEventListener("click", () => select(null));
 $("popMore").addEventListener("click", () => setPopFull(!popFull));
+cardEl.addEventListener("toggle", () => placePop(), true);
 addEventListener("keydown", (e) => {
 if (document.querySelector("dialog[open]")) return;
 if (e.target.closest?.("input") || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -2495,7 +2546,7 @@ if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
 const r = renderer.domElement.getBoundingClientRect();
 ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
 ray.setFromCamera(ndc, camera);
-const s = mod.pick(ray); select(s, s ? firstHit(ray) : null);
+select(mod.pick(ray));
 });
 let needsRender = true;
 function resize() {
@@ -2518,7 +2569,7 @@ camera.position.lerpVectors(fly.p0, fly.p1, k); controls.target.lerpVectors(fly.
 if (k >= 1) fly = null; needsRender = true;
 }
 controls.update();
-if (needsRender) { renderer.render(scene, camera); renderTags(); placeLabs(); placePop(); needsRender = false; }
+if (needsRender) { needsRender = false; renderer.render(scene, camera); renderTags(); placePop(); placeLabs(); }
 if (state.labs || state.sel) {
 if (state.playing) { if (labs.length) clearLabs(); }
 else if (!fly && labDirty && now - lastMove > 220) { labDirty = false; labStart(); }
@@ -2692,6 +2743,6 @@ buildUi(); resize(); snapDefaults(); setMod(mod.id);
 if (HASH0) applyHash(HASH0);
 booted = true; saveHash();
 requestAnimationFrame(loop);
-window.__emb = { hidden, resetMod, applyHash, hashStr, findMatches, nameOf, goEvent, THREE, scene, camera, controls, state, setDay, setMod, update, select, flyTo, MODS, M1, M2, M3, get mod() { return mod; } };
+window.__emb = { hidden, resetMod, applyHash, hashStr, findMatches, nameOf, goEvent, THREE, scene, camera, controls, state, setDay, setMod, update, select, flyTo, MODS, M1, M2, M3, get mod() { return mod; }, get pop() { return { corner: popCorner, rect: popRect, mesh: selMesh, scan: selScan }; } };
 </script>
 </html>
