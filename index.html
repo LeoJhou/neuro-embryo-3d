@@ -1373,7 +1373,7 @@ telf: { name: () => "端腦曲", en: "telencephalic flexure", meta: "第 5 週�
 body: () => `<p>在間腦與端腦之間，往腹側彎，把前腦分成端腦與間腦。Haines 4th p.67：這個名稱是 diencephalic-telencephalic sulcus 的簡稱。</p>`,
 trap: "Langman：只列頸曲、頭曲、橋曲 3 個。Haines（老師 p.18–19）：多一個端腦曲，共 4 個。模型畫 Haines 的 4 個。" },
 optic: { name: () => "視泡／視杯", en: "optic vesicle／optic cup", meta: "間腦外側壁外突",
-body: () => `<p>前腦（間腦）外側壁往外突成視泡，之後凹成雙層的視杯 → 視網膜；視柄 → 視神經。眼的 3D 模型（模組 4）還沒做，國考重點先列在下方。</p><p>Langman（15th ed.）：第 22 天前腦兩側出現視溝，第 4 週末成視泡，書前「Embryonic Development in Days」表列第 34 天為視杯與晶狀體板；第 5 週晶狀體泡脫離表皮。模型第 34 天起標「視杯」。</p>`,
+body: () => `<p>前腦（間腦）外側壁往外突成視泡，之後凹成雙層的視杯 → 視網膜；視柄 → 視神經。眼的國考重點列在下方。</p><p>Langman（15th ed.）：第 22 天前腦兩側出現視溝，第 4 週末成視泡，書前「Embryonic Development in Days」表列第 34 天為視杯與晶狀體板；第 5 週晶狀體泡脫離表皮。模型第 34 天起標「視杯」。</p>`,
 trap: "視泡（視囊）來自間腦，不是髓腦（115-1）。視網膜中央動靜脈來自玻璃體血管的<b>近側段</b>，遠側段退化（108-2）。瞳孔括約肌與擴大肌來自神經外胚層，不是中胚層（106-1、115-2；Langman 同）。Haines 4th p.71 Table 5-1（老師 p.27）把睫狀肌與瞳孔肌列為神經嵴；國考答神經外胚層，校內考題同時有 neural crest 與 neuroectoderm 選項時，依老師的表答 neural crest。",
 more: `<details class="fold"><summary>眼的發育重點（Langman 15th ed.）</summary><ul>
 <li>視杯外層 → 視網膜色素上皮；內層 → 視網膜神經層（108-2）。</li>
@@ -1999,7 +1999,7 @@ return o.userData.struct;
 Object.assign(M, { wallAt, secPolys, NUC, zOf, rods, walls, bands });
 return M;
 })();
-const MODS = [M1, M2, M3, { id: "m4", name: "眼", soon: true }];
+const MODS = [M1, M2, M3];
 let mod = MODS.find((m) => m.id === state.mod && !m.soon) || M1;
 function update() {
 heatColors(); mod.update(); applyHidden(); applyHeat(); labDirty = true; labJob = null;
